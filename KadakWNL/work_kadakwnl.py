@@ -20,8 +20,6 @@ import tabula as tb
 
 # Accessing the blueprint
 tables = tb.read_pdf(r"..\Resources\blueprint_data.pdf", pages="1")
-
-# Get the first DataFrame
 blueprint_data = tables[0]
 
 # Clean column names
@@ -38,7 +36,14 @@ chapterwise_blueprint = {
 for index, row in blueprint_data.iterrows():
     chapterwise_blueprint["Chapter Name"].append(row["Chapter Name"])
     chapterwise_blueprint["Multiple Choice Question"].append(row["Multiple Choice Question"].split()[0])
+print(chapterwise_blueprint)
 
 chapterwise_question_numbers = {}
-i = 1
-while i <= 60:
+pointer = 0
+for i in range(len(chapterwise_blueprint["Chapter Name"])):
+    chapterwise_question_numbers[chapterwise_blueprint["Chapter Name"][i]] = []
+    for j in range(int(chapterwise_blueprint["Multiple Choice Question"][i])):
+        pointer += 1
+        chapterwise_question_numbers[chapterwise_blueprint["Chapter Name"][i]].append(pointer)
+chapterwise_question_numbers.pop("Total")
+print(chapterwise_question_numbers)
