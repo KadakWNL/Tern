@@ -35,8 +35,27 @@ left=list(map(lambda x:int(x),data2["MATHEMATICS L IDS"][0].split(',') ))
 
 
 #==============================================================================
-#===========Getting info on student's responses================================
+#=============Blueprint interpretation=========================================
 Mathematics=dict()
+# Accessing the blueprint
+tables = tb.read_pdf(r"Resources\blueprint_data.pdf", pages="1")
+# Get the first DataFrame
+blueprint_data = tables[0]
+# Clean column names
+blueprint_data.columns = blueprint_data.columns.str.strip().str.replace(r'\s+', ' ', regex=True)
+# Initialize the dictionary properly
+chapterwise_blueprint = {
+    "Chapter Name": [],
+    "Multiple Choice Question": []
+}
+
+# Loop through the DataFrame and populate the dictionary
+for index, row in blueprint_data.iterrows():
+    chapterwise_blueprint["Chapter Name"].append(row["Chapter Name"])
+    chapterwise_blueprint["Multiple Choice Question"].append(row["Multiple Choice Question"].split()[0])
+
+print(chapterwise_blueprint)
+
 #==============================================================================
 #===========SPI Calculation====================================================
 SPI=0
