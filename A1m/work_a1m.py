@@ -37,9 +37,7 @@ left=list(map(lambda x:int(x),data2["MATHEMATICS L IDS"][0].split(',') ))
 #==============================================================================
 #=============Blueprint interpretation=========================================
 Mathematics=dict()
-# Accessing the blueprint
 tables = tb.read_pdf(r"Resources\blueprint_data.pdf", pages="1")
-# Get the first DataFrame
 blueprint_data = tables[0]
 # Clean column names
 blueprint_data.columns = blueprint_data.columns.str.strip().str.replace(r'\s+', ' ', regex=True)
@@ -48,31 +46,56 @@ chapterwise_blueprint = {
     "Chapter Name": [],
     "Multiple Choice Question": []
 }
-
-# Loop through the DataFrame and populate the dictionary
 for index, row in blueprint_data.iterrows():
     chapterwise_blueprint["Chapter Name"].append(row["Chapter Name"])
     chapterwise_blueprint["Multiple Choice Question"].append(row["Multiple Choice Question"].split()[0])
 
-print(chapterwise_blueprint)
+chapterwise_question_numbers = {}
+pointer = 0
+for i in range(len(chapterwise_blueprint["Chapter Name"])):
+    chapterwise_question_numbers[chapterwise_blueprint["Chapter Name"][i]] = []
+    for j in range(int(chapterwise_blueprint["Multiple Choice Question"][i])):
+        pointer += 1
+        chapterwise_question_numbers[chapterwise_blueprint["Chapter Name"][i]].append(pointer)
+chapterwise_question_numbers.pop("Total")
+print(chapterwise_question_numbers)
 
 #==============================================================================
 #===========SPI Calculation====================================================
 SPI=0
-for i in attempt_correct:
-    if i in easy_questions:
-        SPI+=0.8
-    elif i in med_questions:
-        SPI+=1
+for chapter_name,questions in chapterwise_question_numbers.items():
+    if chapter_name in Mathematics:
+        pass
     else:
-        SPI+=1.2
-for i in attempt_wrong:
-    if i in easy_questions:
-        SPI-=0.2
-    elif i in med_questions:
-        SPI-=0.15
-    else:
-        SPI-=0.1
-SPI-=len(left)*0.1
+        Mathematics[chapter_name]=0
+        for question in questions:
+            if question in attempt_correct:
+                if question in easy_questions:
+                    SPI+=0.8*3
+                elif question in med_questions:
+                    SPI+=1*3
+                else:
+                    SPI+=1.2*3
+            elif question in attempt_wrong:
+                    if i in easy_questions: #MULTIPLIED 3 TO ALL THE WEIGHTS JUST SO THAT THE VALUES ARE BIGGER BECAUSE 
+                        SPI-=0.2*3   #I WAS GETTING single intergers :(
+                    elif i in med_questions:
+                        SPI-=0.15*3
+                    else:
+                        SPI-=0.1*3
+            else:
+                SPI-=len(left)*0.1*3
+        Mathematics[chapter_name]=round(SPI)
+print(Mathematics)
+Date=input('Enter date in the format of DD-MM-YYYY')
+results = []
+for chapter_name, marks_scored in Mathematics.items():
+    results.append([Date, chapter_name, marks_scored])
 
-print(round(SPI))
+# Convert to DataFrame
+df = pd.DataFrame(results, columns=["Date", "Chapter_Name", "Marks_Scored"])
+
+# Save to CSV file
+df.to_csv("Resources/student_scores_save.csv", index=False)
+
+print("Data saved successfully to student_scores.csv")
