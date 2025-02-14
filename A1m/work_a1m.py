@@ -260,6 +260,7 @@ from typing import Dict, List, Tuple
 import os
 import glob
 import math
+import csv
 
 def get_subject_code() -> str:
     subject_map = {'1': 'PHYSICS', '2': 'CHEMISTRY', '3': 'MATHEMATICS'}
@@ -471,16 +472,41 @@ def save_results(
         new_df.to_csv(file_path, index=False)
         print(f"Created new file for student {student_id}")
 
+def save_test_metadata(subject: str, date: str, test_id: str, metadata_file: str = r"Data\Metadata\test_metadata.csv"):
+    """Saves the test metadata to a CSV file to track saved tests."""
+    file_exists = os.path.exists(metadata_file)
+    
+    with open(metadata_file, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        if not file_exists:
+            writer.writerow(["Subject", "Date", "Test ID"])
+        writer.writerow([subject, date, test_id])
+
+def is_duplicate_test(subject: str, date: str, test_id: str, metadata_file: str = "test_metadata.csv") -> bool:
+    """Checks if the test with the same subject, date, and test ID already exists."""
+    if not os.path.exists(metadata_file):
+        return False
+    
+    df = pd.read_csv(metadata_file)
+    return ((df["Subject"] == subject) & (df["Date"] == date) & (df["Test ID"] == test_id)).any()
+
+
 def main():
     subject = get_subject_code()
     date, test_id = get_user_inputs(subject)
+    
+    if is_duplicate_test(subject, date, test_id):
+        print(f"Test with Subject: {subject}, Date: {date}, and Test ID: {test_id} already exists. Skipping...")
+        return
+    
+    save_test_metadata(subject, date, test_id)
     
     student_analysis = pd.read_excel("Resources/student_analysis.xls", skiprows=8)
     easy_questions, med_questions, hard_questions = categorize_questions(student_analysis)
     
     chapterwise_questions = get_chapter_questions("Resources/blueprint_data.pdf")
     expanded_scorelist = pd.read_excel('Resources/expanded_scorelist.xlsx')
-    max_spi=calculation_of_max_spi(chapterwise_questions,easy_questions,med_questions,hard_questions)
+    max_spi = calculation_of_max_spi(chapterwise_questions, easy_questions, med_questions, hard_questions)
     print(max_spi)
     
     for idx in range(len(expanded_scorelist)):
@@ -493,15 +519,13 @@ def main():
             med_questions,
             hard_questions
         )
-        scaled_marks=scaling_marks(performance,max_spi)
+        scaled_marks = scaling_marks(performance, max_spi)
         results = [
             [date, expanded_scorelist["CANDIDATE ID"][idx], test_id, chapter, marks]
             for chapter, marks in scaled_marks.items()
         ]
-        #Go through Z-Standardisation and Linear Scaling 
-        
         save_results(results, expanded_scorelist["CANDIDATE ID"][idx], f"Data/{subject}")
-        print('There are some changes') 
+        print('Test data saved successfully!')
+
 if __name__ == "__main__":
     main()
-#Slight changes
