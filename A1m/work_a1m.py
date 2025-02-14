@@ -498,6 +498,7 @@ def main():
             [date, expanded_scorelist["CANDIDATE ID"][idx], test_id, chapter, marks]
             for chapter, marks in scaled_marks.items()
         ]
+        #Go through Z-Standardisation and Linear Scaling 
         
         save_results(results, expanded_scorelist["CANDIDATE ID"][idx], f"Data/{subject}")
         print('There are some changes') 
