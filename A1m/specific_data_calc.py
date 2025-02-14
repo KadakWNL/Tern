@@ -1,5 +1,6 @@
 import work_a1m
 import pandas as pd
+test_data=pd.read_csv(r'Data\Metadata\test_metadata.csv')
 DATE_OF_TEST='DATE'
 find_roll=242007    #could be 'All'
 Subjects=['PHYSICS','CHEMISTRY','MATHEMATICS']
@@ -7,10 +8,10 @@ PHYSICS=[]
 CHEMISTRY=[]
 MATHEMATICS=['Relations and Functions (PUC-I)','Trigonometric Functionsv (PUC-I)','Linear Inequalities (PUC-I)','Limits and Derivatives (PUC-I)',
 'Relations and Functions (PUC-II)','Matrices (PUC-II)','Determinants (PUC-II)','Continuity and Differentiability (PUC-II)']
-#1. Average of each chapter from diff tests (tupled with chapter_name)
-#2. Average of all the tests (avg of 1)
-#3. Average of all students
-#4. Average of each test (tupled with date and test_id)
+#1. Average of each chapter from diff tests (tupled with chapter_name)      DONE
+#2. Average of all the tests (avg of 1)                                     DONE
+#3. Average of all students                                                 DONE
+#4. Average of each test (tupled with date and test_id)                     NEED A LIST OF TEST_ID Not yet done
 #5. Max of a chapter from all the tests. (tupled with date and id)
 #6. Max of avg from all chapters. (tupled with date and id)
 #7. Max from 1 test (tupled with date id and chapter name)
@@ -30,9 +31,6 @@ def calculate_average_of_each_chapter_individual(data_by_roll_no):
         subjectwise_chapter_average_individual[ssubject]=temp
     return subjectwise_chapter_average_individual
 
-def calculate_average_of_each_chapter_class(data_by_roll_no):
-    chapter_name='Relations and Functions (PUC-I)'
-    
 
 def main():
     expanded_scorelist=pd.read_excel('Resources/expanded_scorelist.xlsx')
@@ -62,7 +60,7 @@ def main():
             val=[]
             val.append(performance_avg_of_student[subject][2])
             avg_of_whole_class[subject]=(DATE_OF_TEST,round(sum(val)/len(val)))
-    print(avg_of_whole_class)
+    # print(avg_of_whole_class)  AVERAGE OF WHOLE CLASSSSSSSSSSSSSSS
     class_avg_each_chap={}
     for subject in Subjects:
         subject_avg={}
@@ -72,9 +70,18 @@ def main():
                 val.append(individual_student_avg_dict[subject][chapter])
             subject_avg[chapter]=round(sum(val)/len(val))
         class_avg_each_chap[subject]=subject_avg
-
     # print(class_avg_each_chap) THIS IS AVG OF THE CLASS CHAPTERWISE
 
+#======================================WORK IN PROGRESS
+    # for index in range(len(test_data)):
+    #     for subject in Subjects:
+    #         if subject==test_data['Subject'][index]:
+                
+    #             try:
+    #                 path_of_data=f'Data/{subject}'
+    #                 data_by_roll_no=pd.read_csv(path_of_data+f'/{roll}.csv')
+    #             except Exception:
+    #                 pass
 
 # print(calculate_average_of_each_chapter_individual(data_by_roll_no))
 main()
