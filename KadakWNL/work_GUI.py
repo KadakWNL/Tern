@@ -70,7 +70,7 @@ def open_file(file_label, file_path_var, filetypes):
     )
     
     if file_path:
-        print("File Successfully uploaded")
+        # print("File Successfully uploaded")
         file_label.configure(text=file_path.split("/")[-1])  # Update the label with file path
         file_path_var.set(file_path)  # Store the file path in the variable
     else:
