@@ -1,10 +1,12 @@
 import pandas as pd
 import tabula as tb
+import pdb
+
 Date=input('Enter date in the format of DD-MM-YYYY')
 Test_Id=input('Enter test ID :)')
 #================================================================================
 #=========Dividing questions into easy medium and hard===========================
-student_analysis=pd.read_excel("Resources\student_analysis.xls",skiprows=8)
+student_analysis=pd.read_excel("Tern\Resources\student_analysis.xls",skiprows=8)
 data=student_analysis.head(68) #Questions start from row 8
 easy_questions=[]
 med_questions=[]
@@ -25,7 +27,7 @@ for i in range(0,60):
         else:
             hard_questions.append(i+1)
 print(easy_questions,med_questions,hard_questions,sep='\n')
-tables = tb.read_pdf(r"Resources\blueprint_data.pdf", pages="1")
+tables = tb.read_pdf(r"Tern\Resources\blueprint_data.pdf", pages="1")
 
 blueprint_data = tables[0]
 # Clean column names
@@ -56,8 +58,8 @@ def making_sure_empty_cells_are_noticed(x):
         return(0)
 #==============================================================================
 #===========Getting info on student's responses================================
-expanded_scorelist=pd.read_excel('Resources\expanded_scorelist.xlsx')
-print('333333333333333333333333333333333333333333',len(expanded_scorelist))
+expanded_scorelist=pd.read_excel('Tern\Resources\expanded_scorelist.xlsx')
+# print('333333333333333333333333333333333333333333',len(expanded_scorelist))
 
 for p in range(0,len(expanded_scorelist)):
     data2=expanded_scorelist.iloc[p]  
@@ -75,6 +77,7 @@ for p in range(0,len(expanded_scorelist)):
 
     #=============================================================================
     #===========SPI Calculation====================================================
+    pdb.set_trace()
     SPI=0
     for chapter_name,questions in chapterwise_question_numbers.items():
 
@@ -109,6 +112,6 @@ for p in range(0,len(expanded_scorelist)):
     df = pd.DataFrame(results, columns=["Date","Roll No","Test ID","Chapter_Name", "Marks_Scored"])
 
     # Save to CSV file
-    df.to_csv(f"Data/{expanded_scorelist["CANDIDATE ID"][p]}.csv", index=False)
+    df.to_csv(f"Tern/Data/{expanded_scorelist["CANDIDATE ID"][p]}.csv", index=False)
 
-    print("Data saved successfully to student_scores.csv")
+    print(f"Data saved successfully to {expanded_scorelist["CANDIDATE ID"][p]}.csv")
