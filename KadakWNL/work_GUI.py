@@ -107,15 +107,17 @@ blueprint_data_file_button.grid(row=5, column=1, padx=10, pady=(10,10))
 blueprint_data_save_flile_label = ctk.CTkLabel(frame_right, text="Blueprint Data Path")
 blueprint_data_save_flile_label.grid(row=5, column=2, padx=10, pady=(10,10), sticky="w")
 
+
 #=====================================Button that runs the code====================================================
 #=========================================for the main thing=======================================================
 def run_main_code():
-    if not expanded_scorelist_path or blueprint_data_path or student_analysis_path:
+    # print(expanded_scorelist_path.get(), student_analysis_path.get(), blueprint_data_path.get())
+    if not expanded_scorelist_path.get() or not blueprint_data_path.get() or not student_analysis_path.get():
         messagebox.showerror("File not found", "Some file not uploaded or missing")
         return
     messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
 
-run_analysis_button = ctk.CTkButton(frame_right, text="Run Test Analysis", font=("Arial", 18), command=run_main_code)
+run_analysis_button = ctk.CTkButton(frame_right, text="Run Test Analysis", width=175, height=40,font=("Arial", 18), command=run_main_code)
 run_analysis_button.grid(row=6, column=1, padx=15, pady=(10,10), sticky="w")
 
 app.mainloop()
