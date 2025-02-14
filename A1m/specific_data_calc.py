@@ -37,11 +37,12 @@ def calculate_average_of_each_chapter_class(data_by_roll_no):
 def main():
     expanded_scorelist=pd.read_excel('Resources/expanded_scorelist.xlsx')
     roll_no=[]
-    for index in range(2): #replace with: range(len(expanded_scorelist))
+    for index in range(len(expanded_scorelist)): #replace with: range(len(expanded_scorelist))
         roll_no.append(expanded_scorelist["CANDIDATE ID"][index])
     avg_values_all_students=[]
-    performance_avg_of_student={}
+    performance_avg_of_all_students=[]
     for roll in roll_no:
+        performance_avg_of_student={}
         for subject in Subjects:
             subject_inp=subject
             try:
@@ -53,6 +54,15 @@ def main():
                 # print(performance_avg_of_student) THIS SHIT IS AVERAGE OF STUDENT IN ALL THE TEST HE HAS WRITTTEN SUBJECTWISE
             except FileNotFoundError:
                 performance_avg_of_student[subject]=(int(roll),DATE_OF_TEST,0)
+        performance_avg_of_all_students.append(performance_avg_of_student)
+    # print(performance_avg_of_all_students) AVERAGE OF STUDENT IN ALL THE TEST
+    avg_of_whole_class={}
+    for performance_avg_of_student in performance_avg_of_all_students:
+        for subject in Subjects:
+            val=[]
+            val.append(performance_avg_of_student[subject][2])
+            avg_of_whole_class[subject]=(DATE_OF_TEST,round(sum(val)/len(val)))
+    print(avg_of_whole_class)
     class_avg_each_chap={}
     for subject in Subjects:
         subject_avg={}
