@@ -126,11 +126,140 @@
 
 
 #=================================================================================================================================
+# import pandas as pd
+# import tabula as tb
+# subject=input("Enter 1 for phy 2 for chem 3 for math: ")
+# if subject == '1':
+#     pass
+# elif subject == '2':
+#     pass
+# elif subject=='3':
+#     pass
+# else:
+#     print("Wrong input")
+#     exit()
+
+# Date=input('Enter date in the format of DD-MM-YYYY')
+# Test_Id=input('Enter test ID :)')
+# #================================================================================
+# #=========Dividing questions into easy medium and hard===========================
+# student_analysis=pd.read_excel("Resources\student_analysis.xls",skiprows=8)
+# data=student_analysis.head(68) #Questions start from row 8
+# easy_questions=[]
+# med_questions=[]
+# hard_questions=[]
+# for i in range(0,60):
+#     if data["ATT%"][i]>50:
+#         if (data['R%'][i]/data["ATT%"][i])*100>65:
+#             easy_questions.append(i+1)
+#         elif (data['R%'][i]/data["ATT%"][i])*100<25:
+#             hard_questions.append(i+1)
+#         else:
+#             med_questions.append(i+1)
+#     elif data["ATT%"][i]<25:
+#         hard_questions.append(i+1)
+#     else:
+#         if (data['R%'][i]/data["ATT%"][i])*100>65:
+#             med_questions.append(i+1)
+#         else:
+#             hard_questions.append(i+1)
+# print(easy_questions,med_questions,hard_questions,sep='\n')
+# tables = tb.read_pdf(r"Resources\blueprint_data.pdf", pages="1")
+
+# blueprint_data = tables[0]
+# # Clean column names
+# blueprint_data.columns = blueprint_data.columns.str.strip().str.replace(r'\s+', ' ', regex=True)
+# # Initialize the dictionary properly
+# chapterwise_blueprint = {
+#     "Chapter Name": [],
+#     "Multiple Choice Question": []
+# }
+# for index, row in blueprint_data.iterrows():
+#     chapterwise_blueprint["Chapter Name"].append(row["Chapter Name"])
+#     chapterwise_blueprint["Multiple Choice Question"].append(row["Multiple Choice Question"].split()[0])
+
+# chapterwise_question_numbers = {}
+# pointer = 0
+# for i in range(len(chapterwise_blueprint["Chapter Name"])):
+#     chapterwise_question_numbers[chapterwise_blueprint["Chapter Name"][i]] = []
+#     for j in range(int(chapterwise_blueprint["Multiple Choice Question"][i])):
+#         pointer += 1
+#         chapterwise_question_numbers[chapterwise_blueprint["Chapter Name"][i]].append(pointer)
+# chapterwise_question_numbers.pop("Total")
+# print(chapterwise_question_numbers)
+# #==============================================================================
+# def making_sure_empty_cells_are_noticed(x):
+#     if type(x) != str:
+#         return(int(x))
+#     else:
+#         return(0)
+# #==============================================================================
+# #===========Getting info on student's responses================================
+# expanded_scorelist=pd.read_excel('Resources\expanded_scorelist.xlsx')
+# print('333333333333333333333333333333333333333333',len(expanded_scorelist))
+
+# for p in range(0,len(expanded_scorelist)):
+#     data2=expanded_scorelist.iloc[p]  
+#     attempt_correct=[]
+#     attempt_wrong=[]
+#     left=[]  
+#     attempt_correct=list(map(making_sure_empty_cells_are_noticed,str(data2["MATHEMATICS R IDS"])[0].split(',') ))
+#     attempt_wrong=list(map(making_sure_empty_cells_are_noticed,str(data2["MATHEMATICS W IDS"])[0].split(',') ))
+#     left=list(map(making_sure_empty_cells_are_noticed,str(data2["MATHEMATICS L IDS"])[0].split(',') ))
+
+
+#     #==============================================================================
+#     #=============Blueprint interpretation=========================================
+#     Mathematics=dict()
+
+#     #=============================================================================
+#     #===========SPI Calculation====================================================
+#     SPI=0
+#     for chapter_name,questions in chapterwise_question_numbers.items():
+        
+#         if chapter_name in Mathematics:
+#             pass
+#         else:
+#             Mathematics[chapter_name]=0
+#             for question in questions:
+#                 if question in attempt_correct:
+#                     if question in easy_questions:
+#                         SPI+=0.8*3
+#                     elif question in med_questions:
+#                         SPI+=1*3
+#                     else:
+#                         SPI+=1.2*3
+#                 elif question in attempt_wrong:
+#                         if question in easy_questions: #MULTIPLIED 3 TO ALL THE WEIGHTS JUST SO THAT THE VALUES ARE BIGGER BECAUSE 
+#                             SPI-=0.2  #I WAS GETTING single intergers :(
+#                         elif question in med_questions:
+#                             SPI-=0.15
+#                         else:
+#                             pass
+#             else:
+#                 pass
+#             Mathematics[chapter_name]=round(SPI)
+#     print(Mathematics)
+#     results = []
+#     for chapter_name, marks_scored in Mathematics.items():
+#         results.append([Date,expanded_scorelist["CANDIDATE ID"][p],Test_Id, chapter_name, marks_scored])
+
+#     # Convert to DataFrame
+#     df = pd.DataFrame(results, columns=["Date","Roll No","Test ID","Chapter_Name", "Marks_Scored"])
+
+#     # Save to CSV file
+#     df.to_csv(f"Data/{expanded_scorelist["CANDIDATE ID"][p]}.csv", index=False)
+
+#     print("Data saved successfully to student_scores.csv")
+
+
+#=================================================================================================================================
 import pandas as pd
 import tabula as tb
 from typing import Dict, List, Tuple
 import os
 import glob
+import math
 
 def get_subject_code() -> str:
     subject_map = {'1': 'PHYSICS', '2': 'CHEMISTRY', '3': 'MATHEMATICS'}
@@ -254,7 +383,6 @@ def calculate_student_performance(
     correct_ids = str(student_data[f"{subject} R IDS"]).split(',')
     wrong_ids = str(student_data[f"{subject} W IDS"]).split(',')
     left_ids = str(student_data[f"{subject} L IDS"]).split(',')
-    
     attempt_correct = [parse_response_ids(x) for x in correct_ids]
     attempt_wrong = [parse_response_ids(x) for x in wrong_ids]
     left = [parse_response_ids(x) for x in left_ids]
@@ -272,12 +400,44 @@ def calculate_student_performance(
                     spi += 1.2 * 3
             elif question in attempt_wrong:
                 if question in easy_questions:
-                    spi -= 0.2  # Penalty for wrong attempts
+                    spi -= 0.15  # Penalty for wrong attempts
                 elif question in med_questions:
-                    spi -= 0.15
+                    spi -= 0.1
+                else:
+                    spi-=0.5
         performance[chapter_name] = round(spi)
-    
     return performance
+
+def calculation_of_max_spi(    chapterwise_questions: Dict[str, List[int]],
+    easy_questions: List[int],
+    med_questions: List[int],
+    hard_questions: List[int]
+    ) -> Dict[str, float]:
+    max_spi={}
+    for chapter_name, questions in chapterwise_questions.items():
+        spi = 0
+        for question in questions:
+            if question in easy_questions:
+                spi += 0.8 * 3
+            elif question in med_questions:
+                spi += 1.0 * 3
+            else:
+                spi += 1.2 * 3
+        max_spi[chapter_name] = round(spi)
+    return max_spi
+
+def scaling_marks(initial_spi,max_spi) -> Dict[str,float]:
+    scaled_marks={}
+    for chapter in initial_spi:
+        s=initial_spi[chapter]
+        if s>0:
+            pass
+        else:
+            s=0
+        s_max=max_spi[chapter]
+        new_spi=math.log10(s + 1) * (100 / math.log10(s_max + 1))
+        scaled_marks[chapter]=round(new_spi)
+    return scaled_marks
 
 def create_directory(directory_path: str) -> None:
     if not os.path.exists(directory_path):
@@ -320,6 +480,8 @@ def main():
     
     chapterwise_questions = get_chapter_questions("Resources/blueprint_data.pdf")
     expanded_scorelist = pd.read_excel('Resources/expanded_scorelist.xlsx')
+    max_spi=calculation_of_max_spi(chapterwise_questions,easy_questions,med_questions,hard_questions)
+    print(max_spi)
     
     for idx in range(len(expanded_scorelist)):
         student_data = expanded_scorelist.iloc[idx]
@@ -331,13 +493,14 @@ def main():
             med_questions,
             hard_questions
         )
-        
+        scaled_marks=scaling_marks(performance,max_spi)
         results = [
             [date, expanded_scorelist["CANDIDATE ID"][idx], test_id, chapter, marks]
-            for chapter, marks in performance.items()
+            for chapter, marks in scaled_marks.items()
         ]
         
         save_results(results, expanded_scorelist["CANDIDATE ID"][idx], f"Data/{subject}")
-
+        print('There are some changes') 
 if __name__ == "__main__":
     main()
+#Slight changes
