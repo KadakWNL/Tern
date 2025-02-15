@@ -1,7 +1,7 @@
-import work_a1m
 import pandas as pd
 from pprint import pprint
 from collections import defaultdict
+import os
 
 
 test_data=pd.read_csv(r'Data\Metadata\test_metadata.csv')
@@ -27,8 +27,7 @@ MATHEMATICS=['Relations and Functions (PUC-I)','Trigonometric Functionsv (PUC-I)
 #3. Average of all students                                                 DONE
 #4. Average of each test (tupled with date and test_id)                     DONE
 #5. Max of a chapter from all the tests. (tupled with date and id)          DONE
-#6. Max of avg from all chapters. (tupled with date and id)
-#7. Max from 1 test (tupled with date id and chapter name)
+#6. Max of avg from all chapters. (tupled with date and id)                 DONE
 
 
 
@@ -36,17 +35,28 @@ MATHEMATICS=['Relations and Functions (PUC-I)','Trigonometric Functionsv (PUC-I)
 
 
 
-def calculate_max_marks_in_chapter(roll_no_list, subject, chapter_name, test_data_path):
-    """
-    Finds the maximum marks scored in a specific chapter for each student.
 
-    :param roll_no_list: List of student roll numbers.
-    :param subject: Subject name (e.g., "MATHEMATICS").
-    :param chapter_name: Chapter to find max marks for.
-    :param test_data_path: Path to student test data (folder with CSV files).
-    :return: Dictionary {roll_no: {chapter_name: (max_marks, date, test_id)}}
-    """
-    
+
+
+def find_highest_scoring_chapter(student_avg_list):
+    highest_scores = {}
+
+    for student_data in student_avg_list:  # Loop through the list of dicts
+        for roll, subject_data in student_data.items():
+            max_chapter = None
+            max_marks = -1  # Initialize to a low value
+
+            for subject, chapters in subject_data.items():
+                for chapter, marks in chapters.items():
+                    if marks > max_marks:
+                        max_marks = marks
+                        max_chapter = chapter
+
+            highest_scores[roll] = (max_chapter, max_marks)
+
+    return highest_scores
+
+
 def calculate_max_marks_in_chapters(roll_no_list, subject, chapter_names, test_data_path):
     """
     Finds the maximum marks scored in multiple chapters for each student.
@@ -83,7 +93,7 @@ def calculate_max_marks_in_chapters(roll_no_list, subject, chapter_names, test_d
                 student_data[chapter_name] = (max_marks, max_date, max_test_id)
 
         except FileNotFoundError:
-            print(f"⚠️ File not found: {test_data_path}/{roll}.csv (Skipping roll {roll})")
+            pass
 
         max_marks_dict[int(roll)] = student_data
 
@@ -118,7 +128,7 @@ def main():
     expanded_scorelist=pd.read_excel('Resources/expanded_scorelist.xlsx')
     roll_no=[]
 
-    for index in range(2): #replace with: range(len(expanded_scorelist))
+    for index in range(3): #replace with: range(len(expanded_scorelist))
         roll_no.append(expanded_scorelist["CANDIDATE ID"][index])
 
     avg_values_all_students=[]
@@ -141,8 +151,8 @@ def main():
 
         performance_avg_of_all_students.append(performance_avg_of_student)
 
-    #pprint(performance_avg_of_all_students)# AVERAGE OF STUDENT IN ALL THE TEST
-    #pprint(avg_values_all_students)
+    pprint(performance_avg_of_all_students)# AVERAGE OF STUDENT IN ALL THE TEST
+    pprint(avg_values_all_students)
 
 #==========================================================================
 
@@ -154,7 +164,7 @@ def main():
         val.append(performance_avg_of_student[subject][2])
         avg_of_whole_class[subject]=(DATE_OF_TEST,round(sum(val)/len(val)))
 
-    #pprint(avg_of_whole_class)#  AVERAGE OF WHOLE CLASSSSSSSSSSSSSSS
+    pprint(avg_of_whole_class)#  AVERAGE OF WHOLE CLASSSSSSSSSSSSSSS
 
 #==========================================================================
 
@@ -184,7 +194,7 @@ def main():
         else:
             subject_avg[chapter] = 0
     class_avg_each_chap[subject] = subject_avg.copy()
-    # pprint(class_avg_each_chap)  #Average of the class in each chapters :>
+    pprint(class_avg_each_chap)  #Average of the class in each chapters :>
 
 #==========================================================================
     avg_of_each_test={}
@@ -208,14 +218,18 @@ def main():
             indiv_avg[current_test_id]=(subject,0)
         avg_of_each_test[int(roll)]=indiv_avg
 
-    # pprint(avg_of_each_test) #RETURNS AVG OF A TEST GIVEN THE TEST NUMBER WITH IT
+    pprint(avg_of_each_test) #RETURNS AVG OF A TEST GIVEN THE TEST NUMBER WITH IT
 
 #================================================================================
 
     max_marks_per_chapter = calculate_max_marks_in_chapters(roll_no, subject, eval(subject), path_of_data)
-    # print(max_marks_per_chapter) #Displays max marks per chapter roll_wise
+    print(max_marks_per_chapter) #Displays max marks per chapter roll_wise
 
 #================================================================================
 
-# print(calculate_average_of_each_chapter_individual(data_by_roll_no))
+    highest_scoring_chapters = find_highest_scoring_chapter(avg_values_all_students)
+    print(highest_scoring_chapters) #Best chapter a student is rn :>
+
+#================================================================================
+
 main()
