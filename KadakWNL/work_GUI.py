@@ -62,12 +62,14 @@ frame_test_analysis_label = ctk.CTkLabel(frame_right_upload, text="Test Analysis
 frame_test_analysis_label.grid(row=0, column=0, columnspan=4, sticky="ew", pady=10)
 
 #=====================Data and Test Id Entry===================================
+#*********************************************************************
 date_label = ctk.CTkLabel(frame_right_upload, text="Date:", font=("Arial", 18))
 date_label.grid(row=1, column=0, padx=20, pady=(20, 10), sticky="w")
 date_entry_variable = ctk.StringVar()
 date_entry = ctk.CTkEntry(frame_right_upload, placeholder_text="DD/MM/YYYY", textvariable=date_entry_variable)
 date_entry.grid(row=1, column=1, padx=10, pady=(20, 10))
 
+#*********************************************************************
 test_id_label = ctk.CTkLabel(frame_right_upload, text="Test ID:", font=("Arial", 18))
 test_id_label.grid(row=2, column=0, padx=20, pady=(10, 10), sticky="w")
 test_id_variable = ctk.StringVar()
@@ -75,7 +77,7 @@ test_id_entry = ctk.CTkEntry(frame_right_upload, placeholder_text="000", textvar
 test_id_entry.grid(row=2, column=1, padx=10, pady=(10,10))
 
 #===============================Subject==========================================
-
+#*********************************************************************
 subject_entry_variable = ctk.StringVar()
 subject_label = ctk.CTkLabel(frame_right_upload, text="Subject:", font=("Arial", 18))
 subject_label.grid(row=3, column=0, padx=20, pady=(10, 10), sticky="w")
@@ -182,7 +184,7 @@ class_rbutton = ctk.CTkRadioButton(frame_right_students, text="Class", font=("Ar
                                          variable=class_individual_variable, value="class")
 class_rbutton.grid(row=1, column=1, padx=10, pady=(10,10), sticky="w")
 
-
+#*********************************************************************
 roll_no_variable = ctk.StringVar()
 roll_no_label = ctk.CTkLabel(frame_right_students, text="Roll No:", font=("Arial", 18))
 roll_no_label.grid(row=1, column=2, padx=10, pady=(10,10), sticky="w")
@@ -199,11 +201,12 @@ def toggle_roll_no_entry(*args):
 class_individual_variable.trace_add("write", toggle_roll_no_entry)
 
 #========================================================================================
-
+#*********************************************************************
 subject_entry_variable_students = ctk.StringVar()
 subject_label_students = ctk.CTkLabel(frame_right_students, text="Subject:", font=("Arial", 18))
 subject_label_students.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="w")
-subject_entry_combobox_students = ctk.CTkComboBox(frame_right_students, values=["Physics", "Mathematics", "Chemistry", "All"], variable=subject_entry_variable_students, font=("Arial", 15), state="readonly")
+subject_entry_combobox_students = ctk.CTkComboBox(frame_right_students, values=["Physics", "Mathematics", "Chemistry", "All"],
+                                                  variable=subject_entry_variable_students, font=("Arial", 15), state="readonly")
 subject_entry_combobox_students.grid(row=2, column=1, padx=10, pady=(10,10))
 
 #==========================================================================================
@@ -218,6 +221,7 @@ chapterwise_rbutton = ctk.CTkRadioButton(frame_right_students, text="Chapterwise
                                          variable=overall_chapter_variable, value="chapterwise")
 chapterwise_rbutton.grid(row=4, column=1, padx=10, pady=(10,10), sticky="w")
 
+#*********************************************************************
 chapter_variable_students = ctk.StringVar()
 chapter_students_label = ctk.CTkLabel(frame_right_students, text="Chapter:", font=("Arial", 18))
 chapter_students_label.grid(row=4, column=2, padx=10, pady=(10,10), sticky="w")
@@ -234,7 +238,7 @@ def toggle_chapter_entry(*args):
 
 overall_chapter_variable.trace_add("write", toggle_chapter_entry)
 
-# CREATED PLACEHODLERS
+#*********************************************************************
 mathematics_chapters = ["math chapters"]
 phyiscs_chapters = ["phy chapters"]
 chemistry_chapters = ["chem chapters"]
@@ -265,6 +269,28 @@ def display_list_subject_chapters(*args):
 
 
 subject_entry_variable_students.trace_add("write", display_list_subject_chapters)
+
+#*********************************************************************
+chapter_index_students = ""  # Reset index on any change
+def get_chapter_index(*args):
+    global chapter_index_students
+    
+    if overall_chapter_variable.get() == "chapterwise" and subject_entry_variable_students.get() != "All":
+        try:
+            if subject_entry_variable_students.get() == "Physics":
+                chapter_index_students = phyiscs_chapters.index(chapter_variable_students.get())
+            elif subject_entry_variable_students.get() == "Mathematics":
+                chapter_index_students = mathematics_chapters.index(chapter_variable_students.get())
+            elif subject_entry_variable_students.get() == "Chemistry":
+                chapter_index_students = chemistry_chapters.index(chapter_variable_students.get())
+            print(f"Chapter Index Updated: {chapter_index_students}")
+        except ValueError as e:
+            print(f"Error: Chapter or Subject not found. {e}")
+
+
+overall_chapter_variable.trace_add("write",get_chapter_index)
+chapter_variable_students.trace_add("write",get_chapter_index)
+print(chapter_index_students)
 
 
 
