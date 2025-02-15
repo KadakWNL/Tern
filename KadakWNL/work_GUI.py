@@ -175,7 +175,100 @@ students_label.grid(row=0, column=0, sticky="ew",padx=20, pady=20)
 
 class_individual_variable = ctk.StringVar()
 
-individual_rbutton = ctk.CTkRadioButton(frame_right_students, text="Individual Student", font=("Arial", 18))
+individual_rbutton = ctk.CTkRadioButton(frame_right_students, text="Individual Student", font=("Arial", 18),
+                                         variable=class_individual_variable, value="individual")
+individual_rbutton.grid(row=1, column=0, padx=10, pady=(10,10), sticky="w")
+class_rbutton = ctk.CTkRadioButton(frame_right_students, text="Class", font=("Arial", 18),
+                                         variable=class_individual_variable, value="class")
+class_rbutton.grid(row=1, column=1, padx=10, pady=(10,10), sticky="w")
+
+
+roll_no_variable = ctk.StringVar()
+roll_no_label = ctk.CTkLabel(frame_right_students, text="Roll No:", font=("Arial", 18))
+roll_no_label.grid(row=1, column=2, padx=10, pady=(10,10), sticky="w")
+roll_no_entry = ctk.CTkEntry(frame_right_students, placeholder_text="20XXXXX", textvariable=roll_no_variable, state="disabled")
+roll_no_entry.grid(row=1, column=3, padx=10, pady=(10,10), sticky="w")
+
+def toggle_roll_no_entry(*args):
+    if class_individual_variable.get() == "individual":
+        roll_no_entry.configure(state="normal")
+    else:
+        roll_no_entry.configure(state="disabled")
+
+# Trace changes in the radio button variable
+class_individual_variable.trace_add("write", toggle_roll_no_entry)
+
+#========================================================================================
+
+subject_entry_variable_students = ctk.StringVar()
+subject_label_students = ctk.CTkLabel(frame_right_students, text="Subject:", font=("Arial", 18))
+subject_label_students.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="w")
+subject_entry_combobox_students = ctk.CTkComboBox(frame_right_students, values=["Physics", "Mathematics", "Chemistry", "All"], variable=subject_entry_variable_students, font=("Arial", 15), state="readonly")
+subject_entry_combobox_students.grid(row=2, column=1, padx=10, pady=(10,10))
+
+#==========================================================================================
+
+overall_chapter_variable = ctk.StringVar()
+
+overall_rbutton = ctk.CTkRadioButton(frame_right_students, text="Overall Performance", font=("Arial", 18),
+                                     variable=overall_chapter_variable, value="overall")
+overall_rbutton.grid(row=4, column=0, padx=10, pady=(10,10), sticky="w")
+
+chapterwise_rbutton = ctk.CTkRadioButton(frame_right_students, text="Chapterwise Performance", font=("Arial", 18),
+                                         variable=overall_chapter_variable, value="chapterwise")
+chapterwise_rbutton.grid(row=4, column=1, padx=10, pady=(10,10), sticky="w")
+
+chapter_variable_students = ctk.StringVar()
+chapter_students_label = ctk.CTkLabel(frame_right_students, text="Chapter:", font=("Arial", 18))
+chapter_students_label.grid(row=4, column=2, padx=10, pady=(10,10), sticky="w")
+
+chapter_students_list = ctk.CTkComboBox(frame_right_students, values=["hi"], 
+                                        variable=chapter_variable_students, state="disabled")
+chapter_students_list.grid(row=4, column=3, padx=10, pady=(10,10), sticky="w")
+
+def toggle_chapter_entry(*args):
+    if overall_chapter_variable.get() == "chapterwise" and subject_entry_variable_students.get() != "All":
+        chapter_students_list.configure(state="readonly")
+    else:
+        chapter_students_list.configure(state="disabled")
+
+overall_chapter_variable.trace_add("write", toggle_chapter_entry)
+
+# CREATED PLACEHODLERS
+mathematics_chapters = ["math chapters"]
+phyiscs_chapters = ["phy chapters"]
+chemistry_chapters = ["chem chapters"]
+
+def display_list_subject_chapters(*args):
+    if subject_entry_variable_students.get() == "All":
+        chapterwise_rbutton.configure(state="disabled")
+        chapter_students_list.configure(state="disabled")
+        
+        overall_chapter_variable.set("overall")
+        chapter_students_list.set("")
+        chapter_variable_students.set("")
+        
+    else:
+        chapterwise_rbutton.configure(state="normal")
+        chapter_students_list.configure(state="readonly")
+
+        if subject_entry_variable_students.get() == "Physics":
+            chapter_students_list.configure(values=phyiscs_chapters)
+        elif subject_entry_variable_students.get() == "Mathematics":
+            chapter_students_list.configure(values=mathematics_chapters)
+        else:
+            chapter_students_list.configure(values=chemistry_chapters)
+        
+        chapter_students_list.set("")
+        chapter_variable_students.set("")
+        toggle_chapter_entry()
+
+
+subject_entry_variable_students.trace_add("write", display_list_subject_chapters)
+
+
+
+
 
 
 #===================================Download======================================= 
