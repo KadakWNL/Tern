@@ -34,6 +34,29 @@ MATHEMATICS=['Relations and Functions (PUC-I)','Trigonometric Functionsv (PUC-I)
 
 
 
+def save_data_to_csv(data, roll_no):
+    output_path=f'/Data/Processed/{subject}'
+    for roll in roll_no:
+        file_path = f"{output_path}/{roll}.csv"
+        new_df = pd.DataFrame(data,columns=["Date", "Roll No", "Test ID", "Chapter_Name", "Marks_Scored"]
+        )
+        
+        if os.path.exists(file_path):
+            try:
+                existing_df = pd.read_csv(file_path)
+                combined_df = pd.concat([existing_df, new_df], ignore_index=True)
+                combined_df = combined_df.sort_values(['Date', 'Test ID'])
+                combined_df.to_csv(file_path, index=False)
+                print(f"Data appended successfully for student {roll}")
+            except pd.errors.EmptyDataError:
+                new_df.to_csv(file_path, index=False)
+                print(f"Created new file for student {roll}")
+        else:
+            new_df.to_csv(file_path, index=False)
+            print(f"Created new file for student {roll}")
+
+
+
 
 
 
