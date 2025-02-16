@@ -6,13 +6,6 @@ import glob
 import math
 import csv
 
-def get_subject_code() -> str:
-    subject_map = {'1': 'PHYSICS', '2': 'CHEMISTRY', '3': 'MATHEMATICS'}
-    subject = input("Enter 1 for physics, 2 for chemistry, 3 for math: ")
-    if subject not in subject_map:
-        print("Wrong input")
-        exit()
-    return subject_map[subject]
 
 def check_existing_test(subject: str, date: str, test_id: str) -> bool:
     subject_dir = f"Data/{subject}"
@@ -43,11 +36,8 @@ def check_existing_test(subject: str, date: str, test_id: str) -> bool:
             continue
     return False
 
-def get_user_inputs(subject: str) -> Tuple[str, str]:
+def get_user_inputs(date,test_id,subject: str) -> Tuple[str, str]:
     while True:
-        date = input('Enter date in the format of DD-MM-YYYY: ').strip()
-        test_id = input('Enter test ID: ').strip()
-        
         if check_existing_test(subject, date, test_id):
             print(f"\nError: Test with date '{date}' and test ID '{test_id}' already exists for {subject}!")
             if input("Would you like to try again? (y/n): ").lower() != 'y':
@@ -235,9 +225,8 @@ def is_duplicate_test(subject: str, date: str, test_id: str, metadata_file: str 
     return ((df["Subject"] == subject) & (df["Date"] == date) & (df["Test ID"] == test_id)).any()
 
 
-def main():
-    subject = get_subject_code()
-    date, test_id = get_user_inputs(subject)
+def main(subject=None,date=None,test_id=None,student_analysis_path=None,expanded_scorelist_path=None,blueprint_path=None):
+    date, test_id = get_user_inputs(date,test_id,subject)
     
     if is_duplicate_test(subject, date, test_id):
         print(f"Test with Subject: {subject}, Date: {date}, and Test ID: {test_id} already exists. Skipping...")
@@ -245,11 +234,11 @@ def main():
     
     save_test_metadata(subject, date, test_id)
     
-    student_analysis = pd.read_excel("Resources/student_analysis.xls", skiprows=8)
+    student_analysis = pd.read_excel(student_analysis_path, skiprows=8)
     easy_questions, med_questions, hard_questions = categorize_questions(student_analysis)
     
-    chapterwise_questions = get_chapter_questions("Resources/blueprint_data.pdf")
-    expanded_scorelist = pd.read_excel('Resources/expanded_scorelist.xlsx')
+    chapterwise_questions = get_chapter_questions(blueprint_path)
+    expanded_scorelist = pd.read_excel(expanded_scorelist_path)
     max_spi = calculation_of_max_spi(chapterwise_questions, easy_questions, med_questions, hard_questions)
     print(max_spi)
     
