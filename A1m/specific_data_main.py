@@ -4,20 +4,18 @@ from collections import defaultdict
 import os
 import time
 
+DATE_OF_TEST = None
+current_test_id = None
+subject = None
 
-test_data=pd.read_csv(r'Data\Metadata\test_metadata.csv')
-DATE_OF_TEST='DATE'
-current_test_id=690 #Get input from user (dashboard)
-find_roll=242007    #could be 'All'
-subject='MATHEMATICS'  #From dashboard
-path_of_data=f'Data/{subject}'
-Subjects=['PHYSICS','CHEMISTRY','MATHEMATICS']
-PHYSICS=[]
-CHEMISTRY=[]
-MATHEMATICS=['Relations and Functions (PUC-I)','Trigonometric Functionsv (PUC-I)','Linear Inequalities (PUC-I)','Limits and Derivatives (PUC-I)',
-'Relations and Functions (PUC-II)','Matrices (PUC-II)','Determinants (PUC-II)','Continuity and Differentiability (PUC-II)']
-
-
+PHYSICS = []
+CHEMISTRY = []
+MATHEMATICS = [
+    'Relations and Functions (PUC-I)', 'Trigonometric Functions (PUC-I)',
+    'Linear Inequalities (PUC-I)', 'Limits and Derivatives (PUC-I)',
+    'Relations and Functions (PUC-II)', 'Matrices (PUC-II)',
+    'Determinants (PUC-II)', 'Continuity and Differentiability (PUC-II)'
+]
 
 
 
@@ -145,8 +143,15 @@ def calculate_average_of_each_chapter_individual(data_by_roll_no,roll):
     return subjectwise_chapter_average_individual_roll_wise
 
 
-def main():
+def main(date_of_test=None, test_id=None, sub=None):
+    global DATE_OF_TEST, current_test_id, subject
     
+    DATE_OF_TEST = date_of_test
+    current_test_id = test_id
+    subject = sub
+
+    path_of_data = f'Data/{subject}'
+        
     expanded_scorelist=pd.read_excel('Resources/expanded_scorelist.xlsx')
     roll_no=[]
 
@@ -272,12 +277,13 @@ def main():
         for temp in performance_avg_of_all_students:
             if temp[subject][0]==roll:
                 avg_of_the_test_for_saving=temp[subject][2]
-
-        for temp in avg_values_all_students:
-            if list(temp.keys())==[roll]:
-                for chapter in eval(subject):
-                    list_of_avg_chapter_wise_for_saving.append(temp[roll][subject][chapter])
-
+        try:
+            for temp in avg_values_all_students:
+                if list(temp.keys())==[roll]:
+                    for chapter in eval(subject):
+                        list_of_avg_chapter_wise_for_saving.append(temp[roll][subject][chapter])
+        except KeyError:
+            pass
         for chapter in eval(subject):
             list_of_class_avg_chapter_wise_for_saving.append(class_avg_each_chap[subject][chapter])
             max_marks_chapter_wise_for_saving.append(max_marks_per_chapter[roll][chapter])

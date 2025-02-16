@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
 import upload_main
+import specific_data_main
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -168,6 +169,7 @@ def run_main_code():
         return
     upload_main.main(subject_entry_variable.get(),date_entry_variable.get(),test_id_variable.get(),
                     student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get())
+    specific_data_main.main(date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
     messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
     empty_variables()
     
