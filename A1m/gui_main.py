@@ -331,5 +331,5 @@ print(chapter_index_students)
 # Setup Settings Page
 download_label = ctk.CTkLabel(frame_right_download, text="Download", font=("Arial", 24, "bold"))
 download_label.grid(row=0, column=0, padx=20, pady=20)
-
+#Skibidi
 app.mainloop()
