@@ -314,7 +314,7 @@ def main(date_of_test=None, test_id=None, sub=None):
 
             indiv_avg[current_test_id]=(subject,round(avg))
 
-        except ZeroDivisionError:
+        except (ZeroDivisionError,FileNotFoundError):
             indiv_avg[current_test_id]=(subject,0)
         avg_of_each_test[int(roll)]=indiv_avg
 
@@ -353,10 +353,13 @@ def main(date_of_test=None, test_id=None, sub=None):
                         list_of_avg_chapter_wise_for_saving.append(temp[roll][subject][chapter])
         except KeyError:
             pass
-        for chapter in eval(subject):
-            list_of_class_avg_chapter_wise_for_saving.append(class_avg_each_chap[subject][chapter])
-            max_marks_chapter_wise_for_saving.append(max_marks_per_chapter[roll][chapter])
-        max_marks_in_this_test_for_saving=highest_scoring_chapters[roll]
+        try:
+            for chapter in eval(subject):
+                list_of_class_avg_chapter_wise_for_saving.append(class_avg_each_chap[subject][chapter])
+                max_marks_chapter_wise_for_saving.append(max_marks_per_chapter[roll][chapter])
+            max_marks_in_this_test_for_saving=highest_scoring_chapters[int(roll)]
+        except Exception: #HANDLE THIS <==============================================================
+            pass #<===(Throwing errors for absentees)
 
 
         data=[DATE_OF_TEST,avg_of_the_test_for_saving,avg_of_whole_class[subject][-1],

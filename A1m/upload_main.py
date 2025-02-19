@@ -74,7 +74,7 @@ def categorize_questions(student_analysis: pd.DataFrame) -> Tuple[List[int], Lis
     return easy_questions, med_questions, hard_questions
 
 def get_chapter_questions(blueprint_path: str) -> Dict[str, List[int]]:
-    tables = tb.read_pdf(path, pages="1")
+    tables = tb.read_pdf(blueprint_path, pages="1")
     blueprint_data = dict(tables[0].df)
     chaper_names=list(blueprint_data[0])
     chaper_names.pop()
