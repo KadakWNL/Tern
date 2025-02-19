@@ -1,5 +1,9 @@
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
+import upload_main
+import specific_data_main
+import file_check
+import datetime
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -63,11 +67,26 @@ frame_test_analysis_label.grid(row=0, column=0, columnspan=4, sticky="ew", pady=
 
 #=====================Data and Test Id Entry===================================
 #*********************************************************************
-date_label = ctk.CTkLabel(frame_right_upload, text="Date:", font=("Arial", 18))
+date_label = ctk.CTkLabel(frame_right_upload, text="Date(DD/MM/YYYY):", font=("Arial", 18))
 date_label.grid(row=1, column=0, padx=20, pady=(20, 10), sticky="w")
 date_entry_variable = ctk.StringVar()
 date_entry = ctk.CTkEntry(frame_right_upload, placeholder_text="DD/MM/YYYY", textvariable=date_entry_variable)
 date_entry.grid(row=1, column=1, padx=10, pady=(20, 10))
+
+def is_valid_date(date_str):
+    try:
+        datetime.datetime.strptime(date_str, "%d/%m/%Y")
+        return True 
+    except ValueError:
+        return False  
+
+def on_submit():
+    entered_date = date_entry_variable.get()
+    
+    if not is_valid_date(entered_date):
+        messagebox.showerror("Invalid Date", "Please enter a valid date in the format DD/MM/YYYY.")
+    else:
+        pass
 
 #*********************************************************************
 test_id_label = ctk.CTkLabel(frame_right_upload, text="Test ID:", font=("Arial", 18))
@@ -81,7 +100,7 @@ test_id_entry.grid(row=2, column=1, padx=10, pady=(10,10))
 subject_entry_variable = ctk.StringVar()
 subject_label = ctk.CTkLabel(frame_right_upload, text="Subject:", font=("Arial", 18))
 subject_label.grid(row=3, column=0, padx=20, pady=(10, 10), sticky="w")
-subject_entry_combobox = ctk.CTkComboBox(frame_right_upload, values=["Phyiscs", "Mathematics", "Chemistry"], variable=subject_entry_variable, font=("Arial", 15), state="readonly")
+subject_entry_combobox = ctk.CTkComboBox(frame_right_upload, values=["PHYSICS", "MATHEMATICS", "CHEMISTRY"], variable=subject_entry_variable, font=("Arial", 15), state="readonly")
 subject_entry_combobox.grid(row=3, column=1, padx=10, pady=(10,10))
 
 #=====================All three files upload=====================================
@@ -95,7 +114,9 @@ def open_file(file_label, file_path_var, filetypes):
         # print("File Successfully uploaded")
         file_label.configure(text=file_path.split("/")[-1])
         file_path_var.set(file_path) 
-        print("No file selected")
+        print(f"File selected: {file_path}")
+    else:
+        print("No File Selected")
 
 #=============================================================================================================
 expanded_scorelist_file_label = ctk.CTkLabel(frame_right_upload, text="Expanded Scorelist File (.xlsx): ", font=("Arial", 18))
@@ -117,7 +138,7 @@ student_analysis_file_label.grid(row=5, column=0, padx=20, pady=(10,10), sticky=
 student_analysis_path = ctk.StringVar()
 
 student_analysis_file_button = ctk.CTkButton(frame_right_upload, text="Select File", font=("Arial", 18),
-                                              command=lambda: open_file(student_analysis_save_flile_label, student_analysis_path, (("Excel Files", "*.xls"),)))
+                                            command=lambda: open_file(student_analysis_save_flile_label, student_analysis_path, (("Excel Files", "*.xls"),)))
 student_analysis_file_button.grid(row=5, column=1, padx=10, pady=(10,10))
 
 student_analysis_save_flile_label = ctk.CTkLabel(frame_right_upload, text="Student Analysis Path")
@@ -164,10 +185,17 @@ def run_main_code():
     if not subject_entry_variable.get():
         messagebox.showerror("Input Error", "Please enter a Subject before proceeding.")
         return
-    messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
-    empty_variables()
+    if file_check.main(student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get(),subject_entry_variable.get()):
+        upload_main.main(subject_entry_variable.get(),date_entry_variable.get(),test_id_variable.get(),
+                        student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get())
+        specific_data_main.main(date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
+        messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
+    else:
+        messagebox.showerror("File Error","Please recheck the files.")
 
-run_analysis_button = ctk.CTkButton(frame_right_upload, text="Run Test Analysis", width=175, height=40,font=("Arial", 18), command=run_main_code)
+    empty_variables()
+    
+run_analysis_button = ctk.CTkButton(frame_right_upload, text="Run Test Analysis", width=175, height=40,font=("Arial", 18), command=lambda: (on_submit(), run_main_code()))
 run_analysis_button.grid(row=7, column=1, padx=15, pady=(10,10), sticky="w")
 
 #===================================students======================================= 
@@ -178,10 +206,10 @@ students_label.grid(row=0, column=0, sticky="ew",padx=20, pady=20)
 class_individual_variable = ctk.StringVar()
 
 individual_rbutton = ctk.CTkRadioButton(frame_right_students, text="Individual Student", font=("Arial", 18),
-                                         variable=class_individual_variable, value="individual")
+                                            variable=class_individual_variable, value="individual")
 individual_rbutton.grid(row=1, column=0, padx=10, pady=(10,10), sticky="w")
 class_rbutton = ctk.CTkRadioButton(frame_right_students, text="Class", font=("Arial", 18),
-                                         variable=class_individual_variable, value="class")
+                                            variable=class_individual_variable, value="class")
 class_rbutton.grid(row=1, column=1, padx=10, pady=(10,10), sticky="w")
 
 #*********************************************************************
@@ -206,7 +234,7 @@ subject_entry_variable_students = ctk.StringVar()
 subject_label_students = ctk.CTkLabel(frame_right_students, text="Subject:", font=("Arial", 18))
 subject_label_students.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="w")
 subject_entry_combobox_students = ctk.CTkComboBox(frame_right_students, values=["Physics", "Mathematics", "Chemistry", "All"],
-                                                  variable=subject_entry_variable_students, font=("Arial", 15), state="readonly")
+                                                    variable=subject_entry_variable_students, font=("Arial", 15), state="readonly")
 subject_entry_combobox_students.grid(row=2, column=1, padx=10, pady=(10,10))
 
 #==========================================================================================
@@ -214,11 +242,11 @@ subject_entry_combobox_students.grid(row=2, column=1, padx=10, pady=(10,10))
 overall_chapter_variable = ctk.StringVar()
 
 overall_rbutton = ctk.CTkRadioButton(frame_right_students, text="Overall Performance", font=("Arial", 18),
-                                     variable=overall_chapter_variable, value="overall")
+                                        variable=overall_chapter_variable, value="overall")
 overall_rbutton.grid(row=4, column=0, padx=10, pady=(10,10), sticky="w")
 
 chapterwise_rbutton = ctk.CTkRadioButton(frame_right_students, text="Chapterwise Performance", font=("Arial", 18),
-                                         variable=overall_chapter_variable, value="chapterwise")
+                                            variable=overall_chapter_variable, value="chapterwise")
 chapterwise_rbutton.grid(row=4, column=1, padx=10, pady=(10,10), sticky="w")
 
 #*********************************************************************
@@ -304,5 +332,5 @@ print(chapter_index_students)
 # Setup Settings Page
 download_label = ctk.CTkLabel(frame_right_download, text="Download", font=("Arial", 24, "bold"))
 download_label.grid(row=0, column=0, padx=20, pady=20)
-
+#Skibidi
 app.mainloop()
