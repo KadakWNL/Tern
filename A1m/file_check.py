@@ -1,5 +1,5 @@
 import pandas as pd
-import tabula as tb
+import camelot as tb
 def check_analysis_data(path):
     student_analysis = pd.read_excel(path,skiprows=8)
     if list(student_analysis.columns)==['QNo', 'ATT%', 'R%', 'W%', 'SUBJECT', 'TOPIC / SCHEME', 'POS', 'NEG',
@@ -22,7 +22,7 @@ def check_scorelist_data(path,subject):
         return False
 def check_blueprint_data(path):
     tables = tb.read_pdf(path, pages="1")
-    if list(tables[0].keys())==['Chapter Name', 'Multiple Choice Question', 'Total']:
+    if list(tables[0].df)==[0, 1, 2]:
         return True
     else:
         return False

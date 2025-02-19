@@ -1,5 +1,5 @@
 import pandas as pd
-import tabula as tb
+import camelot as tb
 from typing import Dict, List, Tuple
 import os
 import glob
@@ -74,19 +74,17 @@ def categorize_questions(student_analysis: pd.DataFrame) -> Tuple[List[int], Lis
     return easy_questions, med_questions, hard_questions
 
 def get_chapter_questions(blueprint_path: str) -> Dict[str, List[int]]:
-    tables = tb.read_pdf(blueprint_path, pages="1")
-    blueprint_data = tables[0]
-    blueprint_data.columns = blueprint_data.columns.str.strip().str.replace(r'\s+', ' ', regex=True)
-    
+    tables = tb.read_pdf(path, pages="1")
+    blueprint_data = dict(tables[0].df)
+    chaper_names=list(blueprint_data[0])
+    chaper_names.pop()
+    multiple_choice_questions=list(blueprint_data[1])
+    multiple_choice_questions.pop()
+    multiple_choice_questions_stripped=list(map(lambda x: x.strip()[0],multiple_choice_questions))
     chapterwise_blueprint = {
-        "Chapter Name": [],
-        "Multiple Choice Question": []
+        "Chapter Name": chaper_names,
+        "Multiple Choice Question": multiple_choice_questions_stripped
     }
-    
-    for index, row in blueprint_data.iterrows():
-        chapterwise_blueprint["Chapter Name"].append(row["Chapter Name"])
-        chapterwise_blueprint["Multiple Choice Question"].append(row["Multiple Choice Question"].split()[0])
-    
     chapterwise_question_numbers = {}
     pointer = 0
     
