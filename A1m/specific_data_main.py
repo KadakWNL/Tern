@@ -7,7 +7,7 @@ import json as js
 DATE_OF_TEST = None
 current_test_id = None
 subject = None
-
+# TO DO: Save the class avg in a different json folder only, essentially reducing space used !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 PHYSICS = [     
                 'Units and Measurements (PUC-I)',
                 'Motion in a Straight Line (PUC-I)',
@@ -99,7 +99,31 @@ columns=["Date_of_test", "Avg_of_test", "Avg_class", "Average_of_student_chapter
 #6. Max of avg from all chapters. (tupled with date and id)                 DONE
 
 
+# File saving format:
+# {
+#     DATE-Subject-ID:{
+#         Avg_of_test: ###,
+#         Avg_of_class:###,
+#         Avg_ofstudent_chapter_wise:{
+#             chapter_name:###
+#         },
+#         Class_AVG_chapter_wise:{
+#             chapter_name:###
+#         },
+#         Max_marks_chapter_wise:{
+#             chapter_name: [date,id,marks]
+#         },
+#         Max marks in this test:{
+#             number_of_chapters:[chapters]
+#         },
+#     }
 
+
+#     DATE-Ssubject-ID:{
+    
+
+#     }
+# }
 
 
 
@@ -133,19 +157,22 @@ def find_highest_scoring_chapter(student_avg_list):
 
     for student_data in student_avg_list:  # Loop through the list of dicts
         for roll, subject_data in student_data.items():
-            max_chapter = None
-            max_marks = -1  # Initialize to a low value
+            max_marks = -1  # Track max marks
+            max_chapters = []  # Store all chapters with max marks
 
             for subject, chapters in subject_data.items():
                 for chapter, marks in chapters.items():
                     if marks > max_marks:
                         max_marks = marks
-                        max_chapter = chapter
+                        max_chapters = [chapter]  # Reset list with new max
+                    elif marks == max_marks:
+                        max_chapters.append(chapter)  # Add if it's also max
 
-            highest_scores[roll] = (max_chapter, max_marks)
+            # Store as "count-max_marks": [list of chapters]
+            key = f"{len(max_chapters)}-{max_marks}"
+            highest_scores[roll] = {key: max_chapters}
 
     return highest_scores
-
 
 def calculate_max_marks_in_chapters(roll_no_list, subject, chapter_names, test_data_path):
     """
@@ -158,7 +185,7 @@ def calculate_max_marks_in_chapters(roll_no_list, subject, chapter_names, test_d
     :return: Dictionary {roll_no: {chapter_name: (max_marks, date, test_id)}}
     """
     
-    max_marks_dict = defaultdict(dict)
+    max_marks_dict = {}
 
     for roll in roll_no_list:
         student_data = {chapter: (0, "N/A", "N/A") for chapter in chapter_names}  # Default to 0 marks
@@ -180,8 +207,10 @@ def calculate_max_marks_in_chapters(roll_no_list, subject, chapter_names, test_d
                             max_test_id = row['Test ID']
 
                 # Store results in dictionary
-                student_data[chapter_name] = (max_marks, max_date, max_test_id)
-
+                if max_date!="N/A":
+                    student_data[chapter_name] = (max_marks, max_date, max_test_id)
+                else:
+                    pass
         except FileNotFoundError:
             pass
 
@@ -338,9 +367,9 @@ def main(date_of_test=None, test_id=None, sub=None):
 
     for roll in roll_no:
         avg_of_the_test_for_saving=0
-        list_of_avg_chapter_wise_for_saving=[]
-        list_of_class_avg_chapter_wise_for_saving=[]
-        max_marks_chapter_wise_for_saving=[]
+        list_of_avg_chapter_wise_for_saving={}
+        list_of_class_avg_chapter_wise_for_saving={}
+        max_marks_chapter_wise_for_saving={}
         max_marks_in_this_test_for_saving=()
 
 
@@ -351,25 +380,55 @@ def main(date_of_test=None, test_id=None, sub=None):
             for temp in avg_values_all_students:
                 if list(temp.keys())==[roll]:
                     for chapter in eval(subject):
-                        list_of_avg_chapter_wise_for_saving.append(temp[roll][subject][chapter])
+                        list_of_avg_chapter_wise_for_saving[chapter]=temp[roll][subject][chapter]
         except KeyError:
             pass
         try:
             for chapter in eval(subject):
-                list_of_class_avg_chapter_wise_for_saving.append(class_avg_each_chap[subject][chapter])
-                max_marks_chapter_wise_for_saving.append(max_marks_per_chapter[roll][chapter])
+                list_of_class_avg_chapter_wise_for_saving[chapter]=class_avg_each_chap[subject][chapter]
             max_marks_in_this_test_for_saving=highest_scoring_chapters[int(roll)]
         except Exception: #HANDLE THIS <==============================================================
             pass #<===(Throwing errors for absentees)
+        try:
+            for chapter in eval(subject):
+                max_marks_chapter_wise_for_saving[subject]=max_marks_per_chapter[roll][chapter]
+        except Exception: 
+            pass
 
-
-        data=[DATE_OF_TEST,avg_of_the_test_for_saving,avg_of_whole_class[subject][-1],
-            tuple(list_of_avg_chapter_wise_for_saving),tuple(list_of_class_avg_chapter_wise_for_saving),
-            tuple(max_marks_chapter_wise_for_saving),max_marks_in_this_test_for_saving]
+        data={
+            str(DATE_OF_TEST)+'-'+str(subject)+'-'+str(current_test_id):{
+                'Avg_of_test':avg_of_the_test_for_saving,
+                'Avg_of_class':avg_of_whole_class[subject][-1],
+                'Avg_of_student_chapter_wise':list_of_avg_chapter_wise_for_saving,
+                'Avg_of_class_chapter_wise':list_of_class_avg_chapter_wise_for_saving,
+                'Max_marks_chapter_wise':max_marks_chapter_wise_for_saving,
+                'Max_marks_in_current_test':max_marks_in_this_test_for_saving,#WORRKKKKKKKKKKKKKK
+            }
+        }
+        # data=[DATE_OF_TEST,avg_of_the_test_for_saving,avg_of_whole_class[subject][-1],
+        #     tuple(list_of_avg_chapter_wise_for_saving),tuple(list_of_class_avg_chapter_wise_for_saving),
+        #     tuple(max_marks_chapter_wise_for_saving),max_marks_in_this_test_for_saving]
         
         save_data_to_csv(data, roll)
         print(data)
 
+#  {
+#     DATE-Subject-ID:{
+#         Avg_of_test: ###,
+#         Avg_of_class:###,
+#         Avg_ofstudent_chapter_wise:{
+#             chapter_name:###
+#         },
+#         Class_AVG_chapter_wise:{
+#             chapter_name:###
+#         },
+#         Max_marks_chapter_wise:{
+#             chapter_name: [date,id,marks]
+#         },
+#         Max marks in this test:{
+#             number_of_chapters:[chapters]
+#         },
+#     }
 
 #================================================================================
 
