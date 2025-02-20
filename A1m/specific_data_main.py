@@ -3,7 +3,7 @@ from pprint import pprint
 from collections import defaultdict
 import os
 import time
-
+import json as js
 DATE_OF_TEST = None
 current_test_id = None
 subject = None
@@ -87,7 +87,8 @@ MATHEMATICS = [
                 'Probability (PUC-II)']
 
 
-
+columns=["Date_of_test", "Avg_of_test", "Avg_class", "Average_of_student_chapter_wise",
+        "Class_Average_chapter_wise",'Max_marks_chapter_wise','Max_marks_in_this_test']
 
 
 #1. Average of each chapter from diff tests (tupled with chapter_name)      DONE
@@ -105,27 +106,26 @@ MATHEMATICS = [
 def save_data_to_csv(data, roll):
     output_path=f'Data/Processed/{subject}'
     os.makedirs(output_path, exist_ok=True)
-    file_path = f"{output_path}/{roll}.csv"
-    new_df = pd.DataFrame([data],columns=["Date_of_test", "Avg_of_test", "Avg_class", "Average_of_student_chapter_wise", "Class_Average_chapter_wise",'Max_marks_chapter_wise','Max_marks_in_this_test']
-    )
-    
+    file_path = f"{output_path}/{roll}.json"
+
     if os.path.exists(file_path):
-        try:
-            existing_df = pd.read_csv(file_path)
-            combined_df = pd.concat([existing_df, new_df], ignore_index=True)
-            combined_df.to_csv(file_path, index=False)
-            print(f"Data appended successfully for student {roll}")
-        except pd.errors.EmptyDataError:
-            new_df.to_csv(file_path, index=False)
-            print(f"Created new file for student {roll}")
+        with open(file_path,'r') as current_file:
+            data_of_current_file=js.load(current_file)
+            if str(DATE_OF_TEST)+'-'+str(subject)+'-'+str(current_test_id) in list(data_of_current_file.keys()):
+                print("Test data already exists!")
+            else:
+                try:
+                    existing_data = js.load(file_path)
+                except js.JSONDecodeError:
+                    existing_data = []  # Handle empty or corrupted JSON
+        if not isinstance(existing_data, list):
+            existing_data = [existing_data]
+        existing_data.append(data)
+        with open(file_path, 'w') as file:
+            js.dump(existing_data, file, indent=4)
     else:
-        new_df.to_csv(file_path, index=False)
-        print(f"Created new file for student {roll}")
-
-
-
-
-
+        with open(file_path,'w') as current_file:
+            js.dump(data, current_file, indent=4)
 
 
 def find_highest_scoring_chapter(student_avg_list):
