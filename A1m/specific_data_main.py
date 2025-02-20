@@ -99,31 +99,6 @@ columns=["Date_of_test", "Avg_of_test", "Avg_class", "Average_of_student_chapter
 #6. Max of avg from all chapters. (tupled with date and id)                 DONE
 
 
-# File saving format:
-# {
-#     DATE-Subject-ID:{
-#         Avg_of_test: ###,
-#         Avg_of_class:###,
-#         Avg_ofstudent_chapter_wise:{
-#             chapter_name:###
-#         },
-#         Class_AVG_chapter_wise:{
-#             chapter_name:###
-#         },
-#         Max_marks_chapter_wise:{
-#             chapter_name: [date,id,marks]
-#         },
-#         Max marks in this test:{
-#             number_of_chapters:[chapters]
-#         },
-#     }
-
-
-#     DATE-Ssubject-ID:{
-    
-
-#     }
-# }
 
 
 
@@ -174,6 +149,7 @@ def find_highest_scoring_chapter(student_avg_list):
 
     return highest_scores
 
+
 def calculate_max_marks_in_chapters(roll_no_list, subject, chapter_names, test_data_path):
     """
     Finds the maximum marks scored in multiple chapters for each student.
@@ -188,38 +164,40 @@ def calculate_max_marks_in_chapters(roll_no_list, subject, chapter_names, test_d
     max_marks_dict = {}
 
     for roll in roll_no_list:
-        student_data = {chapter: (0, "N/A", "N/A") for chapter in chapter_names}  # Default to 0 marks
-        
+        student_data = {}  # Only store chapters with valid data
+
         try:
             # Load student's test data
             data_by_roll_no = pd.read_csv(f"{test_data_path}/{roll}.csv")
 
             for chapter_name in chapter_names:
-                max_marks = 0  # Default to 0 marks
+                max_marks = 0
                 max_date, max_test_id = "N/A", "N/A"
 
+                # Iterate through rows and find max marks for the chapter
                 for index, row in data_by_roll_no.iterrows():
                     if row['Chapter_Name'] == chapter_name:
                         marks = row['Marks_Scored']
-                        if marks > max_marks:  # Update if a new max is found
+                        if marks > max_marks:
                             max_marks = marks
                             max_date = row['Date']
                             max_test_id = row['Test ID']
 
-                # Store results in dictionary
-                if max_date!="N/A":
+                # Store only if valid data is found
+                if max_date != "N/A":
                     student_data[chapter_name] = (max_marks, max_date, max_test_id)
-                else:
-                    pass
+
         except FileNotFoundError:
-            pass
+            pass  # Ignore if no file exists
 
-        max_marks_dict[int(roll)] = student_data
+        if student_data:  # Only add if student has valid data
+            max_marks_dict[int(roll)] = student_data
 
-    return dict(max_marks_dict)
+    return max_marks_dict
 
 
-def calculate_average_of_each_chapter_individual(data_by_roll_no,roll):
+
+def calculate_average_of_each_chapter_individual(data_by_roll_no,roll):   #===================FIX THIS FUNCTION, Works for csv, make it work for JSON new format
     subjectwise_chapter_average_individual={}
     subjectwise_chapter_average_individual_roll_wise={}
     temp={}
@@ -242,7 +220,7 @@ def calculate_average_of_each_chapter_individual(data_by_roll_no,roll):
     return subjectwise_chapter_average_individual_roll_wise
 
 
-def main(date_of_test=None, test_id=None, sub=None):
+def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None):
     global DATE_OF_TEST, current_test_id, subject
     
     DATE_OF_TEST = date_of_test
@@ -251,7 +229,7 @@ def main(date_of_test=None, test_id=None, sub=None):
 
     path_of_data = f'Data/{subject}'
         
-    expanded_scorelist=pd.read_excel('Resources/expanded_scorelist.xlsx')
+    expanded_scorelist=pd.read_excel(expanded_scorelist_path)
     roll_no=[]
 
     for index in range(len(expanded_scorelist)): #replace with: range(len(expanded_scorelist))
@@ -268,7 +246,7 @@ def main(date_of_test=None, test_id=None, sub=None):
 
         try:
             path_of_data=f'Data/{subject_inp}'
-            data_by_roll_no=pd.read_csv(path_of_data+f'/{roll}.csv')
+            data_by_roll_no=pd.read_csv(path_of_data+f'/{roll}.json')
             value_of_1=calculate_average_of_each_chapter_individual(data_by_roll_no,roll)
             avg_values_all_students.append(value_of_1) # THIS IS AVG OF ALL STUDENTS PER CHAPTER
             performance_avg_of_student[subject]=(int(roll),DATE_OF_TEST,round(sum(data_by_roll_no['Marks_Scored'])/(len(data_by_roll_no['Marks_Scored']))))
@@ -391,7 +369,7 @@ def main(date_of_test=None, test_id=None, sub=None):
             pass #<===(Throwing errors for absentees)
         try:
             for chapter in eval(subject):
-                max_marks_chapter_wise_for_saving[subject]=max_marks_per_chapter[roll][chapter]
+                max_marks_chapter_wise_for_saving=max_marks_per_chapter[roll]
         except Exception: 
             pass
 
@@ -402,7 +380,7 @@ def main(date_of_test=None, test_id=None, sub=None):
                 'Avg_of_student_chapter_wise':list_of_avg_chapter_wise_for_saving,
                 'Avg_of_class_chapter_wise':list_of_class_avg_chapter_wise_for_saving,
                 'Max_marks_chapter_wise':max_marks_chapter_wise_for_saving,
-                'Max_marks_in_current_test':max_marks_in_this_test_for_saving,#WORRKKKKKKKKKKKKKK
+                'Max_marks_in_current_test':max_marks_in_this_test_for_saving,
             }
         }
         # data=[DATE_OF_TEST,avg_of_the_test_for_saving,avg_of_whole_class[subject][-1],
@@ -411,12 +389,13 @@ def main(date_of_test=None, test_id=None, sub=None):
         
         save_data_to_csv(data, roll)
         print(data)
-
+#=====================================================================================
+# FILE SAVING FORMAT
 #  {
 #     DATE-Subject-ID:{
-#         Avg_of_test: ###,
-#         Avg_of_class:###,
-#         Avg_ofstudent_chapter_wise:{
+#         Avg_of_test: ###,      Sum of all chapters/no of chapters
+#         Avg_of_class:###,      Sum of all students/no of students (Doesnt include absentees, SO DW)
+#         Avg_ofstudent_chapter_wise:{      Considers
 #             chapter_name:###
 #         },
 #         Class_AVG_chapter_wise:{
