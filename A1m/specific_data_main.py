@@ -102,6 +102,28 @@ columns=["Date_of_test", "Avg_of_test", "Avg_class", "Average_of_student_chapter
 
 
 
+def save_common_data(data):
+    output_path=f'Data/Processed/{subject}'
+    file_path=f"{output_path}/common_data.json"
+    if os.path.exists(file_path):
+        with open(file_path,'r') as current_file:
+            try:
+                data_of_current_file=js.load(current_file)
+            except js.JSONDecodeError:
+                data_of_current_file=[]
+        if not isinstance(data_of_current_file, list):
+            data_of_current_file = [data_of_current_file]
+        data_of_current_file.append(data)
+        with open(file_path, 'w') as file:
+            js.dump(data_of_current_file, file, indent=4)
+    else:
+        with open(file_path,'w') as current_file:
+            js.dump(data, current_file, indent=4)
+
+
+
+
+
 def save_data_to_csv(data, roll):
     output_path=f'Data/Processed/{subject}'
     os.makedirs(output_path, exist_ok=True)
@@ -111,17 +133,16 @@ def save_data_to_csv(data, roll):
         with open(file_path,'r') as current_file:
             data_of_current_file=js.load(current_file)
             if str(DATE_OF_TEST)+'-'+str(subject)+'-'+str(current_test_id) in list(data_of_current_file.keys()):
-                print("Test data already exists!")
+                print("Test data already exists!")  #<===== HANDLE THIS!!!!!!!!!!!!!!!!!!!!!!
+            if data_of_current_file:
+                    pass
             else:
-                try:
-                    existing_data = js.load(file_path)
-                except js.JSONDecodeError:
-                    existing_data = []  # Handle empty or corrupted JSON
-        if not isinstance(existing_data, list):
-            existing_data = [existing_data]
-        existing_data.append(data)
+                data_of_current_file = []  # Handle empty or corrupted JSON
+        if not isinstance(data_of_current_file, list):
+            data_of_current_file = [data_of_current_file]
+        data_of_current_file.append(data)
         with open(file_path, 'w') as file:
-            js.dump(existing_data, file, indent=4)
+            js.dump(data_of_current_file, file, indent=4)
     else:
         with open(file_path,'w') as current_file:
             js.dump(data, current_file, indent=4)
@@ -197,7 +218,7 @@ def calculate_max_marks_in_chapters(roll_no_list, subject, chapter_names, test_d
 
 
 
-def calculate_average_of_each_chapter_individual(data_by_roll_no,roll):   #===================FIX THIS FUNCTION, Works for csv, make it work for JSON new format
+def calculate_average_of_each_chapter_individual(data_by_roll_no,roll):  
     subjectwise_chapter_average_individual={}
     subjectwise_chapter_average_individual_roll_wise={}
     temp={}
@@ -246,7 +267,7 @@ def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None)
 
         try:
             path_of_data=f'Data/{subject_inp}'
-            data_by_roll_no=pd.read_csv(path_of_data+f'/{roll}.json')
+            data_by_roll_no=pd.read_csv(path_of_data+f'/{roll}.csv')
             value_of_1=calculate_average_of_each_chapter_individual(data_by_roll_no,roll)
             avg_values_all_students.append(value_of_1) # THIS IS AVG OF ALL STUDENTS PER CHAPTER
             performance_avg_of_student[subject]=(int(roll),DATE_OF_TEST,round(sum(data_by_roll_no['Marks_Scored'])/(len(data_by_roll_no['Marks_Scored']))))
@@ -376,9 +397,8 @@ def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None)
         data={
             str(DATE_OF_TEST)+'-'+str(subject)+'-'+str(current_test_id):{
                 'Avg_of_test':avg_of_the_test_for_saving,
-                'Avg_of_class':avg_of_whole_class[subject][-1],
                 'Avg_of_student_chapter_wise':list_of_avg_chapter_wise_for_saving,
-                'Avg_of_class_chapter_wise':list_of_class_avg_chapter_wise_for_saving,
+                
                 'Max_marks_chapter_wise':max_marks_chapter_wise_for_saving,
                 'Max_marks_in_current_test':max_marks_in_this_test_for_saving,
             }
@@ -388,7 +408,13 @@ def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None)
         #     tuple(max_marks_chapter_wise_for_saving),max_marks_in_this_test_for_saving]
         
         save_data_to_csv(data, roll)
-        print(data)
+    common_data={
+            str(DATE_OF_TEST)+'-'+str(subject)+'-'+str(current_test_id):{
+                'Avg_of_class':avg_of_whole_class[subject][-1],
+                'Avg_of_class_chapter_wise':list_of_class_avg_chapter_wise_for_saving,
+            }
+    }
+    save_common_data(common_data)
 #=====================================================================================
 # FILE SAVING FORMAT
 #  {
