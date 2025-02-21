@@ -159,6 +159,23 @@ def calculation_of_max_spi(    chapterwise_questions: Dict[str, List[int]],
         max_spi[chapter_name] = round(spi)
     return max_spi
 
+#==============================================================================================
+#Logarithmic Scaling
+# def scaling_marks(initial_spi,max_spi) -> Dict[str,float]:
+#     scaled_marks={}
+#     for chapter in initial_spi:
+#         s=initial_spi[chapter]
+#         if s>0:
+#             pass
+#         else:
+#             s=0
+#         s_max=max_spi[chapter]
+#         new_spi=math.log10(s + 1) * (100 / math.log10(s_max + 1))
+#         scaled_marks[chapter]=round(new_spi)
+#     return scaled_marks
+
+#==============================================================================================
+#
 def scaling_marks(initial_spi,max_spi) -> Dict[str,float]:
     scaled_marks={}
     for chapter in initial_spi:
@@ -171,6 +188,26 @@ def scaling_marks(initial_spi,max_spi) -> Dict[str,float]:
         new_spi=math.log10(s + 1) * (100 / math.log10(s_max + 1))
         scaled_marks[chapter]=round(new_spi)
     return scaled_marks
+
+#==============================================================================================
+#
+def scaling_marks(initial_spi,max_spi) -> Dict[str,float]:
+    scaled_marks={}
+    for chapter in initial_spi:
+        s=initial_spi[chapter]
+        if s>0:
+            pass
+        else:
+            s=0
+        s_max=max_spi[chapter]
+        new_spi=math.log10(s + 1) * (100 / math.log10(s_max + 1))
+        scaled_marks[chapter]=round(new_spi)
+    return scaled_marks
+
+#==============================================================================================
+
+
+#==============================================================================================
 
 def create_directory(directory_path: str) -> None:
     if not os.path.exists(directory_path):
