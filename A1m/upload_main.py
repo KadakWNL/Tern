@@ -126,18 +126,18 @@ def calculate_student_performance(
         for question in questions:
             if question in attempt_correct:
                 if question in easy_questions:
-                    spi += 0.8 * 3
+                    spi += 0.8 * 5
                 elif question in med_questions:
-                    spi += 1.0 * 3
+                    spi += 1.0 * 5
                 else:
-                    spi += 1.2 * 3
+                    spi += 1.2 * 5
             elif question in attempt_wrong:
                 if question in easy_questions:
                     spi -= 0.15  # Penalty for wrong attempts
                 elif question in med_questions:
                     spi -= 0.1
                 else:
-                    spi-=0.5
+                    spi-=0.05
         performance[chapter_name] = round(spi)
     return performance
 
@@ -151,16 +151,16 @@ def calculation_of_max_spi(    chapterwise_questions: Dict[str, List[int]],
         spi = 0
         for question in questions:
             if question in easy_questions:
-                spi += 0.8 * 3
+                spi += 0.8 * 5
             elif question in med_questions:
-                spi += 1.0 * 3
+                spi += 1.0 * 5
             else:
-                spi += 1.2 * 3
+                spi += 1.2 * 5
         max_spi[chapter_name] = round(spi)
     return max_spi
 
 #==============================================================================================
-#Logarithmic Scaling
+#                   Logarithmic Scaling
 # def scaling_marks(initial_spi,max_spi) -> Dict[str,float]:
 #     scaled_marks={}
 #     for chapter in initial_spi:
@@ -175,34 +175,38 @@ def calculation_of_max_spi(    chapterwise_questions: Dict[str, List[int]],
 #     return scaled_marks
 
 #==============================================================================================
-#
-def scaling_marks(initial_spi,max_spi) -> Dict[str,float]:
-    scaled_marks={}
+#Non linear log scaling using p=0.9
+def scaling_marks(initial_spi: Dict[str, float], max_spi: Dict[str, float]) -> Dict[str, float]:
+    p = 0.9
+    scaled_marks = {}
+
     for chapter in initial_spi:
-        s=initial_spi[chapter]
-        if s>0:
-            pass
+        s = max(0, initial_spi[chapter])
+        s_max = max_spi[chapter]
+
+        if s_max > 0:
+            new_spi = (math.log10(s + 1) / math.log10(s_max + 1))**p * 100
         else:
-            s=0
-        s_max=max_spi[chapter]
-        new_spi=math.log10(s + 1) * (100 / math.log10(s_max + 1))
-        scaled_marks[chapter]=round(new_spi)
+            new_spi = 0
+
+        scaled_marks[chapter] = round(new_spi)
+
     return scaled_marks
 
 #==============================================================================================
 #
-def scaling_marks(initial_spi,max_spi) -> Dict[str,float]:
-    scaled_marks={}
-    for chapter in initial_spi:
-        s=initial_spi[chapter]
-        if s>0:
-            pass
-        else:
-            s=0
-        s_max=max_spi[chapter]
-        new_spi=math.log10(s + 1) * (100 / math.log10(s_max + 1))
-        scaled_marks[chapter]=round(new_spi)
-    return scaled_marks
+# def scaling_marks(initial_spi,max_spi) -> Dict[str,float]:
+#     scaled_marks={}
+#     for chapter in initial_spi:
+#         s=initial_spi[chapter]
+#         if s>0:
+#             pass
+#         else:
+#             s=0
+#         s_max=max_spi[chapter]
+#         new_spi=math.log10(s + 1) * (100 / math.log10(s_max + 1))
+#         scaled_marks[chapter]=round(new_spi)
+#     return scaled_marks
 
 #==============================================================================================
 
