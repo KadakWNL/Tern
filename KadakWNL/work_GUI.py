@@ -114,7 +114,7 @@ def open_file(file_label, file_path_var, filetypes):
         # print("File Successfully uploaded")
         file_label.configure(text=file_path.split("/")[-1])
         file_path_var.set(file_path) 
-        print(f"File selected: {file_path}")
+        print(f"File Selected: {file_path}")
     else:
         print("No File Selected")
 
@@ -188,7 +188,7 @@ def run_main_code():
     if file_check.main(student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get(),subject_entry_variable.get()):
         upload_main.main(subject_entry_variable.get(),date_entry_variable.get(),test_id_variable.get(),
                         student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get())
-        specific_data_main.main(date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
+        specific_data_main.main(expanded_scorelist_path.get(),date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
         messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
     else:
         messagebox.showerror("File Error","Please recheck the files.")

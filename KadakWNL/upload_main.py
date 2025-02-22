@@ -204,15 +204,6 @@ def save_results(
         new_df.to_csv(file_path, index=False)
         print(f"Created new file for student {student_id}")
 
-def save_test_metadata(subject: str, date: str, test_id: str, metadata_file: str = r"Data\Metadata\test_metadata.csv"):
-    """Saves the test metadata to a CSV file to track saved tests."""
-    file_exists = os.path.exists(metadata_file)
-    
-    with open(metadata_file, mode='a', newline='') as file:
-        writer = csv.writer(file)
-        if not file_exists:
-            writer.writerow(["Subject", "Date", "Test ID"])
-        writer.writerow([subject, date, test_id])
 
 def is_duplicate_test(subject: str, date: str, test_id: str, metadata_file: str = "test_metadata.csv") -> bool:
     """Checks if the test with the same subject, date, and test ID already exists."""
@@ -230,7 +221,6 @@ def main(subject=None,date=None,test_id=None,student_analysis_path=None,expanded
         print(f"Test with Subject: {subject}, Date: {date}, and Test ID: {test_id} already exists. Skipping...")
         return
     
-    save_test_metadata(subject, date, test_id)
     
     student_analysis = pd.read_excel(student_analysis_path, skiprows=8)
     easy_questions, med_questions, hard_questions = categorize_questions(student_analysis)
@@ -256,7 +246,7 @@ def main(subject=None,date=None,test_id=None,student_analysis_path=None,expanded
             for chapter, marks in scaled_marks.items()
         ]
         save_results(results, expanded_scorelist["CANDIDATE ID"][idx], f"Data/{subject}")
-        print('Test data saved successfully!')
+        # print('Test data saved successfully!')
 
 if __name__ == "__main__":
     main()
