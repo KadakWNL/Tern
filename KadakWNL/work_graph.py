@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import pandas as pd
-import json, datetime, os
+import json, datetime, os, pprint
 import seaborn as sns
 import numpy as np
 
@@ -123,19 +123,21 @@ subjects = {
 # subject = input("MATHEMATICS, PHYSICS, CHEMISTRY: ")
 # roll_number = int(input("Roll No: "))
 # date = input("Enter Date (DD/MM//YY): ")
-subject = "PHYSICS"
-roll_number = 242007
-data_processed_path = f"Data/Processed/{subject}/{roll_number}.json"
-common_data_processed_path = f"Data/Processed/{subject}/common_data.json"
+# subject = "PHYSICS"
+# roll_number = 242007
+# data_processed_path = f"Data/Processed/{subject}/{roll_number}.json"
+# common_data_processed_path = f"Data/Processed/{subject}/common_data.json"
 
 os.makedirs("Data/Graph", exist_ok=True)
+def get_data(data_processed_path, common_data_processed_path):
 
+    with open(data_processed_path, 'r') as data_file:
+        student_data = json.load(data_file)
 
-with open(data_processed_path, 'r') as data_file:
-    student_data = json.load(data_file)
-
-with open(common_data_processed_path) as common_data_file:
-    common_data = json.load(common_data_file)
+    with open(common_data_processed_path) as common_data_file:
+        common_data = json.load(common_data_file)
+    
+    return student_data, common_data
 
 
 def student_class_avg_datewise(student_data, common_data):
@@ -222,12 +224,12 @@ def generate_grayscale_heatmaps(student_data, common_data):
     plt.savefig("Data/Graph/student_vs_class_heatmaps.png", dpi=300, bbox_inches='tight')
     plt.show()
 
-def group_by_topics(data):
+def group_by_topics(data, subject, who):
     grouped_data = {}
     
     for test_data in data:
         test = list(test_data.keys())[0]
-        temp = test_data[test]['Avg_of_student_chapter_wise']
+        temp = test_data[test][f'Avg_of_{who}_chapter_wise']
         
         if test not in grouped_data:
             grouped_data[test] = {}
@@ -278,7 +280,11 @@ def group_by_topics(data):
 #     plt.show()
 
 # plot_topicwise_trends(student_data)
-generate_grayscale_heatmaps(student_data, common_data)
 
 
-
+if __name__ == "__main__":
+    print("ALLO!")
+    topic = []
+    for topics in subjects["CHEMISTRY"]:
+        topic.append(topics)
+    print(topic)

@@ -1,0 +1,98 @@
+{
+    "15/10/2024-PHYSICS-102": {
+        "Avg_of_test": 29,
+        "Avg_of_student_chapter_wise": {
+            "Units and Measurements (PUC-I)": 0,
+            "Motion in a Straight Line (PUC-I)": 71,
+            "Motion in a Plane (PUC-I)": 0,
+            "Laws of Motion (PUC-I)": 63,
+            "Work, Energy and Power (PUC-I)": 0,
+            "System of Particles and Rotational Motion (PUC-I)": 0,
+            "Gravitation (PUC-I)": 77,
+            "Mechanical Properties of Solids (PUC-I)": 0,
+            "Mechanical Properties of Fluids (PUC-I)": 100,
+            "Thermal Properties of Matter (PUC-I)": 0,
+            "Thermodynamics (PUC-I)": 0,
+            "Kinetic Theory (PUC-I)": 0,
+            "Oscillations (PUC-I)": 81,
+            "Waves (PUC-I)": 87,
+            "Electric Charges and Fields (PUC-II)": 58,
+            "Electrostatic Potential and Capacitance (PUC-II)": 60,
+            "Current Electricity (PUC-II)": 0,
+            "Moving charges and magnetism (PUC-II)": 0,
+            "Magnetism and Matter (PUC-II)": 58,
+            "Electromagnetic Induction (PUC-II)": 0,
+            "Alternating Current (PUC-II)": 0,
+            "Electromagnetic Waves (PUC-II)": 60,
+            "Ray Optics and Optical Instruments (PUC-II)": 0,
+            "Wave Optics (PUC-II)": 0,
+            "Dual Nature of Radiation and Matter (PUC-II)": 0,
+            "Atoms (PUC-II)": 100,
+            "Nuclei (PUC-II)": 0,
+            "Semiconductor Electronics Materials, Devices and Simple Circuits (PUC-II)": 0
+        },
+        "Max_marks_chapter_wise": {
+            "Motion in a Straight Line (PUC-I)": [
+                71,
+                "15/10/2024",
+                102
+            ],
+            "Laws of Motion (PUC-I)": [
+                63,
+                "15/10/2024",
+                102
+            ],
+            "Gravitation (PUC-I)": [
+                77,
+                "15/10/2024",
+                102
+            ],
+            "Mechanical Properties of Fluids (PUC-I)": [
+                100,
+                "15/10/2024",
+                102
+            ],
+            "Oscillations (PUC-I)": [
+                81,
+                "15/10/2024",
+                102
+            ],
+            "Waves (PUC-I)": [
+                87,
+                "15/10/2024",
+                102
+            ],
+            "Electric Charges and Fields (PUC-II)": [
+                58,
+                "15/10/2024",
+                102
+            ],
+            "Electrostatic Potential and Capacitance (PUC-II)": [
+                60,
+                "15/10/2024",
+                102
+            ],
+            "Magnetism and Matter (PUC-II)": [
+                58,
+                "15/10/2024",
+                102
+            ],
+            "Electromagnetic Waves (PUC-II)": [
+                60,
+                "15/10/2024",
+                102
+            ],
+            "Atoms (PUC-II)": [
+                100,
+                "15/10/2024",
+                102
+            ]
+        },
+        "Max_marks_in_current_test": {
+            "2-100": [
+                "Mechanical Properties of Fluids (PUC-I)",
+                "Atoms (PUC-II)"
+            ]
+        }
+    }
+}

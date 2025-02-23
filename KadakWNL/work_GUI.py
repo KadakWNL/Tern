@@ -1,9 +1,7 @@
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
-import upload_main
-import specific_data_main
-import file_check
-import datetime
+import datetime , file_check, specific_data_main, upload_main
+import work_graph as grph
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -200,24 +198,35 @@ run_analysis_button.grid(row=7, column=1, padx=15, pady=(10,10), sticky="w")
 
 #===================================students======================================= 
 #==================================================================================
-students_label = ctk.CTkLabel(frame_right_students, text="Students", font=("Arial", 24, "bold"))
-students_label.grid(row=0, column=0, sticky="ew",padx=20, pady=20)
+# Create a main container frame to better organize the content
+main_container = ctk.CTkFrame(frame_right_students)
+main_container.grid(row=0, column=0, sticky="nsew", padx=10, pady=5)
+frame_right_students.grid_columnconfigure(0, weight=1)
 
-class_individual_variable = ctk.StringVar()
-
-individual_rbutton = ctk.CTkRadioButton(frame_right_students, text="Individual Student", font=("Arial", 18),
-                                            variable=class_individual_variable, value="individual")
-individual_rbutton.grid(row=1, column=0, padx=10, pady=(10,10), sticky="w")
-class_rbutton = ctk.CTkRadioButton(frame_right_students, text="Class", font=("Arial", 18),
-                                            variable=class_individual_variable, value="class")
-class_rbutton.grid(row=1, column=1, padx=10, pady=(10,10), sticky="w")
+students_label = ctk.CTkLabel(main_container, text="Students", font=("Arial", 20, "bold"))
+students_label.grid(row=0, column=0, columnspan=4, sticky="w", padx=10, pady=(10,5))
 
 #*********************************************************************
-roll_no_variable = ctk.StringVar()
-roll_no_label = ctk.CTkLabel(frame_right_students, text="Roll No:", font=("Arial", 18))
-roll_no_label.grid(row=1, column=2, padx=10, pady=(10,10), sticky="w")
-roll_no_entry = ctk.CTkEntry(frame_right_students, placeholder_text="20XXXXX", textvariable=roll_no_variable, state="disabled")
-roll_no_entry.grid(row=1, column=3, padx=10, pady=(10,10), sticky="w")
+# First row - Student Type and Roll No
+selection_frame = ctk.CTkFrame(main_container)
+selection_frame.grid(row=1, column=0, columnspan=4, sticky="ew", padx=5, pady=5)
+
+class_individual_variable = ctk.StringVar()
+individual_rbutton = ctk.CTkRadioButton(selection_frame, text="Individual Student", font=("Arial", 14),
+                                      variable=class_individual_variable, value="individual")
+individual_rbutton.grid(row=0, column=0, padx=(5,10), pady=5)
+
+class_rbutton = ctk.CTkRadioButton(selection_frame, text="Class", font=("Arial", 14),
+                                  variable=class_individual_variable, value="class")
+class_rbutton.grid(row=0, column=1, padx=10, pady=5)
+
+roll_no_label = ctk.CTkLabel(selection_frame, text="Roll No:", font=("Arial", 14))
+roll_no_label.grid(row=0, column=2, padx=(20,5), pady=5)
+
+roll_no_variable_students = ctk.StringVar()
+roll_no_entry = ctk.CTkEntry(selection_frame, placeholder_text="20XXXXX", 
+                            textvariable=roll_no_variable_students, state="disabled", width=120)
+roll_no_entry.grid(row=0, column=3, padx=5, pady=5)
 
 def toggle_roll_no_entry(*args):
     if class_individual_variable.get() == "individual":
@@ -230,33 +239,47 @@ class_individual_variable.trace_add("write", toggle_roll_no_entry)
 
 #========================================================================================
 #*********************************************************************
+# Second row - Subject Selection
+subject_frame = ctk.CTkFrame(main_container)
+subject_frame.grid(row=2, column=0, columnspan=4, sticky="ew", padx=5, pady=5)
+
+subject_label_students = ctk.CTkLabel(subject_frame, text="Subject:", font=("Arial", 14))
+subject_label_students.grid(row=0, column=0, padx=(5,5), pady=5, sticky="w")
+
 subject_entry_variable_students = ctk.StringVar()
-subject_label_students = ctk.CTkLabel(frame_right_students, text="Subject:", font=("Arial", 18))
-subject_label_students.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="w")
-subject_entry_combobox_students = ctk.CTkComboBox(frame_right_students, values=["Physics", "Mathematics", "Chemistry", "All"],
-                                                    variable=subject_entry_variable_students, font=("Arial", 15), state="readonly")
-subject_entry_combobox_students.grid(row=2, column=1, padx=10, pady=(10,10))
+subject_entry_combobox_students = ctk.CTkComboBox(
+    subject_frame, 
+    values=["PHYSICS", "MATHEMATICS", "CHEMISTRY", "All (doesn't work)"],
+    variable=subject_entry_variable_students, 
+    font=("Arial", 14), 
+    state="readonly",
+    width=200
+)
+subject_entry_combobox_students.grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
 #==========================================================================================
+#*********************************************************************
+# Third row - Performance Type and Topic
+performance_frame = ctk.CTkFrame(main_container)
+performance_frame.grid(row=3, column=0, columnspan=4, sticky="ew", padx=5, pady=5)
 
 overall_chapter_variable = ctk.StringVar()
+overall_rbutton = ctk.CTkRadioButton(performance_frame, text="Overall Performance", font=("Arial", 14),
+                                    variable=overall_chapter_variable, value="overall")
+overall_rbutton.grid(row=0, column=0, padx=(5,10), pady=5)
 
-overall_rbutton = ctk.CTkRadioButton(frame_right_students, text="Overall Performance", font=("Arial", 18),
-                                        variable=overall_chapter_variable, value="overall")
-overall_rbutton.grid(row=4, column=0, padx=10, pady=(10,10), sticky="w")
+chapterwise_rbutton = ctk.CTkRadioButton(performance_frame, text="Topicwise Performance", font=("Arial", 14),
+                                        variable=overall_chapter_variable, value="chapterwise")
+chapterwise_rbutton.grid(row=0, column=1, padx=10, pady=5)
 
-chapterwise_rbutton = ctk.CTkRadioButton(frame_right_students, text="Chapterwise Performance", font=("Arial", 18),
-                                            variable=overall_chapter_variable, value="chapterwise")
-chapterwise_rbutton.grid(row=4, column=1, padx=10, pady=(10,10), sticky="w")
+chapter_students_label = ctk.CTkLabel(performance_frame, text="Topic:", font=("Arial", 14))
+chapter_students_label.grid(row=0, column=2, padx=(20,5), pady=5)
 
-#*********************************************************************
 chapter_variable_students = ctk.StringVar()
-chapter_students_label = ctk.CTkLabel(frame_right_students, text="Chapter:", font=("Arial", 18))
-chapter_students_label.grid(row=4, column=2, padx=10, pady=(10,10), sticky="w")
-
-chapter_students_list = ctk.CTkComboBox(frame_right_students, values=["hi"], 
-                                        variable=chapter_variable_students, state="disabled")
-chapter_students_list.grid(row=4, column=3, padx=10, pady=(10,10), sticky="w")
+chapter_students_list = ctk.CTkComboBox(performance_frame, values=["hi"], 
+                                      variable=chapter_variable_students, state="disabled",
+                                      width=150)
+chapter_students_list.grid(row=0, column=3, padx=5, pady=5)
 
 def toggle_chapter_entry(*args):
     if overall_chapter_variable.get() == "chapterwise" and subject_entry_variable_students.get() != "All":
@@ -267,9 +290,11 @@ def toggle_chapter_entry(*args):
 overall_chapter_variable.trace_add("write", toggle_chapter_entry)
 
 #*********************************************************************
-mathematics_chapters = ["math chapters"]
-phyiscs_chapters = ["phy chapters"]
-chemistry_chapters = ["chem chapters"]
+mathematics_chapters = ['Algebra', 'Trigonometry', 'Coordinate Geometry', 'Calculus', 
+                    'Statistics and Probability', 'Linear Programming', 'Vector Algebra']
+phyiscs_chapters = ['Mechanics', 'Thermodynamics and Kinetic Theory', 'Waves and Oscillations', 
+                    'Electricity and Magnetism', 'Optics', 'Modern Physics']
+chemistry_chapters = ['Physical Chemistry', 'Inorganic Chemistry', 'Organic Chemistry']
 
 def display_list_subject_chapters(*args):
     if subject_entry_variable_students.get() == "All":
@@ -284,17 +309,16 @@ def display_list_subject_chapters(*args):
         chapterwise_rbutton.configure(state="normal")
         chapter_students_list.configure(state="readonly")
 
-        if subject_entry_variable_students.get() == "Physics":
+        if subject_entry_variable_students.get() == "PHYSICS":
             chapter_students_list.configure(values=phyiscs_chapters)
-        elif subject_entry_variable_students.get() == "Mathematics":
+        elif subject_entry_variable_students.get() == "MATHEMATICS":
             chapter_students_list.configure(values=mathematics_chapters)
-        else:
+        elif subject_entry_variable_students.get() == "CHEMISTRY":
             chapter_students_list.configure(values=chemistry_chapters)
         
         chapter_students_list.set("")
         chapter_variable_students.set("")
         toggle_chapter_entry()
-
 
 subject_entry_variable_students.trace_add("write", display_list_subject_chapters)
 
@@ -315,13 +339,45 @@ def get_chapter_index(*args):
         except ValueError as e:
             print(f"Error: Chapter or Subject not found. {e}")
 
+overall_chapter_variable.trace_add("write", get_chapter_index)
+chapter_variable_students.trace_add("write", get_chapter_index)
 
-overall_chapter_variable.trace_add("write",get_chapter_index)
-chapter_variable_students.trace_add("write",get_chapter_index)
-print(chapter_index_students)
+#*********************************************************************
+def check_missing_fields_students():
+    if class_individual_variable.get() == "individual" and not roll_no_variable_students.get():
+        messagebox.showerror("Missing Input", "Please enter the roll number before proceeding.")
+    if not subject_entry_variable_students.get():
+        messagebox.showerror("Missing Input", "Please enter the subject before proceeding.")
+    if not chapter_variable_students.get() and overall_chapter_variable.get() == "chapterwise":
+        messagebox.showerror("Missing Input", "Please enter the topic before proceeding.")
+
+def clear_fields_students():
+    class_individual_variable.set("")
+    roll_no_variable_students.set("")
+    subject_entry_variable_students.set("")
+    overall_chapter_variable.set("")
+    chapter_variable_students.set("")
 
 
+#*********************************************************************
+def generate_graph(roll_no, subject):
+    check_missing_fields_students()
+    student_data_path = f"Data/Processed/{subject}/{roll_no}.json"
+    common_data_path = f"Data/Processed/{subject}/common_data.json"
 
+    student_data, common_data = grph.get_data(student_data_path, common_data_path)
+
+    if overall_chapter_variable.get() == "chapterwise":
+        topic = chapter_variable_students.get()
+        student_grouped, class_grouped = grph.group_by_topics(student_data, subject, "student"), grph.group_by_topics(common_data, subject, "class")
+        print(student_grouped, class_grouped)
+    clear_fields_students()
+
+get_individual_data_button = ctk.CTkButton(main_container, text="Generate Data", 
+                                         width=150, height=35, font=("Arial", 14),
+                                         command=lambda: generate_graph(roll_no_variable_students.get(), 
+                                                                      subject_entry_variable_students.get()))
+get_individual_data_button.grid(row=4, column=0, columnspan=4, pady=10)
 
 
 

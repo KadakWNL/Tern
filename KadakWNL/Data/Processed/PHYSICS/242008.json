@@ -1,0 +1,129 @@
+{
+    "11/10/2024-PHYSICS-101": {
+        "Avg_of_test": 43,
+        "Avg_of_student_chapter_wise": {
+            "Units and Measurements (PUC-I)": 100,
+            "Motion in a Straight Line (PUC-I)": 61,
+            "Motion in a Plane (PUC-I)": 0,
+            "Laws of Motion (PUC-I)": 63,
+            "Work, Energy and Power (PUC-I)": 61,
+            "System of Particles and Rotational Motion (PUC-I)": 60,
+            "Gravitation (PUC-I)": 100,
+            "Mechanical Properties of Solids (PUC-I)": 0,
+            "Mechanical Properties of Fluids (PUC-I)": 0,
+            "Thermal Properties of Matter (PUC-I)": 0,
+            "Thermodynamics (PUC-I)": 61,
+            "Kinetic Theory (PUC-I)": 0,
+            "Oscillations (PUC-I)": 100,
+            "Waves (PUC-I)": 60,
+            "Electric Charges and Fields (PUC-II)": 0,
+            "Electrostatic Potential and Capacitance (PUC-II)": 46,
+            "Current Electricity (PUC-II)": 82,
+            "Moving charges and magnetism (PUC-II)": 63,
+            "Magnetism and Matter (PUC-II)": 58,
+            "Electromagnetic Induction (PUC-II)": 71,
+            "Alternating Current (PUC-II)": 58,
+            "Electromagnetic Waves (PUC-II)": 60,
+            "Ray Optics and Optical Instruments (PUC-II)": 89,
+            "Wave Optics (PUC-II)": 0,
+            "Dual Nature of Radiation and Matter (PUC-II)": 0,
+            "Atoms (PUC-II)": 0,
+            "Nuclei (PUC-II)": 0,
+            "Semiconductor Electronics Materials, Devices and Simple Circuits (PUC-II)": 0
+        },
+        "Max_marks_chapter_wise": {
+            "Units and Measurements (PUC-I)": [
+                100,
+                "11/10/2024",
+                101
+            ],
+            "Motion in a Straight Line (PUC-I)": [
+                61,
+                "11/10/2024",
+                101
+            ],
+            "Laws of Motion (PUC-I)": [
+                63,
+                "11/10/2024",
+                101
+            ],
+            "Work, Energy and Power (PUC-I)": [
+                61,
+                "11/10/2024",
+                101
+            ],
+            "System of Particles and Rotational Motion (PUC-I)": [
+                60,
+                "11/10/2024",
+                101
+            ],
+            "Gravitation (PUC-I)": [
+                100,
+                "11/10/2024",
+                101
+            ],
+            "Thermodynamics (PUC-I)": [
+                61,
+                "11/10/2024",
+                101
+            ],
+            "Oscillations (PUC-I)": [
+                100,
+                "11/10/2024",
+                101
+            ],
+            "Waves (PUC-I)": [
+                60,
+                "11/10/2024",
+                101
+            ],
+            "Electrostatic Potential and Capacitance (PUC-II)": [
+                46,
+                "11/10/2024",
+                101
+            ],
+            "Current Electricity (PUC-II)": [
+                82,
+                "11/10/2024",
+                101
+            ],
+            "Moving charges and magnetism (PUC-II)": [
+                63,
+                "11/10/2024",
+                101
+            ],
+            "Magnetism and Matter (PUC-II)": [
+                58,
+                "11/10/2024",
+                101
+            ],
+            "Electromagnetic Induction (PUC-II)": [
+                71,
+                "11/10/2024",
+                101
+            ],
+            "Alternating Current (PUC-II)": [
+                58,
+                "11/10/2024",
+                101
+            ],
+            "Electromagnetic Waves (PUC-II)": [
+                60,
+                "11/10/2024",
+                101
+            ],
+            "Ray Optics and Optical Instruments (PUC-II)": [
+                89,
+                "11/10/2024",
+                101
+            ]
+        },
+        "Max_marks_in_current_test": {
+            "3-100": [
+                "Units and Measurements (PUC-I)",
+                "Gravitation (PUC-I)",
+                "Oscillations (PUC-I)"
+            ]
+        }
+    }
+}

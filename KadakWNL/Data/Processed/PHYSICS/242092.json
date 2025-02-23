@@ -1,0 +1,137 @@
+{
+    "11/10/2024-PHYSICS-101": {
+        "Avg_of_test": 50,
+        "Avg_of_student_chapter_wise": {
+            "Units and Measurements (PUC-I)": 100,
+            "Motion in a Straight Line (PUC-I)": 61,
+            "Motion in a Plane (PUC-I)": 85,
+            "Laws of Motion (PUC-I)": 82,
+            "Work, Energy and Power (PUC-I)": 100,
+            "System of Particles and Rotational Motion (PUC-I)": 85,
+            "Gravitation (PUC-I)": 71,
+            "Mechanical Properties of Solids (PUC-I)": 0,
+            "Mechanical Properties of Fluids (PUC-I)": 100,
+            "Thermal Properties of Matter (PUC-I)": 0,
+            "Thermodynamics (PUC-I)": 61,
+            "Kinetic Theory (PUC-I)": 0,
+            "Oscillations (PUC-I)": 46,
+            "Waves (PUC-I)": 60,
+            "Electric Charges and Fields (PUC-II)": 100,
+            "Electrostatic Potential and Capacitance (PUC-II)": 0,
+            "Current Electricity (PUC-II)": 50,
+            "Moving charges and magnetism (PUC-II)": 63,
+            "Magnetism and Matter (PUC-II)": 0,
+            "Electromagnetic Induction (PUC-II)": 83,
+            "Alternating Current (PUC-II)": 0,
+            "Electromagnetic Waves (PUC-II)": 0,
+            "Ray Optics and Optical Instruments (PUC-II)": 50,
+            "Wave Optics (PUC-II)": 100,
+            "Dual Nature of Radiation and Matter (PUC-II)": 0,
+            "Atoms (PUC-II)": 0,
+            "Nuclei (PUC-II)": 0,
+            "Semiconductor Electronics Materials, Devices and Simple Circuits (PUC-II)": 100
+        },
+        "Max_marks_chapter_wise": {
+            "Units and Measurements (PUC-I)": [
+                100,
+                "11/10/2024",
+                101
+            ],
+            "Motion in a Straight Line (PUC-I)": [
+                61,
+                "11/10/2024",
+                101
+            ],
+            "Motion in a Plane (PUC-I)": [
+                85,
+                "11/10/2024",
+                101
+            ],
+            "Laws of Motion (PUC-I)": [
+                82,
+                "11/10/2024",
+                101
+            ],
+            "Work, Energy and Power (PUC-I)": [
+                100,
+                "11/10/2024",
+                101
+            ],
+            "System of Particles and Rotational Motion (PUC-I)": [
+                85,
+                "11/10/2024",
+                101
+            ],
+            "Gravitation (PUC-I)": [
+                71,
+                "11/10/2024",
+                101
+            ],
+            "Mechanical Properties of Fluids (PUC-I)": [
+                100,
+                "11/10/2024",
+                101
+            ],
+            "Thermodynamics (PUC-I)": [
+                61,
+                "11/10/2024",
+                101
+            ],
+            "Oscillations (PUC-I)": [
+                46,
+                "11/10/2024",
+                101
+            ],
+            "Waves (PUC-I)": [
+                60,
+                "11/10/2024",
+                101
+            ],
+            "Electric Charges and Fields (PUC-II)": [
+                100,
+                "11/10/2024",
+                101
+            ],
+            "Current Electricity (PUC-II)": [
+                50,
+                "11/10/2024",
+                101
+            ],
+            "Moving charges and magnetism (PUC-II)": [
+                63,
+                "11/10/2024",
+                101
+            ],
+            "Electromagnetic Induction (PUC-II)": [
+                83,
+                "11/10/2024",
+                101
+            ],
+            "Ray Optics and Optical Instruments (PUC-II)": [
+                50,
+                "11/10/2024",
+                101
+            ],
+            "Wave Optics (PUC-II)": [
+                100,
+                "11/10/2024",
+                101
+            ],
+            "Semiconductor Electronics Materials, Devices and Simple Circuits (PUC-II)": [
+                100,
+                "11/10/2024",
+                101
+            ]
+        },
+        "Max_marks_in_current_test": {
+            "6-100": [
+                "Units and Measurements (PUC-I)",
+                "Work, Energy and Power (PUC-I)",
+                "Mechanical Properties of Fluids (PUC-I)",
+                "Electric Charges and Fields (PUC-II)",
+                "Wave Optics (PUC-II)",
+                "Semiconductor Electronics Materials, Devices and Simple Circuits (PUC-II)"
+            ]
+        }
+    }
+}
