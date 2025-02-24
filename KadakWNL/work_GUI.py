@@ -371,6 +371,8 @@ def generate_graph(roll_no, subject):
         topic = chapter_variable_students.get()
         student_grouped, class_grouped = grph.group_by_topics(student_data, subject, "student"), grph.group_by_topics(common_data, subject, "class")
         print(student_grouped, class_grouped)
+    elif overall_chapter_variable.get() == "overall":
+        grph.student_class_avg_datewise(student_data, common_data)
     clear_fields_students()
 
 get_individual_data_button = ctk.CTkButton(main_container, text="Generate Data", 

@@ -153,7 +153,7 @@ def student_class_avg_datewise(student_data, common_data):
             if test.split("-")[0] in dates:
                 class_avg.append(tests[test]['Avg_of_class'])
     dates = [datetime.datetime.strptime(d, "%d/%m/%Y") for d in dates]
-    print(dates)
+    # print(dates)
     plt.figure(figsize=(8, 5))
 
     plt.xlim(min(dates), max(dates))
