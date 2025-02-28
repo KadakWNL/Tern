@@ -362,8 +362,8 @@ def clear_fields_students():
 #*********************************************************************
 def generate_graph(roll_no, subject):
     check_missing_fields_students()
-    student_data_path = r"Data\Processed\{subject}\{roll_no}.json"
-    common_data_path = r"Data\Processed\{subject}\common_data.json"
+    student_data_path = rf"Data\Processed\{subject}\{roll_no}.json"
+    common_data_path = rf"Data\Processed\{subject}\common_data.json"
 
     student_data, common_data = grph.get_data(student_data_path, common_data_path)
 
