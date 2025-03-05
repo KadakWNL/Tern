@@ -2,6 +2,7 @@ import customtkinter as ctk
 from tkinter import filedialog, messagebox
 import datetime , file_check, specific_data_main, upload_main
 import work_graph as grph
+import window_generation as wg
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -374,13 +375,15 @@ def generate_graph(roll_no, subject):
     elif overall_chapter_variable.get() == "overall":
         grph.student_class_avg_datewise(student_data, common_data)
         grph.generate_grayscale_heatmaps(student_data,common_data)
+        wg.open_graph_window(app)
+
         
     clear_fields_students()
 
 get_individual_data_button = ctk.CTkButton(main_container, text="Generate Data", 
-                                         width=150, height=35, font=("Arial", 14),
-                                         command=lambda: generate_graph(roll_no_variable_students.get(), 
-                                                                      subject_entry_variable_students.get()))
+                                            width=150, height=35, font=("Arial", 14),
+                                            command=lambda: generate_graph(roll_no_variable_students.get(), 
+                                            subject_entry_variable_students.get()))
 get_individual_data_button.grid(row=4, column=0, columnspan=4, pady=10)
 
 
