@@ -5,7 +5,7 @@ const DataDisplay = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/data")
+    axios.get("http://127.0.0.1:8000/api/data")
       .then(response => setData(response.data))
       .catch(error => console.error("Error fetching data:", error));
   }, []);
@@ -18,8 +18,7 @@ const DataDisplay = () => {
       <p className="text-gray-600">Name: {data.student_name}</p>
       <p className="text-gray-600">Roll No: {data.roll_no}</p>
       <h3 className="text-lg font-semibold mt-4">Scores</h3>
-      <p>Score 1: {data.values.score1}</p>
-      <p>Score 2: {data.values.score2}</p>
+      <p>SPI: {data.metrics.SPI}</p>
     </div>
   );
 };
