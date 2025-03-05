@@ -374,7 +374,7 @@ def generate_graph(roll_no, subject):
         print(student_grouped, class_grouped)
     elif overall_chapter_variable.get() == "overall":
         grph.student_class_avg_datewise(student_data, common_data)
-        grph.generate_grayscale_heatmaps(student_data,common_data)
+        grph.generate_grayscale_heatmaps(student_data,common_data,subject_entry_variable_students.get())
         wg.open_graph_window(app)
 
         

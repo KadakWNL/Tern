@@ -155,23 +155,6 @@ def student_class_avg_datewise(student_data, common_data):
     dates = [datetime.datetime.strptime(d, "%d/%m/%Y") for d in dates]
     # print(dates)
 
-import seaborn as sns
-import pandas as pd
-import datetime
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
-
-import seaborn as sns
-import pandas as pd
-import datetime
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
-
-import seaborn as sns
-import pandas as pd
-import datetime
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
 
 def student_class_avg_datewise(student_data, common_data):
     sns.set_style("whitegrid")  # Clean look with grid
@@ -240,45 +223,65 @@ def student_class_avg_datewise(student_data, common_data):
     legend.get_frame().set_facecolor('none')
 
     plt.tight_layout()
+    plt.savefig("Data/Graph/student_performance_over_time.png", dpi=300, bbox_inches='tight')
     plt.show()
 
 
-def generate_grayscale_heatmaps(student_data, common_data):
+def generate_grayscale_heatmaps(student_data, common_data,subject=None):
     test_dates = []
     student_scores = {}
     class_scores = {}
-    
+    subject="PHYSICS"
+    student_data, class_data = group_by_topics(student_data,subject,"student"),group_by_topics(common_data,subject,"class")
     for test in student_data:
-        for test_id, test_info in test.items():
-            date = test_id.split("-")[0]
-            if date not in test_dates:
-                test_dates.append(date)
-            for chapter, score in test_info["Avg_of_student_chapter_wise"].items():
-                if chapter not in student_scores:
-                    student_scores[chapter] = []
-                student_scores[chapter].append(score)
+        date=test.split("-")[0]
+        if date not in test_dates:
+            test_dates.append(date)
+        for block_of_chapter,score in student_data[test].items():
+            if block_of_chapter not in student_scores:
+                student_scores[block_of_chapter]=[]
+            student_scores[block_of_chapter].append(score)                
+
+    for test in class_data:
+        date=test.split("-")[0]
+        if date not in test_dates:
+            test_dates.append(date)
+        for block_of_chapter,score in class_data[test].items():
+            if block_of_chapter not in class_scores:
+                class_scores[block_of_chapter]=[]
+            class_scores[block_of_chapter].append(score)             
+    # for test in student_data:
+    #     for test_id, test_info in test.items():
+    #         date = test_id.split("-")[0]
+    #         if date not in test_dates:
+    #             test_dates.append(date)
+    #         for chapter, score in test_info["Avg_of_student_chapter_wise"].items():
+    #             if chapter not in student_scores:
+    #                 student_scores[chapter] = []
+    #             student_scores[chapter].append(score)
+    # print(student_scores)
     
-    for test in common_data:
-        for test_id, test_info in test.items():
-            date = test_id.split("-")[0]
-            for chapter, score in test_info["Avg_of_class_chapter_wise"].items():
-                if chapter not in class_scores:
-                    class_scores[chapter] = []
-                class_scores[chapter].append(score)
-    
+    # for test in common_data:
+    #     for test_id, test_info in test.items():
+    #         date = test_id.split("-")[0]
+    #         for chapter, score in test_info["Avg_of_class_chapter_wise"].items():
+    #             if chapter not in class_scores:
+    #                 class_scores[chapter] = []
+    #             class_scores[chapter].append(score)
+    # print(class_scores)
     student_df = pd.DataFrame.from_dict(student_scores, orient='index', columns=test_dates).fillna(0)
     class_df = pd.DataFrame.from_dict(class_scores, orient='index', columns=test_dates).fillna(0)
     
-    fig, axes = plt.subplots(1, 2, figsize=(9.8, 7.3), sharey=True, gridspec_kw={'width_ratios': [1, 1.2]})  
+    fig, axes = plt.subplots(1, 2, figsize=(7.75, 4.5), sharey=True, gridspec_kw={'width_ratios': [1, 1.2]})  
     
     sns.heatmap(student_df, cmap="RdYlGn", annot=True, fmt=".0f", yticklabels=False, cbar=False, 
-                linewidths=0.5, linecolor='black', vmin=0, vmax=100, ax=axes[0])
+                linewidths=0.3, linecolor='black', vmin=0, vmax=100, ax=axes[0])
     axes[0].set_title(f"Performance of {roll_number}")
     axes[0].set_xlabel("Test Date")
     axes[0].set_ylabel("")
     
     sns.heatmap(class_df, cmap="RdYlGn", annot=True, fmt=".0f", yticklabels=True, linecolor='black', 
-                linewidths=0.5, vmin=0, vmax=100, ax=axes[1])
+                linewidths=0.3, vmin=0, vmax=100, ax=axes[1])
     axes[1].set_title("Class Avg Performance")
     axes[1].set_xlabel("Test Date")
     axes[1].set_ylabel("")
@@ -286,8 +289,7 @@ def generate_grayscale_heatmaps(student_data, common_data):
     axes[1].yaxis.set_label_position("left")
     axes[1].yaxis.tick_left()
 
-    plt.subplots_adjust(wspace=0.3)  
-
+    plt.subplots_adjust(wspace=1.25)  
     plt.tight_layout()
     plt.savefig("Data/Graph/student_vs_class_heatmaps.png", dpi=300, bbox_inches='tight')
     plt.show()
@@ -316,7 +318,7 @@ def group_by_topics(data, subject, who):
 
             if count > 0:
                 grouped_data[test][topic] = round(grouped_data[test][topic] / count, 2)
-    print(grouped_data)
+    # print(grouped_data)
     return grouped_data
 
 
@@ -354,5 +356,6 @@ def group_by_topics(data, subject, who):
 
 if __name__ == "__main__":
     a,b=get_data(data_processed_path,common_data_processed_path)
-    # generate_grayscale_heatmaps(a,b)
+    generate_grayscale_heatmaps(a,b)
     student_class_avg_datewise(a,b)
+    # print(group_by_topics(a, "PHYSICS", "student"))
