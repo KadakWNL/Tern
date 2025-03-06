@@ -4,8 +4,7 @@ import pandas as pd
 import json, datetime, os, pprint
 import seaborn as sns
 import numpy as np
-
-
+import plotly.graph_objects as go
 subjects = {
     "PHYSICS": {
         "Mechanics": [
@@ -323,8 +322,95 @@ def group_by_topics(data, subject, who):
 
 
 
+def plot_student_vs_class_avg_spi(student_data,class_data):
+    for value in student_data[-1]:
+        student_spi=student_data[-1][value]["Avg_SPI_till_date"]
+    for value in class_data[-1]:
+        class_spi=class_data[-1][value]["Avg_SPI_of_class_till_date"]
+    categories = ["Class SPI", "Student SPI"]
+    values = [class_spi, student_spi]
+
+    # Create horizontal bar plot
+    plt.figure(figsize=(8, 1.2))
+    bars = plt.barh(categories, values, color=['red', 'green'], height=0.3)
+    for bar, value in zip(bars, values):
+        plt.text(value + 2, bar.get_y() + bar.get_height()/2, str(value), va='center', fontsize=12, fontweight='bold')
+
+    # Labels and title
+    plt.gca().spines['top'].set_visible(False)
+    plt.gca().spines['right'].set_visible(False)
+
+    plt.xlabel("SPI Score")
+    plt.title("Class SPI vs Student SPI Comparison")
+    plt.xlim(0, 100)  # Assuming SPI is out of 100
+    plt.grid(axis='x', linestyle='--', alpha=0.5)
+    plt.gcf().set_size_inches(8, 2)
+    plt.savefig("Data/Graph/student_vs_class_spi.png", dpi=300, bbox_inches='tight')
+    plt.show()
 
 
+
+
+# def create_pie_chart_for_distribution_comparison(student_data,class_data):
+#     grouped_data = {}
+#     test_data=student_data[-1]
+#     test = list(test_data.keys())[0]
+#     temp = test_data[test][f'Avg_of_student_chapter_wise']
+    
+#     if test not in grouped_data:
+#         grouped_data[test] = {}
+
+#     for topic, chapters in subjects[subject].items():
+#         if topic not in grouped_data[test]:
+#             grouped_data[test][topic] = 0 
+#             count = 0  
+
+#         for chapter_main in chapters:
+#             if chapter_main in temp:
+#                 grouped_data[test][topic] += temp[chapter_main]
+#                 count += 1
+
+#         if count > 0:
+#             grouped_data[test][topic] = round(grouped_data[test][topic] / count, 2)
+#     student_grouped_data=grouped_data
+
+#     grouped_data = {}
+#     test_data=class_data[-1]
+#     test = list(test_data.keys())[0]
+#     temp = test_data[test][f'Avg_of_class_chapter_wise']
+    
+#     if test not in grouped_data:
+#         grouped_data[test] = {}
+
+#     for topic, chapters in subjects[subject].items():
+#         if topic not in grouped_data[test]:
+#             grouped_data[test][topic] = 0 
+#             count = 0  
+
+#         for chapter_main in chapters:
+#             if chapter_main in temp:
+#                 grouped_data[test][topic] += temp[chapter_main]
+#                 count += 1
+
+#         if count > 0:
+#             grouped_data[test][topic] = round(grouped_data[test][topic] / count, 2)
+#     class_grouped_data=grouped_data
+
+#     print(student_grouped_data)
+#     student_data_processing=list(student_grouped_data.values())[0]
+#     student_label=list(student_data_processing.keys())
+#     student_values=list(student_data_processing.values())
+#     fig = plt.figure(figsize=(7, 7))
+#     ax = fig.add_subplot()
+
+#     # Create the Pie Chart
+#     ax.pie(student_values, labels=student_label, autopct='%1.1f%%', startangle=140)
+
+#     # Save as PNG
+#     plt.savefig("student_pie_chart.png", dpi=300)
+
+#     # Show the figure
+#     plt.show()
 # def plot_topicwise_trends(data):
 #     grouped_data = group_by_topics(data)
 #     plt.figure(figsize=(10, 6))
@@ -356,6 +442,8 @@ def group_by_topics(data, subject, who):
 
 if __name__ == "__main__":
     a,b=get_data(data_processed_path,common_data_processed_path)
-    generate_grayscale_heatmaps(a,b)
-    student_class_avg_datewise(a,b)
+    # generate_grayscale_heatmaps(a,b)
+    # student_class_avg_datewise(a,b)
+    # plot_student_vs_class_avg_spi(a,b)
     # print(group_by_topics(a, "PHYSICS", "student"))
+    create_pie_chart_for_distribution_comparison(a,b)
