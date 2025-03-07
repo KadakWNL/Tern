@@ -4,8 +4,7 @@ import pandas as pd
 import json, datetime, os, pprint
 import seaborn as sns
 import numpy as np
-
-
+import plotly.graph_objects as go
 subjects = {
     "PHYSICS": {
         "Mechanics": [
@@ -122,11 +121,11 @@ subjects = {
 
 # subject = input("MATHEMATICS, PHYSICS, CHEMISTRY: ")
 # roll_number = int(input("Roll No: "))
-# date = input("Enter Date (DD/MM//YY): ")
-# subject = "PHYSICS"
-# roll_number = 242007
-# data_processed_path = f"Data/Processed/{subject}/{roll_number}.json"
-# common_data_processed_path = f"Data/Processed/{subject}/common_data.json"
+date = r"05/01/2025"
+subject = "PHYSICS"
+roll_number = 242007
+data_processed_path = rf"Data/Processed/{subject}/{roll_number}.json"
+common_data_processed_path = rf"Data/Processed/{subject}/common_data.json"
 
 os.makedirs("Data/Graph", exist_ok=True)
 def get_data(data_processed_path, common_data_processed_path):
@@ -154,75 +153,147 @@ def student_class_avg_datewise(student_data, common_data):
                 class_avg.append(tests[test]['Avg_of_class'])
     dates = [datetime.datetime.strptime(d, "%d/%m/%Y") for d in dates]
     # print(dates)
-    plt.figure(figsize=(8, 5))
 
-    plt.xlim(min(dates), max(dates))
-    plt.ylim(min(class_avg)-5, max(student_avg)+10)
-    
-    plt.plot(dates, student_avg, label="Student Average", color="blue", linewidth=2, marker="o", markersize=6)
-    plt.plot(dates, class_avg, label="Class Average", color="gray", linewidth=2, linestyle="dashed", marker="s", markersize=6)
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
-    plt.xticks(dates, [d.strftime('%d/%m') for d in dates], fontsize=8, rotation=45) 
 
-    plt.xlabel("Test Date", fontsize=12)
-    plt.ylabel("Score", fontsize=12)
-    plt.title("Student Performance vs Class Average", fontsize=14, fontweight="bold")   
+def student_class_avg_datewise(student_data, common_data):
+    sns.set_style("whitegrid")  # Clean look with grid
 
-    plt.legend(loc="upper left", fontsize=10)
-    plt.grid(True, linestyle="--", alpha=0.6)
+    # Extract data
+    dates = []
+    student_avg = []
+    class_avg = []
+
+    for tests in student_data:
+        for test in tests:
+            dates.append(test.split("-")[0])
+            student_avg.append(tests[test]['Avg_of_test'])
+
+    for tests in common_data:
+        for test in tests:
+            if test.split("-")[0] in dates:
+                class_avg.append(tests[test]['Avg_of_class'])
+
+    # Convert dates to datetime format
+    dates = [datetime.datetime.strptime(d, "%d/%m/%Y") for d in dates]
+
+    # Create a DataFrame for Seaborn
+    df = pd.DataFrame({
+        "Date": dates,
+        "Student Average": student_avg,
+        "Class Average": class_avg
+    })
+
+    # Melt the DataFrame for Seaborn
+    df_melted = df.melt(id_vars=["Date"], var_name="Type", value_name="Score")
+
+    # Create the plot
+    plt.figure(figsize=(6, 6))  
+    ax = sns.lineplot(data=df_melted, x="Date", y="Score", hue="Type", style="Type",
+                      markers=True,  
+                      dashes=False,  
+                      errorbar=None,  
+                      palette={"Student Average": "royalblue", "Class Average": "gray"},
+                      linewidth=2, markersize=8)
+
+    # **Set X-axis grid every 5 days**
+    ax.xaxis.set_major_locator(mdates.DayLocator(interval=5))  # X-grid every 5 days
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m'))  # Format dates
+
+    # Rotate X-ticks for readability
+    plt.xticks(fontsize=9, rotation=45)
+
+    # Labels and Title
+    ax.set_xlabel("Test Date", fontsize=12)
+    ax.set_ylabel("Score", fontsize=12)
+    ax.set_title("Student Performance vs Class Average", fontsize=14, fontweight="bold")
+
+    # **Keep X and Y axes visible**
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(True)
+    ax.spines["bottom"].set_visible(True)
+
+    # **Enable grid with X-grid every 5 days**
+    ax.grid(True, linestyle="--", linewidth=0.7, alpha=0.6)
+
+    # Adjust legend
+    legend = ax.legend(title="Type", loc="upper right", fontsize=10)
+    legend.get_frame().set_linewidth(0)
+    legend.get_frame().set_facecolor('none')
+
     plt.tight_layout()
-
-    # plt.savefig(f"Data/Graph/{roll_number}_DATE_AVG.png")
+    plt.savefig("Data/Graph/student_performance_over_time.png", dpi=300, bbox_inches='tight')
     plt.show()
 
-def generate_grayscale_heatmaps(student_data, common_data):
+
+def generate_grayscale_heatmaps(student_data, common_data,subject=None):
     test_dates = []
     student_scores = {}
     class_scores = {}
-    
+    subject="PHYSICS"
+    student_data, class_data = group_by_topics(student_data,subject,"student"),group_by_topics(common_data,subject,"class")
     for test in student_data:
-        for test_id, test_info in test.items():
-            date = test_id.split("-")[0]
-            if date not in test_dates:
-                test_dates.append(date)
-            for chapter, score in test_info["Avg_of_student_chapter_wise"].items():
-                if chapter not in student_scores:
-                    student_scores[chapter] = []
-                student_scores[chapter].append(score)
+        date=test.split("-")[0]
+        if date not in test_dates:
+            test_dates.append(date)
+        for block_of_chapter,score in student_data[test].items():
+            if block_of_chapter not in student_scores:
+                student_scores[block_of_chapter]=[]
+            student_scores[block_of_chapter].append(score)                
+
+    for test in class_data:
+        date=test.split("-")[0]
+        if date not in test_dates:
+            test_dates.append(date)
+        for block_of_chapter,score in class_data[test].items():
+            if block_of_chapter not in class_scores:
+                class_scores[block_of_chapter]=[]
+            class_scores[block_of_chapter].append(score)             
+    # for test in student_data:
+    #     for test_id, test_info in test.items():
+    #         date = test_id.split("-")[0]
+    #         if date not in test_dates:
+    #             test_dates.append(date)
+    #         for chapter, score in test_info["Avg_of_student_chapter_wise"].items():
+    #             if chapter not in student_scores:
+    #                 student_scores[chapter] = []
+    #             student_scores[chapter].append(score)
+    # print(student_scores)
     
-    for test in common_data:
-        for test_id, test_info in test.items():
-            date = test_id.split("-")[0]
-            for chapter, score in test_info["Avg_of_class_chapter_wise"].items():
-                if chapter not in class_scores:
-                    class_scores[chapter] = []
-                class_scores[chapter].append(score)
-    
+    # for test in common_data:
+    #     for test_id, test_info in test.items():
+    #         date = test_id.split("-")[0]
+    #         for chapter, score in test_info["Avg_of_class_chapter_wise"].items():
+    #             if chapter not in class_scores:
+    #                 class_scores[chapter] = []
+    #             class_scores[chapter].append(score)
+    # print(class_scores)
     student_df = pd.DataFrame.from_dict(student_scores, orient='index', columns=test_dates).fillna(0)
     class_df = pd.DataFrame.from_dict(class_scores, orient='index', columns=test_dates).fillna(0)
     
-    fig, axes = plt.subplots(1, 2, figsize=(16, 8), sharey=True, gridspec_kw={'width_ratios': [1, 1.2]})  
+    fig, axes = plt.subplots(1, 2, figsize=(7.75, 4.5), sharey=True, gridspec_kw={'width_ratios': [1, 1.2]})  
     
-    sns.heatmap(student_df, cmap="gray_r", annot=True, fmt=".0f", yticklabels=False, cbar=False, 
-                linewidths=0.5, linecolor='black', vmin=0, vmax=100, ax=axes[0])
-    axes[0].set_title("Student Performance Heatmap")
+    sns.heatmap(student_df, cmap="RdYlGn", annot=True, fmt=".0f", yticklabels=False, cbar=False, 
+                linewidths=0.3, linecolor='black', vmin=0, vmax=100, ax=axes[0])
+    axes[0].set_title(f"Performance of {roll_number}")
     axes[0].set_xlabel("Test Date")
     axes[0].set_ylabel("")
     
-    sns.heatmap(class_df, cmap="gray_r", annot=True, fmt=".0f", yticklabels=True, linecolor='black', 
-                linewidths=0.5, vmin=0, vmax=100, ax=axes[1])
-    axes[1].set_title("Class Average Performance Heatmap")
+    sns.heatmap(class_df, cmap="RdYlGn", annot=True, fmt=".0f", yticklabels=True, linecolor='black', 
+                linewidths=0.3, vmin=0, vmax=100, ax=axes[1])
+    axes[1].set_title("Class Avg Performance")
     axes[1].set_xlabel("Test Date")
     axes[1].set_ylabel("")
 
     axes[1].yaxis.set_label_position("left")
     axes[1].yaxis.tick_left()
 
-    plt.subplots_adjust(wspace=0.05)  
-
+    plt.subplots_adjust(wspace=1.25)  
     plt.tight_layout()
     plt.savefig("Data/Graph/student_vs_class_heatmaps.png", dpi=300, bbox_inches='tight')
     plt.show()
+
+
 
 def group_by_topics(data, subject, who):
     grouped_data = {}
@@ -246,13 +317,100 @@ def group_by_topics(data, subject, who):
 
             if count > 0:
                 grouped_data[test][topic] = round(grouped_data[test][topic] / count, 2)
-    
+    # print(grouped_data)
     return grouped_data
 
 
 
+def plot_student_vs_class_avg_spi(student_data,class_data):
+    for value in student_data[-1]:
+        student_spi=student_data[-1][value]["Avg_SPI_till_date"]
+    for value in class_data[-1]:
+        class_spi=class_data[-1][value]["Avg_SPI_of_class_till_date"]
+    categories = ["Class SPI", "Student SPI"]
+    values = [class_spi, student_spi]
+
+    # Create horizontal bar plot
+    plt.figure(figsize=(8, 1.2))
+    bars = plt.barh(categories, values, color=['red', 'green'], height=0.3)
+    for bar, value in zip(bars, values):
+        plt.text(value + 2, bar.get_y() + bar.get_height()/2, str(value), va='center', fontsize=12, fontweight='bold')
+
+    # Labels and title
+    plt.gca().spines['top'].set_visible(False)
+    plt.gca().spines['right'].set_visible(False)
+
+    plt.xlabel("SPI Score")
+    plt.title("Class SPI vs Student SPI Comparison")
+    plt.xlim(0, 100)  # Assuming SPI is out of 100
+    plt.grid(axis='x', linestyle='--', alpha=0.5)
+    plt.gcf().set_size_inches(8, 2)
+    plt.savefig("Data/Graph/student_vs_class_spi.png", dpi=300, bbox_inches='tight')
+    plt.show()
 
 
+
+
+# def create_pie_chart_for_distribution_comparison(student_data,class_data):
+#     grouped_data = {}
+#     test_data=student_data[-1]
+#     test = list(test_data.keys())[0]
+#     temp = test_data[test][f'Avg_of_student_chapter_wise']
+    
+#     if test not in grouped_data:
+#         grouped_data[test] = {}
+
+#     for topic, chapters in subjects[subject].items():
+#         if topic not in grouped_data[test]:
+#             grouped_data[test][topic] = 0 
+#             count = 0  
+
+#         for chapter_main in chapters:
+#             if chapter_main in temp:
+#                 grouped_data[test][topic] += temp[chapter_main]
+#                 count += 1
+
+#         if count > 0:
+#             grouped_data[test][topic] = round(grouped_data[test][topic] / count, 2)
+#     student_grouped_data=grouped_data
+
+#     grouped_data = {}
+#     test_data=class_data[-1]
+#     test = list(test_data.keys())[0]
+#     temp = test_data[test][f'Avg_of_class_chapter_wise']
+    
+#     if test not in grouped_data:
+#         grouped_data[test] = {}
+
+#     for topic, chapters in subjects[subject].items():
+#         if topic not in grouped_data[test]:
+#             grouped_data[test][topic] = 0 
+#             count = 0  
+
+#         for chapter_main in chapters:
+#             if chapter_main in temp:
+#                 grouped_data[test][topic] += temp[chapter_main]
+#                 count += 1
+
+#         if count > 0:
+#             grouped_data[test][topic] = round(grouped_data[test][topic] / count, 2)
+#     class_grouped_data=grouped_data
+
+#     print(student_grouped_data)
+#     student_data_processing=list(student_grouped_data.values())[0]
+#     student_label=list(student_data_processing.keys())
+#     student_values=list(student_data_processing.values())
+#     fig = plt.figure(figsize=(7, 7))
+#     ax = fig.add_subplot()
+
+#     # Create the Pie Chart
+#     ax.pie(student_values, labels=student_label, autopct='%1.1f%%', startangle=140)
+
+#     # Save as PNG
+#     plt.savefig("student_pie_chart.png", dpi=300)
+
+#     # Show the figure
+#     plt.show()
 # def plot_topicwise_trends(data):
 #     grouped_data = group_by_topics(data)
 #     plt.figure(figsize=(10, 6))
@@ -283,8 +441,9 @@ def group_by_topics(data, subject, who):
 
 
 if __name__ == "__main__":
-    print("ALLO!")
-    topic = []
-    for topics in subjects["CHEMISTRY"]:
-        topic.append(topics)
-    print(topic)
+    a,b=get_data(data_processed_path,common_data_processed_path)
+    # generate_grayscale_heatmaps(a,b)
+    # student_class_avg_datewise(a,b)
+    # plot_student_vs_class_avg_spi(a,b)
+    # print(group_by_topics(a, "PHYSICS", "student"))
+    create_pie_chart_for_distribution_comparison(a,b)

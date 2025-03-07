@@ -1,7 +1,8 @@
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
-import datetime , file_check, specific_data_main, upload_main
+import datetime , file_check, specific_data_main, upload_main, os, csv, CTkTable
 import work_graph as grph
+from datetime import datetime
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -26,6 +27,7 @@ frame_container.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
 frame_right_upload = ctk.CTkFrame(frame_container, border_width=0)
 frame_right_students = ctk.CTkFrame(frame_container, border_width=0)
 frame_right_download = ctk.CTkFrame(frame_container, border_width=0)
+frame_right_history = ctk.CTkFrame(frame_container, border_width=0)
 
 # Function to Switch Pages
 def show_frame(frame):
@@ -57,6 +59,9 @@ nav_button3 = ctk.CTkButton(frame_left, text="Upload", fg_color="transparent", h
                             command=lambda: show_frame(frame_right_upload))
 nav_button3.pack(fill="x", pady=5)
 
+nav_button4 = ctk.CTkButton(frame_left, text="History", fg_color="transparent", hover_color="#4E5257",
+                            command=lambda: show_frame(frame_right_history))
+nav_button4.pack(fill="x", side="bottom", pady=15)
 
 #==============================Test Analysis======================================= 
 #==================================================================================
@@ -73,7 +78,7 @@ date_entry.grid(row=1, column=1, padx=10, pady=(20, 10))
 
 def is_valid_date(date_str):
     try:
-        datetime.datetime.strptime(date_str, "%d/%m/%Y")
+        datetime.strptime(date_str, "%d/%m/%Y")
         return True 
     except ValueError:
         return False  
@@ -169,6 +174,30 @@ def empty_variables():
     student_analysis_save_flile_label.configure(text="Student Analysis Path")
     blueprint_data_save_flile_label.configure(text="Blueprint Data Path")
 
+def create_log():
+
+    now = datetime.now()
+    date, time = now.date().strftime("%d/%m/%Y"), now.time().strftime("%H:%M:%S")
+    path_save_to = r"Data/logs.csv"
+
+    os.makedirs(os.path.dirname(path_save_to), exist_ok=True)
+    file_exists = os.path.exists(path_save_to)
+
+    with open(path_save_to, "a" if file_exists else "w", newline="") as file_log:
+        columns = ["Test Details", "Upload Date", "Upload Time"]
+        file_obj = csv.DictWriter(file_log, fieldnames=columns)
+
+        if not file_exists:
+            file_obj.writeheader()
+
+        file_obj.writerow({
+            "Test Details": f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()}",
+            "Upload Date": date,
+            "Upload Time": time
+        })
+
+    print(f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()} saved on {date} {time}")
+
 def run_main_code():
     # print(expanded_scorelist_path.get(), student_analysis_path.get(), blueprint_data_path.get())
     if not expanded_scorelist_path.get() or not blueprint_data_path.get() or not student_analysis_path.get():
@@ -188,6 +217,7 @@ def run_main_code():
                         student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get())
         specific_data_main.main(expanded_scorelist_path.get(),date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
         messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
+        create_log()
     else:
         messagebox.showerror("File Error","Please recheck the files.")
 
@@ -391,4 +421,10 @@ get_individual_data_button.grid(row=4, column=0, columnspan=4, pady=10)
 download_label = ctk.CTkLabel(frame_right_download, text="Download", font=("Arial", 24, "bold"))
 download_label.grid(row=0, column=0, padx=20, pady=20)
 #Skibidi
+
+#===================================History======================================== 
+#==================================================================================
+
+
+
 app.mainloop()

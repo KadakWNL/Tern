@@ -2,6 +2,7 @@ import pandas as pd
 from pprint import pprint
 from collections import defaultdict
 import os
+import math
 import time
 import json as js
 DATE_OF_TEST = None
@@ -122,8 +123,6 @@ def save_common_data(data):
 
 
 
-
-
 def save_data_to_csv(data, roll):
     output_path=f'Data/Processed/{subject}'
     os.makedirs(output_path, exist_ok=True)
@@ -147,6 +146,8 @@ def save_data_to_csv(data, roll):
         with open(file_path,'w') as current_file:
             js.dump(data, current_file, indent=4)
 
+def calculate_the_avg_spi_till_date(data_by_roll_no,roll):
+    return int(sum(list(data_by_roll_no["Marks_Scored"])) / len(data_by_roll_no["Marks_Scored"]))
 
 def find_highest_scoring_chapter(student_avg_list):
     highest_scores = {}
@@ -240,6 +241,20 @@ def calculate_average_of_each_chapter_individual(data_by_roll_no,roll):
 
     return subjectwise_chapter_average_individual_roll_wise
 
+def filtering_data_and_calculating_avg(data_by_roll_no):
+    temp=[]
+    for index, row in data_by_roll_no.iterrows():
+        if str(row["Test ID"])==str(current_test_id):
+            temp.append(int(row["Marks_Scored"]))
+    if len(temp)>0:
+        return math.ceil(sum(temp)/len(temp))
+    else:
+        return 0
+
+
+
+
+
 
 def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None):
     global DATE_OF_TEST, current_test_id, subject
@@ -270,12 +285,17 @@ def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None)
             data_by_roll_no=pd.read_csv(path_of_data+f'/{roll}.csv')
             value_of_1=calculate_average_of_each_chapter_individual(data_by_roll_no,roll)
             avg_values_all_students.append(value_of_1) # THIS IS AVG OF ALL STUDENTS PER CHAPTER
-            performance_avg_of_student[subject]=(int(roll),DATE_OF_TEST,round(sum(data_by_roll_no['Marks_Scored'])/(len(data_by_roll_no['Marks_Scored']))))
+            # print(data_by_roll_no)
+            avg_score=filtering_data_and_calculating_avg(data_by_roll_no)
+
+
+            performance_avg_of_student[subject]=(int(roll),DATE_OF_TEST,avg_score)
         except FileNotFoundError:
             performance_avg_of_student[subject]=(int(roll),DATE_OF_TEST,0)
-
-        performance_avg_of_all_students.append(performance_avg_of_student)
-
+        except ZeroDivisionError:
+            pass
+        if performance_avg_of_student:
+            performance_avg_of_all_students.append(performance_avg_of_student)
     # pprint(performance_avg_of_all_students)# AVERAGE OF STUDENT IN ALL THE TEST
     #2
     # pprint(avg_values_all_students)
@@ -285,13 +305,39 @@ def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None)
 
     avg_of_whole_class={}
     val=[]  
-    for performance_avg_of_student in performance_avg_of_all_students:
-        
-        val.append(performance_avg_of_student[subject][2])
-        avg_of_whole_class[subject]=(DATE_OF_TEST,round(sum(val)/len(val)))
+    try:
 
-    pprint(avg_of_whole_class)#  AVERAGE OF WHOLE CLASSSSSSSSSSSSSSS
+        for performance_avg_of_student in performance_avg_of_all_students:
+            
+            val.append(performance_avg_of_student[subject][2])
+    except ZeroDivisionError:
+        pass
+
+    if len(val)!=0:
+        avg_of_whole_class[subject]=(DATE_OF_TEST,round(sum(val)/len(val)))
+    else:
+        avg_of_whole_class[subject]=(DATE_OF_TEST,0)
+
+    # pprint(avg_of_whole_class)#  AVERAGE OF WHOLE CLASSSSSSSSSSSSSSS
     #3
+
+#==========================================================================
+#============Shi is used to calc the Average over time SPI=================
+    avg_spi_till_date_roll_wise={}
+    temp=0
+    for roll in roll_no:
+        data_by_roll_no=pd.read_csv(path_of_data+f'/{roll}.csv')
+        avg_spi_till_date=calculate_the_avg_spi_till_date(data_by_roll_no,roll)
+        temp+=math.ceil(avg_spi_till_date)
+        avg_spi_till_date_roll_wise[roll]=avg_spi_till_date
+    #For class
+    avg_spi_till_date_class=math.ceil(temp/len(roll_no))
+    del temp
+
+
+
+
+
 
 #==========================================================================
 
@@ -325,31 +371,31 @@ def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None)
     #5
 
 #==========================================================================
-    avg_of_each_test={}
+    # avg_of_each_test={}
 
-    for roll in roll_no:
-        indiv_avg={}
-        val=[]
-        avg=0
+    # for roll in roll_no:
+    #     indiv_avg={}
+    #     val=[]
+    #     avg=0
 
-        try:
-            path_of_data=f'Data/{subject}'
-            data_by_roll_no=pd.read_csv(path_of_data+f'/{roll}.csv')
+    #     try:
+    #         path_of_data=f'Data/{subject}'
+    #         data_by_roll_no=pd.read_csv(path_of_data+f'/{roll}.csv')
 
-            for index in range(len(data_by_roll_no)):
-                if data_by_roll_no['Test ID'][index]==current_test_id:
-                    avg=sum(data_by_roll_no['Marks_Scored'])/len(data_by_roll_no['Marks_Scored'])
-                    # val.append(data_by_roll_no['Marks_Scored'])
+    #         for index in range(len(data_by_roll_no)):
+    #             if data_by_roll_no['Test ID'][index]==current_test_id:
+    #                 avg=sum(data_by_roll_no['Marks_Scored'])/len(data_by_roll_no['Marks_Scored'])
+    #                 # val.append(data_by_roll_no['Marks_Scored'])
 
-            indiv_avg[current_test_id]=(subject,round(avg))
+    #         indiv_avg[current_test_id]=(subject,round(avg))
 
-        except (ZeroDivisionError,FileNotFoundError):
-            indiv_avg[current_test_id]=(subject,0)
-        avg_of_each_test[int(roll)]=indiv_avg
+    #     except (ZeroDivisionError,FileNotFoundError):
+    #         indiv_avg[current_test_id]=(subject,0)
+    #     avg_of_each_test[int(roll)]=indiv_avg
 
-    # pprint(avg_of_each_test) #RETURNS AVG OF A TEST GIVEN THE TEST NUMBER WITH IT
-    #THIS SHI USELESS :(
-    #Already did it up
+    # # pprint(avg_of_each_test) #RETURNS AVG OF A TEST GIVEN THE TEST NUMBER WITH IT
+    # #THIS SHI USELESS :(
+    # #Already did it up
 
 #================================================================================
 
@@ -398,7 +444,7 @@ def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None)
             str(DATE_OF_TEST)+'-'+str(subject)+'-'+str(current_test_id):{
                 'Avg_of_test':avg_of_the_test_for_saving,
                 'Avg_of_student_chapter_wise':list_of_avg_chapter_wise_for_saving,
-                
+                'Avg_SPI_till_date':avg_spi_till_date_roll_wise[roll],
                 'Max_marks_chapter_wise':max_marks_chapter_wise_for_saving,
                 'Max_marks_in_current_test':max_marks_in_this_test_for_saving,
             }
@@ -412,6 +458,7 @@ def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None)
             str(DATE_OF_TEST)+'-'+str(subject)+'-'+str(current_test_id):{
                 'Avg_of_class':avg_of_whole_class[subject][-1],
                 'Avg_of_class_chapter_wise':list_of_class_avg_chapter_wise_for_saving,
+                'Avg_SPI_of_class_till_date':avg_spi_till_date_class
             }
     }
     save_common_data(common_data)
