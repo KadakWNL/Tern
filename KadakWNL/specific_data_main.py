@@ -1,9 +1,7 @@
 import pandas as pd
 from pprint import pprint
 from collections import defaultdict
-import os
-import math
-import time
+import os, math, time, csv
 import json as js
 DATE_OF_TEST = None
 current_test_id = None
@@ -251,7 +249,7 @@ def filtering_data_and_calculating_avg(data_by_roll_no):
     else:
         return 0
 
-
+    
 
 
 
@@ -263,12 +261,47 @@ def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None)
     current_test_id = test_id
     subject = sub
 
+    import os
+
+    dir_path = "Data"
+    file_path = f"{dir_path}/student_names.csv"
+
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+        
+    if not os.path.exists(file_path):
+        with open(file_path, "w") as f:
+            pass
+
     path_of_data = f'Data/{subject}'
         
     expanded_scorelist=pd.read_excel(expanded_scorelist_path)
-    roll_no=[]
 
-    for index in range(len(expanded_scorelist)): #replace with: range(len(expanded_scorelist))
+    existing_roll_numbers = set()
+
+    if os.path.exists(file_path):  # Check if file exists
+        with open(file_path, "r", newline="") as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader, None)  # Skip header
+            for row in reader:
+                if len(row) >= 1:  # Ensure there's at least one column
+                    existing_roll_numbers.add(row[0].strip())  # Store roll_no
+
+    with open(file_path, "a", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+    
+        if os.stat(file_path).st_size == 0:
+            writer.writerow(["Roll Number", "Name"])  
+    
+        for index in range(len(expanded_scorelist)):
+            roll_no_csv = str(expanded_scorelist['CANDIDATE ID'][index]).strip()
+            name = str(expanded_scorelist['CANDIDATE NAME'][index]).strip()
+
+            if roll_no_csv not in existing_roll_numbers:  
+                writer.writerow([roll_no_csv, name])
+
+    roll_no=[]
+    for index in range(len(expanded_scorelist)):
         roll_no.append(expanded_scorelist["CANDIDATE ID"][index])
 
     avg_values_all_students=[]

@@ -1,8 +1,9 @@
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
-import datetime , file_check, specific_data_main, upload_main, os, csv, CTkTable
+import datetime , file_check, specific_data_main, upload_main, os, csv, json
 import work_graph as grph
 from datetime import datetime
+from CTkTable import *
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -198,6 +199,8 @@ def create_log():
 
     print(f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()} saved on {date} {time}")
 
+
+
 def run_main_code():
     # print(expanded_scorelist_path.get(), student_analysis_path.get(), blueprint_data_path.get())
     if not expanded_scorelist_path.get() or not blueprint_data_path.get() or not student_analysis_path.get():
@@ -220,7 +223,8 @@ def run_main_code():
         create_log()
     else:
         messagebox.showerror("File Error","Please recheck the files.")
-
+    
+    refresh_frame(frame_right_history)
     empty_variables()
     
 run_analysis_button = ctk.CTkButton(frame_right_upload, text="Run Test Analysis", width=175, height=40,font=("Arial", 18), command=lambda: (on_submit(), run_main_code()))
@@ -425,6 +429,166 @@ download_label.grid(row=0, column=0, padx=20, pady=20)
 #===================================History======================================== 
 #==================================================================================
 
+def load_logs():
+    log_file = "Data/logs.csv"
+    if not os.path.exists(log_file):
+        return []  
 
+    with open(log_file, "r", newline="") as file:
+        reader = csv.reader(file)
+        data = list(reader) 
+
+    for test in data[1:]:
+        date_test, subj, id = test[0].split("-")
+        if subj == "PHYSICS":
+            test[0] = f"PH{id}"
+        elif subj == "MATHEMATICS":
+            test[0] = f"MA{id}"
+        elif subj == "CHEMISTRY":
+            test[0] = f"CY{id}"
+    return data
+
+def delete_entries():
+    id_thing = ""
+    subj, to_delete_id = delete_entry_var.get()[:2], delete_entry_var.get()[-3:]
+    if subj == "PH":
+        id_thing = f"PHYSICS-{to_delete_id}"
+        subj = "PHYSICS"
+    elif subj == "CY":
+        id_thing = f"CHEMISTRY-{to_delete_id}"
+        subj = "CHEMISTRY"
+    elif subj == "MA":
+        id_thing = f"MATHEMATICS-{to_delete_id}"
+        subj = "MATHEMATICS"
+    else:
+        messagebox.showerror("Invalid ID", "Please enter the correct Test ID.")
+        return
+    
+    try:
+        roll_file_path = r"Data/student_names.csv"
+        roll_numbers = []
+
+        with open(roll_file_path, "r", newline="") as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader, None)
+            for row in reader:
+                if len(row) >= 1:
+                    roll_numbers.append(row[0].strip())
+        
+        # REMOVING UNPROCESSED DATA
+        for roll_no in roll_numbers:
+            roll_no_path = rf"Data/{subj}/{roll_no}.csv"
+            filtered_rows = []
+
+            with open(roll_no_path, "r", newline="") as csvfile:
+                reader = csv.reader(csvfile)
+                header = next(reader)
+
+                for row in reader:
+                    if len(row) >= 3 and row[2] != to_delete_id:
+                        filtered_rows.append(row)
+
+            with open(roll_no_path, "w", newline="") as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(header)
+
+                for row in filtered_rows:
+                    writer.writerow(row)
+        
+        # REMOVING PROCESSED DATA (Individual Student Files)
+        for roll_no in roll_numbers:
+            roll_no_processed_path = f"Data/Processed/{subj}/{roll_no}.json"
+
+            if not os.path.exists(roll_no_processed_path):
+                continue  # Skip if the file doesn't exist
+
+            with open(roll_no_processed_path, "r") as file:
+                data = json.load(file)  # Data is a LIST of dictionaries
+
+            # Remove only the dictionary containing the specific test entry
+            filtered_data = [entry for entry in data if id_thing not in entry]
+
+            # If the file is empty after deletion, remove it
+            if filtered_data:
+                with open(roll_no_processed_path, "w") as file:
+                    json.dump(filtered_data, file, indent=4)
+            else:
+                os.remove(roll_no_processed_path)  # Delete file when empty
+
+        # REMOVING COMMON PROCESSED DATA
+        common_processed_path = f"Data/Processed/{subj}/common_data.json"
+
+        if os.path.exists(common_processed_path):
+            with open(common_processed_path, "r") as file:
+                data = json.load(file)  # Data is a LIST of dictionaries
+
+            # Remove only the specific test entry
+            filtered_data = [entry for entry in data if id_thing not in entry]
+
+            # If no data remains, delete the file
+            if filtered_data:
+                with open(common_processed_path, "w") as file:
+                    json.dump(filtered_data, file, indent=4)
+            else:
+                os.remove(common_processed_path)  # Delete file when empty
+
+
+
+        # Deleting last log!
+        logs_path = r"Data/logs.csv"
+        with open(logs_path, "r", newline="") as file:
+            reader = csv.reader(file)
+            headers = next(reader) 
+            logs = [row for row in reader if not row[0].endswith(id_thing)]
+
+        with open(logs_path, "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(headers) 
+            writer.writerows(logs)
+    except FileNotFoundError:
+        pass
+    messagebox.showinfo("Success", f"Test {to_delete_id} has been deleted successfully!")
+    refresh_frame(frame_right_history)
+
+
+
+delete_entry_var = ctk.StringVar()        
+def refresh_frame(frame):
+    delete_entry_var.set("")  # Clear the input before destroying widgets
+
+    for widget in frame.winfo_children():
+        widget.destroy()
+    
+    logs = load_logs()
+
+    scrollable_frame = ctk.CTkScrollableFrame(frame_right_history, width=650, height=400)
+    scrollable_frame.pack(expand=True, fill="both")
+
+    delete_frame = ctk.CTkFrame(scrollable_frame)
+    delete_frame.pack(pady=2, side="top")
+
+    delete_label = ctk.CTkLabel(delete_frame, text="Enter ID: ", font=("Arial", 14))
+    delete_label.grid(row=0, column=0, padx=5, pady=5)
+
+    delete_entry = ctk.CTkEntry(delete_frame, placeholder_text="SU000", textvariable=delete_entry_var)
+    delete_entry.grid(row=0, column=1, padx=5, pady=5)
+
+    delete_butoon = ctk.CTkButton(delete_frame, text="Delete", command=delete_entries)    
+    delete_butoon.grid(row=0, column=2, padx=5, pady=5)
+
+    table = CTkTable(
+        master=scrollable_frame,
+        row=len(logs), column=3,
+        values=[logs[0]] + sorted(
+            logs[1:], key=lambda x: datetime.strptime(f"{x[1]} {x[2]}", "%d/%m/%Y %H:%M:%S"), 
+            reverse=True
+        ),
+        corner_radius=3
+    )
+    table.pack(expand=True, fill="both", padx=20, pady=20)
+try:
+    refresh_frame(frame_right_history)
+except IndexError:
+    pass
 
 app.mainloop()
