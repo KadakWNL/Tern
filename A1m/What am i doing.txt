@@ -8,3 +8,6 @@ Uvicorn for hosting and fastapi for data transfer between python and react
 Installed axios
 npm install axios
 
+ALRIGHT LETS DITCH MATPLOT LIB AND ALL THAT BULLSHIT LIKE BRO WTFFF
+Lets start using apexplotting for plotting graphs sidha into frontend
+also the graphs are amazing

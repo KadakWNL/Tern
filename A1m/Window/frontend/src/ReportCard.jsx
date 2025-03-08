@@ -28,28 +28,49 @@ const ReportCard = () => {
                         <p><br></br> </p>
                     </div>
                 </div>
-
                 <div className="mt-8">
-                    <h3 className="font-bold text-2xl text-center">Performance Analysis</h3>
+                        <h3 className="font-bold text-2xl text-center mb-4">
+                            Performance Analysis
+                        </h3>
 
-                    <div className="mt-4 flex flex-col gap-10">
-                        {/* Image 1 - Stretched, No Clipping */}
-                        <img src={student_performance_over_time} 
-                            alt="Time Graph" 
-                            className="w-full h-[30vh] object-cover rounded-lg"/>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Image 1 - Time Graph */}
+                            <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+                                <img 
+                                    src={student_performance_over_time} 
+                                    alt="Time Graph" 
+                                    className="w-full aspect-[16/9] object-contain p-4"
+                                />
+                                <p className="text-center text-sm text-gray-500 p-2">
+                                    Student Performance Over Time
+                                </p>
+                            </div>
 
-                        {/* Image 2 - Stretched, No Clipping */}
-                        <img src={student_vs_class_heatmaps} 
-                            alt="Heatmap Graph" 
-                            className="w-full h-[35vh] object-cover rounded-lg"/>
+                            {/* Image 2 - Heatmap Graph */}
+                            <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+                                <img 
+                                    src={student_vs_class_heatmaps} 
+                                    alt="Heatmap Graph" 
+                                    className="w-full aspect-[16/9] object-contain p-4"
+                                />
+                                <p className="text-center text-sm text-gray-500 p-2">
+                                    Student vs Class Heatmap
+                                </p>
+                            </div>
 
-                        {/* Image 3 - Stretched, No Clipping */}
-                        <img src={student_vs_class_spi} 
-                            alt="Subject Analysis Graph" 
-                            className="w-full h-[40vh] object-cover rounded-lg"/>
+                            {/* Image 3 - Subject Analysis Graph */}
+                            <div className="bg-white shadow-lg rounded-lg overflow-hidden col-span-1 md:col-span-2">
+                                <img 
+                                    src={student_vs_class_spi} 
+                                    alt="Subject Analysis Graph" 
+                                    className="w-full aspect-[16/7] object-contain p-4"
+                                />
+                                <p className="text-center text-sm text-gray-500 p-2">
+                                    Subject-Wise Performance Analysis
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
 
 
                 {/* GPA Scale */}
