@@ -1,8 +1,9 @@
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
-import datetime , file_check, specific_data_main, upload_main
+import datetime , file_check, specific_data_main, upload_main, os, csv, json
 import work_graph as grph
-import window_generation as wg
+from datetime import datetime
+from CTkTable import *
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -27,6 +28,7 @@ frame_container.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
 frame_right_upload = ctk.CTkFrame(frame_container, border_width=0)
 frame_right_students = ctk.CTkFrame(frame_container, border_width=0)
 frame_right_download = ctk.CTkFrame(frame_container, border_width=0)
+frame_right_history = ctk.CTkFrame(frame_container, border_width=0)
 
 # Function to Switch Pages
 def show_frame(frame):
@@ -58,6 +60,9 @@ nav_button3 = ctk.CTkButton(frame_left, text="Upload", fg_color="transparent", h
                             command=lambda: show_frame(frame_right_upload))
 nav_button3.pack(fill="x", pady=5)
 
+nav_button4 = ctk.CTkButton(frame_left, text="History", fg_color="transparent", hover_color="#4E5257",
+                            command=lambda: show_frame(frame_right_history))
+nav_button4.pack(fill="x", side="bottom", pady=15)
 
 #==============================Test Analysis======================================= 
 #==================================================================================
@@ -74,7 +79,7 @@ date_entry.grid(row=1, column=1, padx=10, pady=(20, 10))
 
 def is_valid_date(date_str):
     try:
-        datetime.datetime.strptime(date_str, "%d/%m/%Y")
+        datetime.strptime(date_str, "%d/%m/%Y")
         return True 
     except ValueError:
         return False  
@@ -170,6 +175,32 @@ def empty_variables():
     student_analysis_save_flile_label.configure(text="Student Analysis Path")
     blueprint_data_save_flile_label.configure(text="Blueprint Data Path")
 
+def create_log():
+
+    now = datetime.now()
+    date, time = now.date().strftime("%d/%m/%Y"), now.time().strftime("%H:%M:%S")
+    path_save_to = r"Data/logs.csv"
+
+    os.makedirs(os.path.dirname(path_save_to), exist_ok=True)
+    file_exists = os.path.exists(path_save_to)
+
+    with open(path_save_to, "a" if file_exists else "w", newline="") as file_log:
+        columns = ["Test Details", "Upload Date", "Upload Time"]
+        file_obj = csv.DictWriter(file_log, fieldnames=columns)
+
+        if not file_exists:
+            file_obj.writeheader()
+
+        file_obj.writerow({
+            "Test Details": f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()}",
+            "Upload Date": date,
+            "Upload Time": time
+        })
+
+    print(f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()} saved on {date} {time}")
+
+
+
 def run_main_code():
     # print(expanded_scorelist_path.get(), student_analysis_path.get(), blueprint_data_path.get())
     if not expanded_scorelist_path.get() or not blueprint_data_path.get() or not student_analysis_path.get():
@@ -189,9 +220,11 @@ def run_main_code():
                         student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get())
         specific_data_main.main(expanded_scorelist_path.get(),date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
         messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
+        create_log()
     else:
         messagebox.showerror("File Error","Please recheck the files.")
-
+    
+    refresh_frame(frame_right_history)
     empty_variables()
     
 run_analysis_button = ctk.CTkButton(frame_right_upload, text="Run Test Analysis", width=175, height=40,font=("Arial", 18), command=lambda: (on_submit(), run_main_code()))
@@ -363,8 +396,8 @@ def clear_fields_students():
 #*********************************************************************
 def generate_graph(roll_no, subject):
     check_missing_fields_students()
-    student_data_path = rf"Data\Processed\{subject}\{roll_no}.json"
-    common_data_path = rf"Data\Processed\{subject}\common_data.json"
+    student_data_path = f"Data/Processed/{subject}/{roll_no}.json"
+    common_data_path = f"Data/Processed/{subject}/common_data.json"
 
     student_data, common_data = grph.get_data(student_data_path, common_data_path)
 
@@ -374,18 +407,15 @@ def generate_graph(roll_no, subject):
         print(student_grouped, class_grouped)
     elif overall_chapter_variable.get() == "overall":
         grph.student_class_avg_datewise(student_data, common_data)
-        grph.generate_grayscale_heatmaps(student_data,common_data,subject_entry_variable_students.get())
-        grph.plot_student_vs_class_avg_spi(student_data,common_data)
         grph.create_radio_chart_for_distribution_comparison(student_data,common_data)
-        # wg.open_graph_window(app)
-
-        
+        grph.generate_grayscale_heatmaps(student_data,common_data)
+        grph.plot_student_vs_class_avg_spi(student_data,common_data)
     clear_fields_students()
 
 get_individual_data_button = ctk.CTkButton(main_container, text="Generate Data", 
-                                            width=150, height=35, font=("Arial", 14),
-                                            command=lambda: generate_graph(roll_no_variable_students.get(), 
-                                            subject_entry_variable_students.get()))
+                                         width=150, height=35, font=("Arial", 14),
+                                         command=lambda: generate_graph(roll_no_variable_students.get(), 
+                                                                      subject_entry_variable_students.get()))
 get_individual_data_button.grid(row=4, column=0, columnspan=4, pady=10)
 
 
@@ -398,4 +428,170 @@ get_individual_data_button.grid(row=4, column=0, columnspan=4, pady=10)
 download_label = ctk.CTkLabel(frame_right_download, text="Download", font=("Arial", 24, "bold"))
 download_label.grid(row=0, column=0, padx=20, pady=20)
 #Skibidi
+
+#===================================History======================================== 
+#==================================================================================
+
+def load_logs():
+    log_file = "Data/logs.csv"
+    if not os.path.exists(log_file):
+        return []  
+
+    with open(log_file, "r", newline="") as file:
+        reader = csv.reader(file)
+        data = list(reader) 
+
+    for test in data[1:]:
+        date_test, subj, id = test[0].split("-")
+        if subj == "PHYSICS":
+            test[0] = f"PH{id}"
+        elif subj == "MATHEMATICS":
+            test[0] = f"MA{id}"
+        elif subj == "CHEMISTRY":
+            test[0] = f"CY{id}"
+    return data
+
+def delete_entries():
+    id_thing = ""
+    subj, to_delete_id = delete_entry_var.get()[:2], delete_entry_var.get()[-3:]
+    if subj == "PH":
+        id_thing = f"PHYSICS-{to_delete_id}"
+        subj = "PHYSICS"
+    elif subj == "CY":
+        id_thing = f"CHEMISTRY-{to_delete_id}"
+        subj = "CHEMISTRY"
+    elif subj == "MA":
+        id_thing = f"MATHEMATICS-{to_delete_id}"
+        subj = "MATHEMATICS"
+    else:
+        messagebox.showerror("Invalid ID", "Please enter the correct Test ID.")
+        return
+    
+    try:
+        roll_file_path = r"Data/student_names.csv"
+        roll_numbers = []
+
+        with open(roll_file_path, "r", newline="") as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader, None)
+            for row in reader:
+                if len(row) >= 1:
+                    roll_numbers.append(row[0].strip())
+        
+        # REMOVING UNPROCESSED DATA
+        for roll_no in roll_numbers:
+            roll_no_path = rf"Data/{subj}/{roll_no}.csv"
+            filtered_rows = []
+
+            with open(roll_no_path, "r", newline="") as csvfile:
+                reader = csv.reader(csvfile)
+                header = next(reader)
+
+                for row in reader:
+                    if len(row) >= 3 and row[2] != to_delete_id:
+                        filtered_rows.append(row)
+
+            with open(roll_no_path, "w", newline="") as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(header)
+
+                for row in filtered_rows:
+                    writer.writerow(row)
+        
+        # REMOVING PROCESSED DATA (Individual Student Files)
+        for roll_no in roll_numbers:
+            roll_no_processed_path = f"Data/Processed/{subj}/{roll_no}.json"
+
+            if not os.path.exists(roll_no_processed_path):
+                continue  # Skip if the file doesn't exist
+
+            with open(roll_no_processed_path, "r") as file:
+                data = json.load(file)  # Data is a LIST of dictionaries
+
+            # Remove only the dictionary containing the specific test entry
+            filtered_data = [entry for entry in data if id_thing not in entry]
+
+            # If the file is empty after deletion, remove it
+            if filtered_data:
+                with open(roll_no_processed_path, "w") as file:
+                    json.dump(filtered_data, file, indent=4)
+            else:
+                os.remove(roll_no_processed_path)  # Delete file when empty
+
+        # REMOVING COMMON PROCESSED DATA
+        common_processed_path = f"Data/Processed/{subj}/common_data.json"
+
+        if os.path.exists(common_processed_path):
+            with open(common_processed_path, "r") as file:
+                data = json.load(file)  # Data is a LIST of dictionaries
+
+            # Remove only the specific test entry
+            filtered_data = [entry for entry in data if id_thing not in entry]
+
+            # If no data remains, delete the file
+            if filtered_data:
+                with open(common_processed_path, "w") as file:
+                    json.dump(filtered_data, file, indent=4)
+            else:
+                os.remove(common_processed_path)  # Delete file when empty
+
+
+
+        # Deleting last log!
+        logs_path = r"Data/logs.csv"
+        with open(logs_path, "r", newline="") as file:
+            reader = csv.reader(file)
+            headers = next(reader) 
+            logs = [row for row in reader if not row[0].endswith(id_thing)]
+
+        with open(logs_path, "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(headers) 
+            writer.writerows(logs)
+    except FileNotFoundError:
+        pass
+    messagebox.showinfo("Success", f"Test {to_delete_id} has been deleted successfully!")
+    refresh_frame(frame_right_history)
+
+
+
+delete_entry_var = ctk.StringVar()        
+def refresh_frame(frame):
+    delete_entry_var.set("")  # Clear the input before destroying widgets
+
+    for widget in frame.winfo_children():
+        widget.destroy()
+    
+    logs = load_logs()
+
+    scrollable_frame = ctk.CTkScrollableFrame(frame_right_history, width=650, height=400)
+    scrollable_frame.pack(expand=True, fill="both")
+
+    delete_frame = ctk.CTkFrame(scrollable_frame)
+    delete_frame.pack(pady=2, side="top")
+
+    delete_label = ctk.CTkLabel(delete_frame, text="Enter ID: ", font=("Arial", 14))
+    delete_label.grid(row=0, column=0, padx=5, pady=5)
+
+    delete_entry = ctk.CTkEntry(delete_frame, placeholder_text="SU000", textvariable=delete_entry_var)
+    delete_entry.grid(row=0, column=1, padx=5, pady=5)
+
+    delete_butoon = ctk.CTkButton(delete_frame, text="Delete", command=delete_entries)    
+    delete_butoon.grid(row=0, column=2, padx=5, pady=5)
+
+    table = CTkTable(
+        master=scrollable_frame,
+        row=len(logs), column=3,
+        values=[logs[0]] + sorted(
+            logs[1:], key=lambda x: datetime.strptime(f"{x[1]} {x[2]}", "%d/%m/%Y %H:%M:%S"), 
+            reverse=True
+        ),
+        corner_radius=3
+    )
+    table.pack(expand=True, fill="both", padx=20, pady=20)
+try:
+    refresh_frame(frame_right_history)
+except IndexError:
+    pass
+
 app.mainloop()

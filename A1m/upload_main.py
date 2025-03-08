@@ -5,6 +5,7 @@ import os
 import glob
 import math
 import csv
+from tkinter import messagebox
 
 
 def check_existing_test(subject: str, date: str, test_id: str) -> bool:
@@ -39,7 +40,8 @@ def check_existing_test(subject: str, date: str, test_id: str) -> bool:
 def get_user_inputs(date,test_id,subject: str) -> Tuple[str, str]:
     while True:
         if check_existing_test(subject, date, test_id):
-            print(f"\nError: Test with date '{date}' and test ID '{test_id}' already exists for {subject}!")
+            messagebox.showerror("Test Exists", "Please check your inputs again!")
+            return
             if input("Would you like to try again? (y/n): ").lower() != 'y':
                 exit()
             print()

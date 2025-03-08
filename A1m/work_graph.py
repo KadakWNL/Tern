@@ -139,20 +139,20 @@ def get_data(data_processed_path, common_data_processed_path):
     return student_data, common_data
 
 
-def student_class_avg_datewise(student_data, common_data):
-    dates = []
-    student_avg = []
-    class_avg = []
-    for tests in student_data:
-        for test in tests:
-            dates.append(test.split("-")[0])
-            student_avg.append(tests[test]['Avg_of_test'])
-    for tests in common_data:
-        for test in tests:
-            if test.split("-")[0] in dates:
-                class_avg.append(tests[test]['Avg_of_class'])
-    dates = [datetime.datetime.strptime(d, "%d/%m/%Y") for d in dates]
-    # print(dates)
+# def student_class_avg_datewise(student_data, common_data):
+#     dates = []
+#     student_avg = []
+#     class_avg = []
+#     for tests in student_data:
+#         for test in tests:
+#             dates.append(test.split("-")[0])
+#             student_avg.append(tests[test]['Avg_of_test'])
+#     for tests in common_data:
+#         for test in tests:
+#             if test.split("-")[0] in dates:
+#                 class_avg.append(tests[test]['Avg_of_class'])
+#     dates = [datetime.datetime.strptime(d, "%d/%m/%Y") for d in dates]
+#     # print(dates)
 
 
 def student_class_avg_datewise(student_data, common_data):
