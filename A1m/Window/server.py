@@ -19,12 +19,10 @@ app.add_middleware(
 def get_data():
     return JSONResponse({
         "student_name": "Test_name",
-        "roll_no": "242007",
-        "metrics": {
-            "SPI": 89.5,
-            "Attendance": "95%",
-            "Rank": 5
-        }
+        "date":r"05/01/2025",
+        "roll_number" : 242007,
+        "subject" : "PHYSICS"
+        
     })
 
 # Serve React Frontend
