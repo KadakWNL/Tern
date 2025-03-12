@@ -2,15 +2,23 @@ import React from 'react';
 import Chart from 'react-apexcharts';
 
 const TopicWisePerformanceChart = ({ studentData, classData }) => {
-  const topics = Object.keys(studentData);
-  const studentScores = Object.values(studentData);
-  const classScores = Object.values(classData);
-
+    console.log(studentData)
+    console.log(classData)
+    const topics = Object.keys(studentData);
+    const studentScores = topics.map(topic => {
+      const latestTest = Object.keys(studentData[topic]).pop(); // Get the latest test key
+      return studentData[topic][latestTest]; // Get the latest test score
+    });
+    const classScores = topics.map(topic => {
+      const latestTest = Object.keys(classData[topic]).pop(); // Get the latest test key
+      return classData[topic][latestTest]; // Get the latest class score
+    });
+    
   const options = {
     chart: {
       type: 'radar',
-      height: 700, // SUPER BIG now
-      width: '100%', // Uses full width
+      height: 400, // SUPER BIG now
+      width: '50%', // Uses full width
       toolbar: {
         show: false,
       },

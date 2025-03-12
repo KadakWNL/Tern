@@ -6,15 +6,16 @@ const StudentClassHeatmaps = ({ studentData, classData }) => {
     return <div className="text-center text-gray-500">Loading heatmap data... ⏳</div>;
   }
 
-  // 🔥 Extract available test keys dynamically
-  const testEntries = Object.entries(studentData);
-  if (testEntries.length === 0) {
-    return <div className="text-center text-red-500">No test data available 😢</div>;
-  }
+  // 🔥 Extract unique test names from student data
+  const testNames = [
+    ...new Set(
+      Object.values(studentData)
+        .flatMap((topicData) => Object.keys(topicData))
+    ),
+  ];
 
-  const testNames = Object.keys(testEntries[testEntries.length - 1][1]); // Get test names from last test object
   if (testNames.length === 0) {
-    return <div className="text-center text-red-500">No test data found 😭</div>;
+    return <div className="text-center text-red-500">No test data available 😢</div>;
   }
 
   // 🔥 Function to format data for ApexCharts
@@ -23,7 +24,7 @@ const StudentClassHeatmaps = ({ studentData, classData }) => {
       name: topic, // Example: "Mechanics", "Optics", etc.
       data: testNames.map((test) => ({
         x: test,
-        y: data[topic]?.[test] ?? null, // Ensure safe access to test scores
+        y: Math.round(data[topic]?.[test] ?? null), // Round values & ensure safe access
       })),
     }));
   };
@@ -31,14 +32,7 @@ const StudentClassHeatmaps = ({ studentData, classData }) => {
   const studentSeries = formatDataForHeatmap(studentData);
   const classSeries = formatDataForHeatmap(classData);
 
-  // 🔥 Check if data is actually being populated
-  console.log("📊 Student Heatmap Data:", studentSeries);
-  console.log("📊 Class Heatmap Data:", classSeries);
 
-  // If no valid data, show a message instead of a broken chart
-  if (studentSeries.length === 0 || classSeries.length === 0) {
-    return <div className="text-center text-red-500">No heatmap data available 😭</div>;
-  }
 
   // ApexCharts config
   const options = {
@@ -80,10 +74,13 @@ const StudentClassHeatmaps = ({ studentData, classData }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Student Performance Heatmap */}
       <div className="bg-white p-4 rounded-lg shadow-md">
         <h2 className="text-lg font-semibold mb-2">Student Performance</h2>
         <Chart options={options} series={studentSeries} type="heatmap" height={400} />
       </div>
+
+      {/* Class Performance Heatmap */}
       <div className="bg-white p-4 rounded-lg shadow-md">
         <h2 className="text-lg font-semibold mb-2">Class Average Performance</h2>
         <Chart options={options} series={classSeries} type="heatmap" height={400} />
