@@ -185,7 +185,7 @@ def create_log():
     file_exists = os.path.exists(path_save_to)
 
     with open(path_save_to, "a" if file_exists else "w", newline="") as file_log:
-        columns = ["Test Details", "Upload Date", "Upload Time"]
+        columns = ["Test Details", "Test Date", "Upload Date"]
         file_obj = csv.DictWriter(file_log, fieldnames=columns)
 
         if not file_exists:
@@ -193,8 +193,8 @@ def create_log():
 
         file_obj.writerow({
             "Test Details": f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()}",
-            "Upload Date": date,
-            "Upload Time": time
+            "Test Date": date_entry_variable.get(),
+            "Upload Date": date
         })
 
     print(f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()} saved on {date} {time}")
@@ -216,11 +216,14 @@ def run_main_code():
         messagebox.showerror("Input Error", "Please enter a Subject before proceeding.")
         return
     if file_check.main(student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get(),subject_entry_variable.get()):
-        upload_main.main(subject_entry_variable.get(),date_entry_variable.get(),test_id_variable.get(),
-                        student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get())
-        specific_data_main.main(expanded_scorelist_path.get(),date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
-        messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
-        create_log()
+        if file_check.check_if_date_exists(date_entry_variable.get(),test_id_variable.get(),subject_entry_combobox.get()):
+            upload_main.main(subject_entry_variable.get(),date_entry_variable.get(),test_id_variable.get(),
+                            student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get())
+            specific_data_main.main(expanded_scorelist_path.get(),date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
+            messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
+            create_log()
+        else:
+            messagebox.showerror("The test data already exists.","Please recheck the date and test ID.")
     else:
         messagebox.showerror("File Error","Please recheck the files.")
     
@@ -509,7 +512,8 @@ def delete_entries():
                 data = json.load(file)  # Data is a LIST of dictionaries
 
             # Remove only the dictionary containing the specific test entry
-            filtered_data = [entry for entry in data if id_thing not in entry]
+            filtered_data = [entry for entry in data if not str(entry).endswith(id_thing)]
+
 
             # If the file is empty after deletion, remove it
             if filtered_data:
@@ -526,7 +530,7 @@ def delete_entries():
                 data = json.load(file)  # Data is a LIST of dictionaries
 
             # Remove only the specific test entry
-            filtered_data = [entry for entry in data if id_thing not in entry]
+            filtered_data = [entry for entry in data if not str(entry).endswith(id_thing)]
 
             # If no data remains, delete the file
             if filtered_data:
@@ -582,16 +586,13 @@ def refresh_frame(frame):
     table = CTkTable(
         master=scrollable_frame,
         row=len(logs), column=3,
-        values=[logs[0]] + sorted(
-            logs[1:], key=lambda x: datetime.strptime(f"{x[1]} {x[2]}", "%d/%m/%Y %H:%M:%S"), 
-            reverse=True
-        ),
+        values=[logs[0]] + logs[1:], 
         corner_radius=3
     )
     table.pack(expand=True, fill="both", padx=20, pady=20)
 try:
     refresh_frame(frame_right_history)
-except IndexError:
+except Exception:
     pass
 
 app.mainloop()
