@@ -33,10 +33,13 @@ def check_if_date_exists(current_date,current_test_id,current_subject):
         for test in tests:
             test_date,subject,test_id=test.split("-")
             if test_date==current_date and subject==current_subject and test_id==current_test_id:
+                print("HERE")
                 return False
             else:
                 return True
-    except FileNotFoundError:
+    except Exception as e:
+        return True
+    finally:
         return True
 
 def main(student_analysis_path,expanded_scorelist_path,blueprint_data_path,subject,current_date=None,test_id=None):

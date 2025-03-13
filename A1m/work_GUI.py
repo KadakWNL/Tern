@@ -512,8 +512,7 @@ def delete_entries():
                 data = json.load(file)  # Data is a LIST of dictionaries
 
             # Remove only the dictionary containing the specific test entry
-            filtered_data = [entry for entry in data if not str(entry).endswith(id_thing)]
-
+            filtered_data = [entry for entry in data if id_thing not in entry]
 
             # If the file is empty after deletion, remove it
             if filtered_data:
@@ -530,7 +529,7 @@ def delete_entries():
                 data = json.load(file)  # Data is a LIST of dictionaries
 
             # Remove only the specific test entry
-            filtered_data = [entry for entry in data if not str(entry).endswith(id_thing)]
+            filtered_data = [entry for entry in data if id_thing not in entry]
 
             # If no data remains, delete the file
             if filtered_data:
@@ -538,7 +537,6 @@ def delete_entries():
                     json.dump(filtered_data, file, indent=4)
             else:
                 os.remove(common_processed_path)  # Delete file when empty
-
 
 
         # Deleting last log!
