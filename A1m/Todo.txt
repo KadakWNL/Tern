@@ -1,0 +1,2 @@
+1. Fix the deletion of data. The function is not deleting the processed data
+2. Fix the random errors coming in terminal after uploading files. (Suspected: Prolly coming because of widget cleaning)
