@@ -178,7 +178,7 @@ def empty_variables():
 def create_log():
 
     now = datetime.now()
-    date, time = now.date().strftime("%d/%m/%Y"), now.time().strftime("%H:%M:%S")
+    date= now.date().strftime("%d/%m/%Y")
     path_save_to = r"Data/logs.csv"
 
     os.makedirs(os.path.dirname(path_save_to), exist_ok=True)
@@ -197,7 +197,7 @@ def create_log():
             "Upload Date": date
         })
 
-    print(f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()} saved on {date} {time}")
+    print(f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()} saved on {date}")
 
 
 
@@ -216,14 +216,14 @@ def run_main_code():
         messagebox.showerror("Input Error", "Please enter a Subject before proceeding.")
         return
     if file_check.main(student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get(),subject_entry_variable.get()):
-        if file_check.check_if_date_exists(date_entry_variable.get(),test_id_variable.get(),subject_entry_combobox.get()):
+        if file_check.check_if_date_exists(date_entry_variable.get(),test_id_variable.get(),subject_entry_variable.get()):
             upload_main.main(subject_entry_variable.get(),date_entry_variable.get(),test_id_variable.get(),
                             student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get())
             specific_data_main.main(expanded_scorelist_path.get(),date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
             messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
             create_log()
         else:
-            messagebox.showerror("The test data already exists.","Please recheck the date and test ID.")
+            messagebox.showerror("Invalid Test ID or Date", "Please check Test ID and Date")
     else:
         messagebox.showerror("File Error","Please recheck the files.")
     
@@ -410,9 +410,6 @@ def generate_graph(roll_no, subject):
         print(student_grouped, class_grouped)
     elif overall_chapter_variable.get() == "overall":
         grph.student_class_avg_datewise(student_data, common_data)
-        grph.create_radio_chart_for_distribution_comparison(student_data,common_data)
-        grph.generate_grayscale_heatmaps(student_data,common_data)
-        grph.plot_student_vs_class_avg_spi(student_data,common_data)
     clear_fields_students()
 
 get_individual_data_button = ctk.CTkButton(main_container, text="Generate Data", 
@@ -470,6 +467,19 @@ def delete_entries():
         messagebox.showerror("Invalid ID", "Please enter the correct Test ID.")
         return
     
+    logs_path = r"Data/logs.csv"
+    with open(logs_path, "r") as logs_file_check:
+        log_reader = csv.reader(logs_file_check)
+        found_entry = False
+        for row in log_reader:
+            if row[0].endswith(id_thing) and row:
+                found_entry = True
+                break
+    if not found_entry:
+        messagebox.showerror("Invalid ID", "The given Test ID doesn't exist")
+        return
+                
+
     try:
         roll_file_path = r"Data/student_names.csv"
         roll_numbers = []
@@ -512,16 +522,26 @@ def delete_entries():
                 data = json.load(file)  # Data is a LIST of dictionaries
 
             # Remove only the dictionary containing the specific test entry
-            filtered_data = [entry for entry in data if id_thing not in entry]
+            if isinstance(data, dict):
+                key = next(iter(data))
+                if key.endswith(id_thing):
+                    os.remove(roll_no_processed_path)  # Delete entire file if single dictionary matches
 
-            # If the file is empty after deletion, remove it
-            if filtered_data:
-                with open(roll_no_processed_path, "w") as file:
-                    json.dump(filtered_data, file, indent=4)
-            else:
-                os.remove(roll_no_processed_path)  # Delete file when empty
+            elif isinstance(data, list):
+                filtered_data = []
+                for dict_data in data:
+                    key_dict = next(iter(dict_data))  # Extract key from each dictionary
+                    if not key_dict.endswith(id_thing):  # Keep only unmatched entries
+                        filtered_data.append(dict_data)
 
-        # REMOVING COMMON PROCESSED DATA
+                # If no data remains, delete the file; otherwise, save updated data
+                if filtered_data:
+                    with open(roll_no_processed_path, "w") as file:
+                        json.dump(filtered_data, file, indent=4)
+                else:
+                    os.remove(roll_no_processed_path)  # Delete file when empty
+
+        # REMOVING PROCESSED DATA (Common File)
         common_processed_path = f"Data/Processed/{subj}/common_data.json"
 
         if os.path.exists(common_processed_path):
@@ -529,18 +549,28 @@ def delete_entries():
                 data = json.load(file)  # Data is a LIST of dictionaries
 
             # Remove only the specific test entry
-            filtered_data = [entry for entry in data if id_thing not in entry]
+            if isinstance(data, dict):
+                key = next(iter(data))
+                if key.endswith(id_thing):
+                    os.remove(common_processed_path)  # Delete entire file if single dictionary matches
 
-            # If no data remains, delete the file
-            if filtered_data:
-                with open(common_processed_path, "w") as file:
-                    json.dump(filtered_data, file, indent=4)
-            else:
-                os.remove(common_processed_path)  # Delete file when empty
+            elif isinstance(data, list):
+                filtered_data = []
+                for dict_data in data:
+                    key_dict = next(iter(dict_data))  # Extract key from each dictionary
+                    if not key_dict.endswith(id_thing):  # Keep only unmatched entries
+                        filtered_data.append(dict_data)
+
+                # If no data remains, delete the file; otherwise, save updated data
+                if filtered_data:
+                    with open(common_processed_path, "w") as file:
+                        json.dump(filtered_data, file, indent=4)
+                else:
+                    os.remove(common_processed_path)  # Delete file when empty
+
 
 
         # Deleting last log!
-        logs_path = r"Data/logs.csv"
         with open(logs_path, "r", newline="") as file:
             reader = csv.reader(file)
             headers = next(reader) 
@@ -581,16 +611,17 @@ def refresh_frame(frame):
     delete_butoon = ctk.CTkButton(delete_frame, text="Delete", command=delete_entries)    
     delete_butoon.grid(row=0, column=2, padx=5, pady=5)
 
+
     table = CTkTable(
         master=scrollable_frame,
         row=len(logs), column=3,
-        values=[logs[0]] + logs[1:], 
+        values=[logs[0]] + sorted(logs[1:], reverse=True),
         corner_radius=3
     )
     table.pack(expand=True, fill="both", padx=20, pady=20)
 try:
     refresh_frame(frame_right_history)
-except Exception:
+except IndexError:
     pass
 
 app.mainloop()
