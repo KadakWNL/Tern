@@ -16,7 +16,7 @@ ctk.set_default_color_theme("dark-blue")
 app = ctk.CTk()
 app.geometry("854x480")
 app.title("Tern - Student Progress Tracker")
-app.iconbitmap(r"Logo\final.ico")
+app.iconbitmap(r"Logo\final_inv.ico")
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
 # Grid Configuration for Layout
 app.grid_columnconfigure(1, weight=1)  # Right frame expands
