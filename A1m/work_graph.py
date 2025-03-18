@@ -222,7 +222,7 @@ def student_class_avg_datewise(student_data, common_data):
     legend.get_frame().set_facecolor('none')
 
     plt.tight_layout()
-    plt.savefig("Data/Graph/student_performance_over_time.png", dpi=300, bbox_inches='tight')
+    # plt.savefig("Data/Graph/student_performance_over_time.png", dpi=300, bbox_inches='tight')
     plt.show()
 
 
@@ -290,7 +290,7 @@ def generate_grayscale_heatmaps(student_data, common_data,subject=None):
 
     plt.subplots_adjust(wspace=1.25)  
     plt.tight_layout()
-    plt.savefig("Data/Graph/student_vs_class_heatmaps.png", dpi=300, bbox_inches='tight')
+    # plt.savefig("Data/Graph/student_vs_class_heatmaps.png", dpi=300, bbox_inches='tight')
     plt.show()
 
 
@@ -345,7 +345,7 @@ def plot_student_vs_class_avg_spi(student_data,class_data):
     plt.xlim(0, 100)  # Assuming SPI is out of 100
     plt.grid(axis='x', linestyle='--', alpha=0.5)
     plt.gcf().set_size_inches(8, 2)
-    plt.savefig("Data/Graph/student_vs_class_spi.png", dpi=300, bbox_inches='tight')
+    # plt.savefig("Data/Graph/student_vs_class_spi.png", dpi=300, bbox_inches='tight')
     plt.show()
 
 
@@ -422,7 +422,7 @@ def create_radio_chart_for_distribution_comparison(student_data,class_data):
 
     # Add a title
     # plt.title(f"{roll_number}'s Performance", size=15, weight='bold', pad=30)
-    plt.savefig("Data/Graph/radio_chart.png", dpi=300, bbox_inches='tight')
+    # plt.savefig("Data/Graph/radio_chart.png", dpi=300, bbox_inches='tight')
     plt.show()
 
 

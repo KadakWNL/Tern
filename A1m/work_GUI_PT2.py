@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, PhotoImage
 import datetime, file_check, specific_data_main, upload_main, os, csv, json
 import work_graph as grph
 from datetime import datetime
@@ -7,7 +7,7 @@ from CTkTable import *
 import threading
 import queue
 import time
-
+import ctypes
 # Set appearance mode and color theme
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -16,7 +16,8 @@ ctk.set_default_color_theme("dark-blue")
 app = ctk.CTk()
 app.geometry("854x480")
 app.title("Tern - Student Progress Tracker")
-
+app.iconbitmap(r"Logo\final.ico")
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
 # Grid Configuration for Layout
 app.grid_columnconfigure(1, weight=1)  # Right frame expands
 app.grid_rowconfigure(0, weight=1)
@@ -210,36 +211,79 @@ progress_bar.set(0)  # Initialize progress to 0
 task_queue = queue.Queue()
 
 def run_main_code():
+    """Handles validation and starts the processing thread."""
+    if not expanded_scorelist_path.get() or not blueprint_data_path.get() or not student_analysis_path.get():
+        messagebox.showerror("File not found", "Some file not uploaded or missing")
+        return
+    if not date_entry_variable.get():
+        messagebox.showerror("Input Error", "Please enter a Date before proceeding.")
+        return
+    if not test_id_variable.get():
+        messagebox.showerror("Input Error", "Please enter a Test ID before proceeding.")
+        return
+    if not subject_entry_variable.get():
+        messagebox.showerror("Input Error", "Please enter a Subject before proceeding.")
+        return
+
     # Disable the button to prevent multiple clicks
     run_analysis_button.configure(state="disabled")
 
     # Reset the progress bar
     progress_bar.set(0)
 
-    # Start the long-running task in a separate thread
+    # Start processing in a separate thread
     threading.Thread(target=process_data, daemon=True).start()
 
-    # Check for progress updates
+    # Start checking progress
     app.after(100, check_progress)
 
 def process_data():
-    # Simulate a long-running task
-    for i in range(100):
-        time.sleep(0.1)  # Simulate work
-        task_queue.put(i + 1)  # Update progress
+    """Runs the file validation and processing while updating progress."""
+    try:
+        # File validation
+        if not file_check.main(student_analysis_path.get(), expanded_scorelist_path.get(), blueprint_data_path.get(),subject_entry_variable.get(),date_entry_variable.get(),test_id_variable.get()):
+            task_queue.put(None)  # Stop progress
+            messagebox.showerror("File Error", "Please recheck the files.")
+            return
+        
+        # Check test ID and date validity
+        if not file_check.check_if_date_exists(date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get()):
+            task_queue.put(None)  # Stop progress
+            messagebox.showerror("Invalid Test ID or Date", "Please check Test ID and Date")
+            return
 
-    # Signal that the task is complete
-    task_queue.put(None)
+        # Simulate task progress
+        for i in range(50):  # Halfway progress
+            time.sleep(0.1)
+            task_queue.put(i + 1)
+
+        # Perform the actual processing
+        upload_main.main(subject_entry_variable.get(), date_entry_variable.get(), test_id_variable.get(),
+                         student_analysis_path.get(), expanded_scorelist_path.get(), blueprint_data_path.get())
+        
+        specific_data_main.main(expanded_scorelist_path.get(), date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
+
+        # Complete progress
+        for i in range(50, 100):  # Remaining progress
+            time.sleep(0.1)
+            task_queue.put(i + 1)
+
+        # Task completed
+        task_queue.put(None)
+
+    except Exception as e:
+        task_queue.put(None)  # Stop progress
+        messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
 def check_progress():
+    """Monitors the progress and updates the UI."""
     try:
-        # Get the latest progress value from the queue
         progress = task_queue.get_nowait()
 
         if progress is None:
-            # Task is complete
+            # Task completed
             run_analysis_button.configure(state="normal")
-            progress_bar.set(1)  # Set progress to 100%
+            progress_bar.set(1)  # Set to 100%
             messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
             create_log()
             refresh_frame(frame_right_history)
@@ -247,7 +291,7 @@ def check_progress():
         else:
             # Update the progress bar
             progress_bar.set(progress / 100)
-            app.after(100, check_progress)  # Continue checking for updates
+            app.after(100, check_progress)  # Continue checking progress
     except queue.Empty:
         # No updates yet, check again later
         app.after(100, check_progress)
