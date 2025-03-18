@@ -5,7 +5,7 @@ import TopicWisePerformanceChart from './components/TopicWisePerformanceChart';
 import StudentClassHeatmaps from './components/StudentClassHeatmaps';
 import studentData from './Data/242021.json';
 import classData from './Data/common_data.json';
-
+import Test from './components/test';
 const current_subject = "PHYSICS";
 const subjects = {
   "PHYSICS": {
@@ -178,6 +178,9 @@ const App = () => {
       </div>
       <div className="bg-white p-4 rounded-lg shadow-md">
       <StudentVsClassSPIChart studentSPI={studentSPI} classSPI={classSPI} />
+      </div>
+      <div>
+        <Test/>
       </div>
     </div>
   );
