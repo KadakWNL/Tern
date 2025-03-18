@@ -26,10 +26,23 @@ def check_blueprint_data(path):
         return True
     else:
         return False
+def check_if_date_exists(current_date,current_test_id,current_subject):
+    try:
+        logs=pd.read_csv(r"Data\logs.csv")
+        tests=list(logs["Test Details"])
+        for test in tests:
+            test_date,subject,test_id=test.split("-")
+            if test_date==current_date and subject==current_subject and test_id==current_test_id:
+                print("HERE")
+                return False
+            else:
+                return True
+    except Exception as e:
+        return True
+    finally:
+        return True
 
-
-
-def main(student_analysis_path,expanded_scorelist_path,blueprint_data_path,subject):
+def main(student_analysis_path,expanded_scorelist_path,blueprint_data_path,subject,current_date=None,test_id=None):
     if check_analysis_data(student_analysis_path) and check_scorelist_data(expanded_scorelist_path,subject) and check_blueprint_data(blueprint_data_path):
         return True
     
@@ -40,5 +53,8 @@ if __name__=='__main__':
     student_analysis_path=r'Resources\student_analysis.xls'
     expanded_scorelist_path=r'Resources\expanded_scorelist.xlsx'
     blueprint_data_path=r'Resources\blueprint_data.pdf'
-    subject='MATHEMATICS'
-    main(student_analysis_path,expanded_scorelist_path,blueprint_data_path,subject)
+    subject='PHYSICS'
+    current_date="05/01/2025"
+    test_id="101"
+    # main(student_analysis_path,expanded_scorelist_path,blueprint_data_path,subject)
+    print(check_if_date_exists(current_date,test_id,subject))

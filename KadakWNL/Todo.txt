@@ -1,1 +1,1 @@
-1. Add features for class data
+1. Add a ranking system

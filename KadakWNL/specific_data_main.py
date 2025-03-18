@@ -329,6 +329,21 @@ def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None)
             pass
         if performance_avg_of_student:
             performance_avg_of_all_students.append(performance_avg_of_student)
+    
+    ranking = {}
+    rank = 1
+    performance_avg_of_all_students.sort(key=lambda x: x[sub][2], reverse=True)
+
+    for i in range(len(performance_avg_of_all_students)):
+        roll_number = performance_avg_of_all_students[i][sub][0]
+
+        if i > 0 and performance_avg_of_all_students[i][sub][2] == performance_avg_of_all_students[i - 1][sub][2]:
+            ranking[roll_number] = ranking[performance_avg_of_all_students[i - 1][sub][0]]
+        else:
+            ranking[roll_number] = rank
+
+        rank += 1
+    # pprint(ranking)
     # pprint(performance_avg_of_all_students)# AVERAGE OF STUDENT IN ALL THE TEST
     #2
     # pprint(avg_values_all_students)
@@ -480,6 +495,7 @@ def main(expanded_scorelist_path=None,date_of_test=None, test_id=None, sub=None)
                 'Avg_SPI_till_date':avg_spi_till_date_roll_wise[roll],
                 'Max_marks_chapter_wise':max_marks_chapter_wise_for_saving,
                 'Max_marks_in_current_test':max_marks_in_this_test_for_saving,
+                'Rank':ranking[roll]
             }
         }
         # data=[DATE_OF_TEST,avg_of_the_test_for_saving,avg_of_whole_class[subject][-1],
