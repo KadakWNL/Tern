@@ -139,20 +139,20 @@ def get_data(data_processed_path, common_data_processed_path):
     return student_data, common_data
 
 
-def student_class_avg_datewise(student_data, common_data):
-    dates = []
-    student_avg = []
-    class_avg = []
-    for tests in student_data:
-        for test in tests:
-            dates.append(test.split("-")[0])
-            student_avg.append(tests[test]['Avg_of_test'])
-    for tests in common_data:
-        for test in tests:
-            if test.split("-")[0] in dates:
-                class_avg.append(tests[test]['Avg_of_class'])
-    dates = [datetime.datetime.strptime(d, "%d/%m/%Y") for d in dates]
-    # print(dates)
+# def student_class_avg_datewise(student_data, common_data):
+#     dates = []
+#     student_avg = []
+#     class_avg = []
+#     for tests in student_data:
+#         for test in tests:
+#             dates.append(test.split("-")[0])
+#             student_avg.append(tests[test]['Avg_of_test'])
+#     for tests in common_data:
+#         for test in tests:
+#             if test.split("-")[0] in dates:
+#                 class_avg.append(tests[test]['Avg_of_class'])
+#     dates = [datetime.datetime.strptime(d, "%d/%m/%Y") for d in dates]
+#     # print(dates)
 
 
 def student_class_avg_datewise(student_data, common_data):
@@ -222,7 +222,7 @@ def student_class_avg_datewise(student_data, common_data):
     legend.get_frame().set_facecolor('none')
 
     plt.tight_layout()
-    plt.savefig("Data/Graph/student_performance_over_time.png", dpi=300, bbox_inches='tight')
+    # plt.savefig("Data/Graph/student_performance_over_time.png", dpi=300, bbox_inches='tight')
     plt.show()
 
 
@@ -290,7 +290,7 @@ def generate_grayscale_heatmaps(student_data, common_data,subject=None):
 
     plt.subplots_adjust(wspace=1.25)  
     plt.tight_layout()
-    plt.savefig("Data/Graph/student_vs_class_heatmaps.png", dpi=300, bbox_inches='tight')
+    # plt.savefig("Data/Graph/student_vs_class_heatmaps.png", dpi=300, bbox_inches='tight')
     plt.show()
 
 
@@ -345,10 +345,85 @@ def plot_student_vs_class_avg_spi(student_data,class_data):
     plt.xlim(0, 100)  # Assuming SPI is out of 100
     plt.grid(axis='x', linestyle='--', alpha=0.5)
     plt.gcf().set_size_inches(8, 2)
-    plt.savefig("Data/Graph/student_vs_class_spi.png", dpi=300, bbox_inches='tight')
+    # plt.savefig("Data/Graph/student_vs_class_spi.png", dpi=300, bbox_inches='tight')
     plt.show()
 
 
+
+def create_radio_chart_for_distribution_comparison(student_data,class_data):
+    grouped_data = {}
+    test_data=student_data[-1]
+    test = list(test_data.keys())[0]
+    temp = test_data[test][f'Avg_of_student_chapter_wise']
+    
+    if test not in grouped_data:
+        grouped_data[test] = {}
+
+    for topic, chapters in subjects[subject].items():
+        if topic not in grouped_data[test]:
+            grouped_data[test][topic] = 0 
+            count = 0  
+
+        for chapter_main in chapters:
+            if chapter_main in temp:
+                grouped_data[test][topic] += temp[chapter_main]
+                count += 1
+
+        if count > 0:
+            grouped_data[test][topic] = round(grouped_data[test][topic] / count, 2)
+    student_grouped_data=grouped_data
+
+    grouped_data = {}
+    test_data=class_data[-1]
+    test = list(test_data.keys())[0]
+    temp = test_data[test][f'Avg_of_class_chapter_wise']
+    
+    if test not in grouped_data:
+        grouped_data[test] = {}
+
+    for topic, chapters in subjects[subject].items():
+        if topic not in grouped_data[test]:
+            grouped_data[test][topic] = 0 
+            count = 0  
+
+        for chapter_main in chapters:
+            if chapter_main in temp:
+                grouped_data[test][topic] += temp[chapter_main]
+                count += 1
+
+        if count > 0:
+            grouped_data[test][topic] = round(grouped_data[test][topic] / count, 2)
+    class_grouped_data=grouped_data
+
+    print(student_grouped_data)
+    student_data_processing=list(student_grouped_data.values())[0]
+    student_label=list(student_data_processing.keys())
+    student_values=list(student_data_processing.values())
+
+    labels = student_label
+    scores = student_values
+
+    # Convert scores to a circular graph
+    angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False).tolist()
+    scores += scores[:1]  
+    angles += angles[:1]
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(polar=True))
+
+    ax.fill(angles, scores, color='skyblue', alpha=0.4)
+    ax.plot(angles, scores, color='blue', linewidth=2)
+
+    # Add labels to each angle
+    ax.set_yticklabels([])
+    ax.set_xticks(angles[:-1])
+    ax.set_xticklabels(labels, fontsize=11, ha='center', rotation=45)
+    ax.spines['polar'].set_visible(False)
+
+    # Add a title
+    # plt.title(f"{roll_number}'s Performance", size=15, weight='bold', pad=30)
+    # plt.savefig("Data/Graph/radio_chart.png", dpi=300, bbox_inches='tight')
+    plt.show()
 
 
 # def create_pie_chart_for_distribution_comparison(student_data,class_data):
@@ -411,6 +486,8 @@ def plot_student_vs_class_avg_spi(student_data,class_data):
 
 #     # Show the figure
 #     plt.show()
+
+
 # def plot_topicwise_trends(data):
 #     grouped_data = group_by_topics(data)
 #     plt.figure(figsize=(10, 6))
@@ -446,4 +523,4 @@ if __name__ == "__main__":
     # student_class_avg_datewise(a,b)
     # plot_student_vs_class_avg_spi(a,b)
     # print(group_by_topics(a, "PHYSICS", "student"))
-    create_pie_chart_for_distribution_comparison(a,b)
+    create_radio_chart_for_distribution_comparison(a,b)
