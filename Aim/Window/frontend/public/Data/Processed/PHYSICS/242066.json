@@ -1,0 +1,125 @@
+{
+    "05/02/2025-PHYSICS-102": {
+        "Avg_of_test": 40,
+        "Avg_of_student_chapter_wise": {
+            "Units and Measurements (PUC-I)": 0,
+            "Motion in a Straight Line (PUC-I)": 0,
+            "Motion in a Plane (PUC-I)": 63,
+            "Laws of Motion (PUC-I)": 82,
+            "Work, Energy and Power (PUC-I)": 53,
+            "System of Particles and Rotational Motion (PUC-I)": 58,
+            "Gravitation (PUC-I)": 0,
+            "Mechanical Properties of Solids (PUC-I)": 0,
+            "Mechanical Properties of Fluids (PUC-I)": 100,
+            "Thermal Properties of Matter (PUC-I)": 0,
+            "Thermodynamics (PUC-I)": 0,
+            "Kinetic Theory (PUC-I)": 0,
+            "Oscillations (PUC-I)": 0,
+            "Waves (PUC-I)": 81,
+            "Electric Charges and Fields (PUC-II)": 58,
+            "Electrostatic Potential and Capacitance (PUC-II)": 60,
+            "Current Electricity (PUC-II)": 58,
+            "Moving charges and magnetism (PUC-II)": 50,
+            "Magnetism and Matter (PUC-II)": 100,
+            "Electromagnetic Induction (PUC-II)": 56,
+            "Alternating Current (PUC-II)": 58,
+            "Electromagnetic Waves (PUC-II)": 0,
+            "Ray Optics and Optical Instruments (PUC-II)": 58,
+            "Wave Optics (PUC-II)": 77,
+            "Dual Nature of Radiation and Matter (PUC-II)": 0,
+            "Atoms (PUC-II)": 0,
+            "Nuclei (PUC-II)": 0,
+            "Semiconductor Electronics Materials, Devices and Simple Circuits (PUC-II)": 100
+        },
+        "Avg_SPI_till_date": 39,
+        "Max_marks_chapter_wise": {
+            "Motion in a Plane (PUC-I)": [
+                63,
+                "05/02/2025",
+                102
+            ],
+            "Laws of Motion (PUC-I)": [
+                82,
+                "05/02/2025",
+                102
+            ],
+            "Work, Energy and Power (PUC-I)": [
+                53,
+                "05/02/2025",
+                102
+            ],
+            "System of Particles and Rotational Motion (PUC-I)": [
+                58,
+                "05/02/2025",
+                102
+            ],
+            "Mechanical Properties of Fluids (PUC-I)": [
+                100,
+                "05/02/2025",
+                102
+            ],
+            "Waves (PUC-I)": [
+                81,
+                "05/02/2025",
+                102
+            ],
+            "Electric Charges and Fields (PUC-II)": [
+                58,
+                "05/02/2025",
+                102
+            ],
+            "Electrostatic Potential and Capacitance (PUC-II)": [
+                60,
+                "05/02/2025",
+                102
+            ],
+            "Current Electricity (PUC-II)": [
+                58,
+                "05/02/2025",
+                102
+            ],
+            "Moving charges and magnetism (PUC-II)": [
+                50,
+                "05/02/2025",
+                102
+            ],
+            "Magnetism and Matter (PUC-II)": [
+                100,
+                "05/02/2025",
+                102
+            ],
+            "Electromagnetic Induction (PUC-II)": [
+                56,
+                "05/02/2025",
+                102
+            ],
+            "Alternating Current (PUC-II)": [
+                58,
+                "05/02/2025",
+                102
+            ],
+            "Ray Optics and Optical Instruments (PUC-II)": [
+                58,
+                "05/02/2025",
+                102
+            ],
+            "Wave Optics (PUC-II)": [
+                77,
+                "05/02/2025",
+                102
+            ],
+            "Semiconductor Electronics Materials, Devices and Simple Circuits (PUC-II)": [
+                100,
+                "05/02/2025",
+                102
+            ]
+        },
+        "Max_marks_in_current_test": {
+            "3-100": [
+                "Mechanical Properties of Fluids (PUC-I)",
+                "Magnetism and Matter (PUC-II)",
+                "Semiconductor Electronics Materials, Devices and Simple Circuits (PUC-II)"
+            ]
+        }
+    }
+}
