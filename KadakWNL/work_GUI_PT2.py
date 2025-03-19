@@ -463,26 +463,33 @@ def clear_fields_students():
 
 
 #*********************************************************************
-def generate_graph(roll_no, subject):
+def generate_graph(subject):
     check_missing_fields_students()
-    student_data_path = f"Data/Processed/{subject}/{roll_no}.json"
-    common_data_path = f"Data/Processed/{subject}/common_data.json"
 
-    student_data, common_data = grph.get_data(student_data_path, common_data_path)
+    if class_individual_variable.get() == "individual":
+        roll_no = roll_no_entry.get()
+        student_data_path = f"Data/Processed/{subject}/{roll_no}.json"
+        common_data_path = f"Data/Processed/{subject}/common_data.jsonṇ"
+        student_data, common_data = grph.get_data(student_data_path, common_data_path)
+        if  overall_chapter_variable.get() == "overall":
+            ... # generate the graph/ show report of that student
+        elif overall_chapter_variable.get() == "chapterwise":
+            messagebox.showinfo("NA", "Feature not available yet!") # individual, topicwise data!
 
-    if overall_chapter_variable.get() == "chapterwise":
-        topic = chapter_variable_students.get()
-        student_grouped, class_grouped = grph.group_by_topics(student_data, subject, "student"), grph.group_by_topics(common_data, subject, "class")
-        print(student_grouped, class_grouped)
-    elif overall_chapter_variable.get() == "overall":
-        grph.student_class_avg_datewise(student_data, common_data)
+    elif class_individual_variable.get() == "class":
+        common_data_path = f"Data/Processed/{subject}/common_data.json"
+        common_data = grph.get_common_data(common_data_path)
+        if overall_chapter_variable.get() == "overall":
+            grouped_common_data = grph.group_by_topics(common_data, subject, "class")
+            # print(grouped_common_data)
+            grph.class_avg_datewise(common_data)
+
     clear_fields_students()
 
-get_individual_data_button = ctk.CTkButton(main_container, text="Generate Data", 
+get_data_button = ctk.CTkButton(main_container, text="Generate Data", 
                                          width=150, height=35, font=("Arial", 14),
-                                         command=lambda: generate_graph(roll_no_variable_students.get(), 
-                                                                      subject_entry_variable_students.get()))
-get_individual_data_button.grid(row=4, column=0, columnspan=4, pady=10)
+                                         command=lambda: generate_graph(subject_entry_variable_students.get()))
+get_data_button.grid(row=4, column=0, columnspan=4, pady=10)
 
 #===================================Download======================================= 
 #==================================================================================
