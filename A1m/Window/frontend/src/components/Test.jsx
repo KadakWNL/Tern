@@ -10,9 +10,6 @@ const ReportCard = () => {
     major: "wiffing",
     term: "2 years"
   };
-  
-  // Your software name
-  const softwareName = "Test";
 
   return (
     <div className="max-w-5xl mx-auto p-6">
