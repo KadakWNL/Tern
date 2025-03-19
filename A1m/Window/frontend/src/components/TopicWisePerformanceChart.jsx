@@ -2,8 +2,10 @@ import React from 'react';
 import Chart from 'react-apexcharts';
 
 const TopicWisePerformanceChart = ({ studentData, classData }) => {
-    console.log(studentData)
-    console.log(classData)
+    if (!studentData || !classData) {
+        return <div className="text-center text-gray-500">Loading topic data...</div>;
+    }
+
     const topics = Object.keys(studentData);
     const studentScores = topics.map(topic => {
       const latestTest = Object.keys(studentData[topic]).pop(); // Get the latest test key
@@ -17,17 +19,16 @@ const TopicWisePerformanceChart = ({ studentData, classData }) => {
   const options = {
     chart: {
       type: 'radar',
-      height: 400, // SUPER BIG now
-      width: '50%', // Uses full width
       toolbar: {
         show: false,
       },
+      fontFamily: 'inherit',
     },
     title: {
-      text: '📊 Topic-wise Performance',
+      text: 'Topic-wise Performance',
       align: 'center',
       style: {
-        fontSize: '22px',
+        fontSize: '16px',
         fontWeight: 'bold',
       },
     },
@@ -35,7 +36,7 @@ const TopicWisePerformanceChart = ({ studentData, classData }) => {
       categories: topics,
       labels: {
         style: {
-          fontSize: '16px', // Bigger text
+          fontSize: '12px',
           fontWeight: 'bold',
         },
       },
@@ -44,17 +45,57 @@ const TopicWisePerformanceChart = ({ studentData, classData }) => {
       min: 0,
       max: 100,
       labels: {
+        show: true,
         style: {
-          fontSize: '7px',
+          fontSize: '10px',
         },
       },
     },
     colors: ['#007AFF', '#FF5733'],
     legend: {
       position: 'top',
-      fontSize: '16px',
+      fontSize: '12px',
       fontWeight: 'bold',
+      offsetY: 0,
     },
+    markers: {
+      size: 4,
+    },
+    stroke: {
+      width: 2,
+    },
+    fill: {
+      opacity: 0.4,
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    tooltip: {
+      enabled: true,
+    },
+    plotOptions: {
+      radar: {
+        size: 140, // This controls the size of the radar chart
+        polygons: {
+          strokeColors: '#e9e9e9',
+          fill: {
+            colors: ['#f8f8f8', '#fff']
+          }
+        }
+      }
+    },
+    responsive: [
+      {
+        breakpoint: 480,
+        options: {
+          plotOptions: {
+            radar: {
+              size: 100
+            }
+          }
+        }
+      }
+    ]
   };
 
   const series = [
@@ -69,8 +110,16 @@ const TopicWisePerformanceChart = ({ studentData, classData }) => {
   ];
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg w-full">
-      <Chart options={options} series={series} type="radar" height={700} />
+    <div className="bg-white p-4 rounded-lg shadow-md w-full h-full flex flex-col">
+      <div className="flex-grow" style={{ minHeight: "300px" }}>
+        <Chart 
+          options={options} 
+          series={series} 
+          type="radar" 
+          height="100%" 
+          width="100%" 
+        />
+      </div>
     </div>
   );
 };

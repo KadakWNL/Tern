@@ -6,7 +6,7 @@ const StudentClassHeatmaps = ({ studentData, classData }) => {
     return <div className="text-center text-gray-500">Loading heatmap data... ⏳</div>;
   }
 
-  // 🔥 Extract unique test names from student data
+  // Extract unique test names from student data
   const testNames = [
     ...new Set(
       Object.values(studentData)
@@ -18,13 +18,13 @@ const StudentClassHeatmaps = ({ studentData, classData }) => {
     return <div className="text-center text-red-500">No test data available 😢</div>;
   }
 
-  // 🔥 Function to format data for ApexCharts
+  // Function to format data for ApexCharts
   const formatDataForHeatmap = (data) => {
     return Object.keys(data).map((topic) => ({
-      name: topic, // Example: "Mechanics", "Optics", etc.
+      name: topic,
       data: testNames.map((test) => ({
         x: test,
-        y: Math.round(data[topic]?.[test] ?? null), // Round values & ensure safe access
+        y: Math.round(data[topic]?.[test] ?? null),
       })),
     }));
   };
@@ -32,13 +32,14 @@ const StudentClassHeatmaps = ({ studentData, classData }) => {
   const studentSeries = formatDataForHeatmap(studentData);
   const classSeries = formatDataForHeatmap(classData);
 
-
-
-  // ApexCharts config
+  // Simplified options
   const options = {
     chart: {
       type: "heatmap",
-      height: 400,
+      height: 250,
+      toolbar: {
+        show: false
+      }
     },
     plotOptions: {
       heatmap: {
@@ -57,33 +58,29 @@ const StudentClassHeatmaps = ({ studentData, classData }) => {
     },
     xaxis: {
       categories: testNames,
-      labels: { style: { fontSize: "14px" } },
+      labels: { 
+        rotate: -45,
+        style: { fontSize: "10px" } 
+      },
     },
     yaxis: {
       labels: { style: { fontSize: "12px" } },
     },
-    tooltip: {
-      enabled: true,
-    },
-    title: {
-      text: "📊 Topic Block Performance Heatmap",
-      align: "center",
-      style: { fontSize: "18px", fontWeight: "bold" },
-    },
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {/* Student Performance Heatmap */}
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <h2 className="text-lg font-semibold mb-2">Student Performance</h2>
-        <Chart options={options} series={studentSeries} type="heatmap" height={400} />
-      </div>
+    <div>
+      <h2 className="text-lg font-semibold mb-2 text-center">Topic Block Performance Comparison</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h3 className="text-md font-semibold mb-1">Student Performance</h3>
+          <Chart options={options} series={studentSeries} type="heatmap" height={250} />
+        </div>
 
-      {/* Class Performance Heatmap */}
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <h2 className="text-lg font-semibold mb-2">Class Average Performance</h2>
-        <Chart options={options} series={classSeries} type="heatmap" height={400} />
+        <div>
+          <h3 className="text-md font-semibold mb-1">Class Average Performance</h3>
+          <Chart options={options} series={classSeries} type="heatmap" height={250} />
+        </div>
       </div>
     </div>
   );

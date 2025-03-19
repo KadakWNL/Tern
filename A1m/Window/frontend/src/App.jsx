@@ -1,12 +1,22 @@
-import React from 'react';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import React, { useRef } from 'react';
 import StudentVsClassAvgChart from './components/StudentVsClassAvgChart';
 import StudentVsClassSPIChart from './components/StudentVsClassSPIChart';
 import TopicWisePerformanceChart from './components/TopicWisePerformanceChart';
 import StudentClassHeatmaps from './components/StudentClassHeatmaps';
 import studentData from './Data/242021.json';
 import classData from './Data/common_data.json';
-import Test from './components/test';
+import PDFReport from './components/PDFReport';
 const current_subject = "PHYSICS";
+const studentInfo = {
+  name: "Shreyas",
+  studentNo: "69",
+  yearLevel: "1",
+  course: "How to get bitches",
+  major: "wiffing",
+  term: "2 years"
+};
+
 const subjects = {
   "PHYSICS": {
       "Mechanics": [
@@ -121,6 +131,8 @@ const subjects = {
   }
 };
 
+
+
 const groupByBlocks = (data, type) => {
   const groupedScores = {};
 
@@ -155,7 +167,13 @@ const groupByBlocks = (data, type) => {
   return groupedScores;
 };
 
+
 const App = () => {
+  const printPage = () => {
+    window.print();
+  };
+  
+
   if (!studentData || !classData) {
     return <div className="text-center text-gray-500">Loading data...</div>;
   }
@@ -166,22 +184,130 @@ const App = () => {
   const studentTopicData = groupByBlocks(studentData, 'student');
   const classTopicData = groupByBlocks(classData, 'class');
 
+
   return (
-    <div className="p-4 space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <StudentVsClassAvgChart studentData={studentData} classData={classData} />
-        <TopicWisePerformanceChart studentData={studentTopicData} classData={classTopicData} />
-        
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden relative">
+        {/* Header with logo and university name */}
+        <div className="bg-blue-800 text-white p-8 flex items-center justify-center">
+          <div className="flex items-center">
+            <div className="mr-6">
+              <div className="w-24 h-24 relative">
+                <div className="absolute inset-0 border-4 border-white rounded-full flex items-center justify-center">
+                  <span className="text-4xl font-bold">M</span>
+                </div>
+                <div className="absolute inset-0 border-4 border-white rounded-full" style={{
+                  borderLeftColor: 'transparent',
+                  borderBottomColor: 'transparent',
+                  transform: 'rotate(45deg)'
+                }}></div>
+              </div>
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">Manyu Classes</h1>
+            </div>
+          </div>
+        </div>
+
+        {/* Report Card Title */}
+        <div className="bg-cream-50 py-8">
+          <h1 className="text-5xl font-bold text-blue-800 text-center">REPORT CARD</h1>
+          <div className="mt-6 border-t-2 border-blue-800 mx-24"></div>
+        </div>
+
+        {/* Student Information */}
+        <div className="bg-cream-50 p-12">
+          <div className="grid grid-cols-2 gap-16 mb-12">
+            <div className="space-y-6">
+              <div>
+                <span className="text-2xl font-bold">Student Name:</span>
+                <span className="text-2xl ml-2">{studentInfo.name}</span>
+              </div>
+              <div>
+                <span className="text-2xl font-bold">Student No.:</span>
+                <span className="text-2xl ml-2">{studentInfo.studentNo}</span>
+              </div>
+              <div>
+                <span className="text-2xl font-bold">Year Level:</span>
+                <span className="text-2xl ml-2">{studentInfo.yearLevel}</span>
+              </div>
+            </div>
+            <div className="space-y-6">
+              <div>
+                <span className="text-2xl font-bold">Course:</span>
+                <span className="text-2xl ml-2">{studentInfo.course}</span>
+              </div>
+              <div>
+                <span className="text-2xl font-bold">Major:</span>
+                <span className="text-2xl ml-2">{studentInfo.major}</span>
+              </div>
+              <div>
+                <span className="text-2xl font-bold">Term:</span>
+                <span className="text-2xl ml-2">{studentInfo.term}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Charts Section */}
+          <div className="space-y-8">
+            {/* First Row: 2 charts side by side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-white p-6 rounded-lg shadow-md h-full">
+                <StudentVsClassAvgChart studentData={studentData} classData={classData} />
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-md h-full">
+                <TopicWisePerformanceChart studentData={studentTopicData} classData={classTopicData} />
+              </div>
+            </div>
+            
+            {/* Second Row: Heatmap (full width) */}
+            <div className="bg-white p-4 rounded-lg shadow-md">
+              <StudentClassHeatmaps studentData={studentTopicData} classData={classTopicData} />
+            </div>
+                        
+            {/* Third Row: SPI Chart (full width) */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <StudentVsClassSPIChart studentSPI={studentSPI} classSPI={classSPI} />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom section with logos */}
+        <div className="bg-cream-50 p-8 flex justify-between items-center">
+          {/* Your company logo */}
+          <div className="flex items-center">
+            <img 
+              src="/api/placeholder/120/60" 
+              alt="Institute Logo" 
+              className="h-16 w-auto mr-2"
+            />
+          </div>
+          
+          {/* Institute logo */}
+          <div>
+            <img 
+              src="/api/placeholder/120/60" 
+              alt="Tern Logo" 
+              className="h-16 w-auto"
+            />
+          </div>
+        </div>
+
+        {/* Bottom border decoration with branding */}
+        <div className="h-12 bg-blue-800 relative flex items-center justify-center">
+          <div className="text-white text-lg">
+            made with ❤️ by Tern
+          </div>
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <StudentClassHeatmaps studentData={studentTopicData} classData={classTopicData} />
-      </div>
-      <div className="bg-white p-4 rounded-lg shadow-md">
-      <StudentVsClassSPIChart studentSPI={studentSPI} classSPI={classSPI} />
-      </div>
-      <div>
-        <Test/>
-      </div>
+      <button
+        onClick={printPage}
+        className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded shadow"
+      >
+        Generate PDF
+      </button>
+      {/* Download PDF Button */}
+
     </div>
   );
 };
