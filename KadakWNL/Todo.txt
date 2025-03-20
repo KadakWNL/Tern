@@ -1,1 +1,2 @@
 1. Add a ranking system
+2. All students' report, class report, color or 'b'n'w', generate button, path file
