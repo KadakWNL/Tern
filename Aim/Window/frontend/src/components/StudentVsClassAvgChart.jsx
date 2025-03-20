@@ -1,7 +1,7 @@
 import React from "react";
 import Chart from "react-apexcharts";
 
-const StudentVsClassAvgChart = ({ studentData, classData }) => {
+const StudentVsClassAvgChart = ({ studentData, classData,isStatic=false }) => {
   // Extract dates and averages
   const dates = studentData.map((test) => Object.keys(test)[0]);
   const studentAvg = studentData.map((test) => test[Object.keys(test)[0]].Avg_of_test);
@@ -13,11 +13,19 @@ const StudentVsClassAvgChart = ({ studentData, classData }) => {
       height: 350,
       toolbar: { show: false },
       animations: {
-        enabled: true,
+        enabled: !isStatic,
         easing: "easeout",
         speed: 800,
       },
       background: "#ffffff", // White background
+    },
+    title: {
+      text: 'Overtime Performance',
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        fontWeight: 'bold',
+      },
     },
     stroke: {
       curve: "smooth",
@@ -91,10 +99,7 @@ const StudentVsClassAvgChart = ({ studentData, classData }) => {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-xl border border-gray-200">
-      <h2 className="text-xl font-semibold text-gray-700 mb-4">
-        📊 Student vs Class Performance
-      </h2>
+      <div>
       <Chart options={options} series={series} type="line" height={350} />
     </div>
   );

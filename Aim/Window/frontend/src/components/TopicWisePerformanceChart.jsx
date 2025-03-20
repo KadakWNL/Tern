@@ -1,7 +1,7 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
 
-const TopicWisePerformanceChart = ({ studentData, classData }) => {
+const TopicWisePerformanceChart = ({ studentData, classData, isStatic=false }) => {
     if (!studentData || !classData) {
         return <div className="text-center text-gray-500">Loading topic data...</div>;
     }
@@ -19,6 +19,7 @@ const TopicWisePerformanceChart = ({ studentData, classData }) => {
   const options = {
     chart: {
       type: 'radar',
+      animations:{enabled:!isStatic},
       toolbar: {
         show: false,
       },
@@ -75,7 +76,7 @@ const TopicWisePerformanceChart = ({ studentData, classData }) => {
     },
     plotOptions: {
       radar: {
-        size: 140, // This controls the size of the radar chart
+        size: 120, // This controls the size of the radar chart
         polygons: {
           strokeColors: '#e9e9e9',
           fill: {
@@ -110,16 +111,14 @@ const TopicWisePerformanceChart = ({ studentData, classData }) => {
   ];
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md w-full h-full flex flex-col">
-      <div className="flex-grow" style={{ minHeight: "300px" }}>
+        <div>
         <Chart 
           options={options} 
           series={series} 
           type="radar" 
           height="100%" 
-          width="100%" 
+          width="80%" 
         />
-      </div>
     </div>
   );
 };

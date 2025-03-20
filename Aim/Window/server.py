@@ -26,58 +26,112 @@ def get_data():
         "subject": "PHYSICS"
     })
 
+
+
+# Add a specific function to handle chart conversion
+async def convert_charts_to_images(page):
+    await page.evaluate("""
+    // Create a function that returns a promise for chart readiness
+    function waitForCharts() {
+        return new Promise(resolve => {
+            const checkCharts = () => {
+                const charts = document.querySelectorAll('.apexcharts-canvas');
+                let allReady = true;
+                charts.forEach(chart => {
+                    if (!chart.querySelector('svg') || 
+                        chart.getBoundingClientRect().width === 0) {
+                        allReady = false;
+                    }
+                });
+                
+                if (allReady && charts.length > 0) {
+                    resolve();
+                } else {
+                    setTimeout(checkCharts, 100);
+                }
+            };
+            checkCharts();
+        });
+    }
+    
+    // Call the function but don't use await inside evaluate
+    return waitForCharts().then(() => {
+        // Convert to static images with proper dimensions
+        document.querySelectorAll('.apexcharts-canvas').forEach(chart => {
+            const svg = chart.querySelector('svg');
+            if (svg) {
+                // Get computed dimensions
+                const rect = chart.getBoundingClientRect();
+                const width = rect.width;
+                const height = rect.height;
+                
+                // Create new image
+                const img = document.createElement('img');
+                const serializer = new XMLSerializer();
+                const svgString = serializer.serializeToString(svg);
+                const svgBase64 = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+                
+                img.src = svgBase64;
+                img.style.width = width + 'px';
+                img.style.height = height + 'px';
+                img.style.display = 'block'; // Important for layout
+                
+                // Replace with image while preserving container dimensions
+                const container = chart.parentElement;
+                container.style.width = width + 'px';
+                container.style.height = height + 'px';
+                container.style.display = 'inline-block'; // Keep side by side layout
+                chart.replaceWith(img);
+            }
+        });
+        return true;
+    });
+    """)
 # Playwright function to generate PDF
 async def create_pdf():
     pdf_path = "output.pdf"
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)  # Runs without UI
-        page = await browser.new_page()
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={"width": 1200, "height": 1600})
 
-        # Load the frontend page
-        await page.goto("http://localhost:5173", wait_until="networkidle")
-
-        # Wait for the page body to ensure full load
-        await page.wait_for_selector("body", timeout=20000)  # 20 sec timeout
-
-        # Extra delay to allow full rendering
-        await asyncio.sleep(3)  # Wait 3 seconds before capturing the PDF
-
-        # Adjust body style for better PDF layout
-        await page.evaluate("""
-            document.body.style.width = '100%';  // Full width
-            document.body.style.height = '1123px';  // A4 height in pixels (portrait)
-            document.body.style.margin = '0';  // Remove margin
-            document.body.style.padding = '0';  // Remove padding
-            document.body.style.overflow = 'hidden';  // Prevent page breaks
-        """)
+        await page.goto("http://127.0.0.1:8000/report", wait_until="networkidle")
+        await page.wait_for_selector(".apexcharts-canvas", timeout=10000)
+        await asyncio.sleep(3)  # Give charts time to fully render
         
-        # Ensure graphs are handled correctly for printing
-        await page.evaluate("""
-            let graphs = document.querySelectorAll('.graph-container');
-            graphs.forEach(graph => {
-                graph.style.display = 'inline-block';
-                graph.style.width = '45%'; // Adjust to fit side by side
-                graph.style.height = 'auto'; // Ensure graphs don't overflow
-            });
-        """)
-
-        # Generate PDF and save it
+        # Force window resize
+        await page.evaluate("window.dispatchEvent(new Event('resize'))")
+        await asyncio.sleep(1)
+        
+        # Add CSS that helps maintain layout
+        await page.add_style_tag(content="""
+    .charts-row, .row {
+        display: flex !important;
+        flex-wrap: wrap !important;  /* Allow items to wrap */
+        justify-content: center !important; /* Center items */
+    }
+    
+    .apexcharts-canvas {
+        max-width: 100% !important; /* Ensure charts don't exceed container width */
+        overflow: hidden !important;
+    }
+""")
+    
+        
+        await asyncio.sleep(1)
+        
+        # Generate PDF
         await page.pdf(
-            path=pdf_path, 
-            format="A4", 
+            path=pdf_path,
+            format="A4",
             print_background=True,
-            margin={"top": "10px", "bottom": "10px", "left": "10px", "right": "10px"},
-            scale=0.8,  # Adjust scale to fit content within a single page
-            height="1123px",  # Explicitly set height to A4 height
-            width="794px"  # Explicitly set width to A4 width
-        )  
+            scale=0.75
+        )
 
         await browser.close()
         print("✅ PDF generated successfully!")
 
     return pdf_path
-
 # FastAPI endpoint to trigger PDF generation
 @app.get("/generate-pdf")
 async def generate_pdf():

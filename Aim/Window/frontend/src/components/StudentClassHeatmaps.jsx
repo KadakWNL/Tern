@@ -1,7 +1,7 @@
 import React from "react";
 import Chart from "react-apexcharts";
 
-const StudentClassHeatmaps = ({ studentData, classData }) => {
+const StudentClassHeatmaps = ({ studentData, classData, bw=null,isStatic=false }) => {
   if (!studentData || !classData) {
     return <div className="text-center text-gray-500">Loading heatmap data... ⏳</div>;
   }
@@ -33,23 +33,32 @@ const StudentClassHeatmaps = ({ studentData, classData }) => {
   const classSeries = formatDataForHeatmap(classData);
 
   // Simplified options
+  const colorScale = {
+    ranges: !bw
+      ? [
+          { from: 0, to: 30, color: "#ff4d4d", name: "Low" },
+          { from: 31, to: 70, color: "#fdd835", name: "Medium" },
+          { from: 71, to: 100, color: "#00e676", name: "High" },
+        ]
+      : [
+          { from: 0, to: 30, color: "#eeeeee", name: "Low" }, // Near White
+          { from: 31, to: 70, color: "#888888", name: "Medium" }, // Mid Gray
+          { from: 71, to: 100, color: "#222222", name: "High" },
+        ],
+  };
+  
   const options = {
     chart: {
       type: "heatmap",
       height: 250,
+      animations:{enabled: !isStatic},
       toolbar: {
-        show: false
-      }
+        show: true,
+      },
     },
     plotOptions: {
       heatmap: {
-        colorScale: {
-          ranges: [
-            { from: 0, to: 30, color: "#ff4d4d", name: "Low" },
-            { from: 31, to: 70, color: "#fdd835", name: "Medium" },
-            { from: 71, to: 100, color: "#00e676", name: "High" },
-          ],
-        },
+        colorScale, // Using the dynamically assigned colorScale here
       },
     },
     dataLabels: {
@@ -58,15 +67,16 @@ const StudentClassHeatmaps = ({ studentData, classData }) => {
     },
     xaxis: {
       categories: testNames,
-      labels: { 
+      labels: {
         rotate: -45,
-        style: { fontSize: "10px" } 
+        style: { fontSize: "10px" },
       },
     },
     yaxis: {
       labels: { style: { fontSize: "12px" } },
     },
   };
+  
 
   return (
     <div>
