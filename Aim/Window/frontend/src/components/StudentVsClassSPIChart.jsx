@@ -1,11 +1,12 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
 
-const StudentVsClassSPIChart = ({ studentSPI, classSPI }) => {
+const StudentVsClassSPIChart = ({ studentSPI, classSPI,isStatic=false }) => {
   const options = {
     chart: {
       type: 'bar',
       height: 200,
+      animations:{enabled:!isStatic},
       toolbar: { show: false },
     },
     plotOptions: {
@@ -38,7 +39,7 @@ const StudentVsClassSPIChart = ({ studentSPI, classSPI }) => {
   const series = [{ name: 'SPI', data: [classSPI, studentSPI] }];
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
+    <div className="bg-white p-4 rounded-lg">
       <h3 className="text-lg font-semibold text-gray-700 mb-2">Student vs Class SPI</h3>
       <Chart options={options} series={series} type="bar" height={200} />
     </div>
