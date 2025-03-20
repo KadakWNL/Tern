@@ -1,7 +1,7 @@
 import React from "react";
 import Chart from "react-apexcharts";
 
-const StudentClassHeatmaps = ({ studentData, classData, bw=null,isStatic=false }) => {
+const StudentClassHeatmaps = ({ studentData, classData, bw = null, isStatic = false }) => {
   if (!studentData || !classData) {
     return <div className="text-center text-gray-500">Loading heatmap data... ⏳</div>;
   }
@@ -32,29 +32,27 @@ const StudentClassHeatmaps = ({ studentData, classData, bw=null,isStatic=false }
   const studentSeries = formatDataForHeatmap(studentData);
   const classSeries = formatDataForHeatmap(classData);
 
-  // Simplified options
+  // Updated color scale
   const colorScale = {
     ranges: !bw
       ? [
-          { from: 0, to: 30, color: "#ff4d4d", name: "Low" },
-          { from: 31, to: 70, color: "#fdd835", name: "Medium" },
-          { from: 71, to: 100, color: "#00e676", name: "High" },
+        { from: 0, to: 31, color: "#888888", name: "Low" }, // Mid Gray
+        { from: 31, to: 70, color: "#3A5BA4", name: "Medium" }, // Professional Royal Blue
+        { from: 71, to: 100, color: "#050535", name: "High" }, // Deep Navy
         ]
       : [
-          { from: 0, to: 30, color: "#eeeeee", name: "Low" }, // Near White
+          { from: 0, to: 30, color: "#E5E7EB", name: "Low" }, // Light Gray
           { from: 31, to: 70, color: "#888888", name: "Medium" }, // Mid Gray
-          { from: 71, to: 100, color: "#222222", name: "High" },
+          { from: 71, to: 100, color: "#222222", name: "High" }, // Dark Gray
         ],
   };
-  
+
   const options = {
     chart: {
       type: "heatmap",
       height: 250,
-      animations:{enabled: !isStatic},
-      toolbar: {
-        show: true,
-      },
+      animations: { enabled: !isStatic },
+      toolbar: { show: true },
     },
     plotOptions: {
       heatmap: {
@@ -63,20 +61,19 @@ const StudentClassHeatmaps = ({ studentData, classData, bw=null,isStatic=false }
     },
     dataLabels: {
       enabled: true,
-      style: { colors: ["#000"] },
+      style: { colors: ["#ffffff"] }, // White text for better contrast
     },
     xaxis: {
       categories: testNames,
       labels: {
         rotate: -45,
-        style: { fontSize: "10px" },
+        style: { fontSize: "10px", color: bw ? "#4B5563" : "#000000" },
       },
     },
     yaxis: {
-      labels: { style: { fontSize: "12px" } },
+      labels: { style: { fontSize: "12px", color: bw ? "#4B5563" : "#000000" } },
     },
   };
-  
 
   return (
     <div>

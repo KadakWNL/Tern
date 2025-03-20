@@ -95,7 +95,7 @@ async def create_pdf():
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 1200, "height": 1600})
 
-        await page.goto("http://127.0.0.1:8000/report", wait_until="networkidle")
+        await page.goto("http://127.0.0.1:8000/bwreport", wait_until="networkidle")
         await page.wait_for_selector(".apexcharts-canvas", timeout=10000)
         await asyncio.sleep(3)  # Give charts time to fully render
         
@@ -133,7 +133,7 @@ async def create_pdf():
 
     return pdf_path
 # FastAPI endpoint to trigger PDF generation
-@app.get("/generate-pdf")
+@app.get("/d")
 async def generate_pdf():
     pdf_file = await create_pdf()
     return FileResponse(pdf_file, filename="exported_page.pdf", media_type="application/pdf")

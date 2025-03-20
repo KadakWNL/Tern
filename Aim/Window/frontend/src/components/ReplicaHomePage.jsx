@@ -12,10 +12,7 @@ const current_subject = "PHYSICS";
 const studentInfo = {
   name: "Shreyas",
   studentNo: "69",
-  yearLevel: "1",
-  course: "How to get bitches",
-  major: "wiffing",
-  term: "2 years"
+  rank:"5"
 };
 
 const subjects = {
@@ -132,7 +129,10 @@ const subjects = {
   }
 };
 
-
+const today = new Date();
+const formattedDate = today.getDate().toString().padStart(2, '0') + '/' + 
+                      (today.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                      today.getFullYear();
 
 const groupByBlocks = (data, type) => {
   const groupedScores = {};
@@ -206,24 +206,25 @@ const ReplicaHomePage = () => {
         </div>
   
         {/* Student Info */}
-        <div className="bg-cream-50 px-32 grid grid-cols-2 gap-12 justify-center text-lg">
-          <div>
-            <div><b>Student Name:</b> {studentInfo.name}</div>
-            <div><b>Student No.:</b> {studentInfo.studentNo}</div>
-            <div><b>Year Level:</b> {studentInfo.yearLevel}</div>
-          </div>
-          <div>
-            <div><b>Course:</b> {studentInfo.course}</div>
-            <div><b>Major:</b> {studentInfo.major}</div>
-            <div><b>Term:</b> {studentInfo.term}</div>
-          </div>
+        <div className="bg-cream-50 px-32 grid grid-cols-2 gap-12 text-lg flex justify-between items-center">
+        <div className="text-left">
+          <div><b>Student Name:</b> {studentInfo.name}</div>
+          <div><b>Roll Number:</b> {studentInfo.studentNo}</div>
+          <div><b>Generated On:</b> {formattedDate}</div>
         </div>
-  
+        <div className="text-right text-gray-800 flex flex-col items-center justify-center">
+          <div className="text-6xl font-bold">{studentInfo.rank} <span className="text-4xl">/10</span></div>
+          <div className="text-sm text-gray-600 mt-2">Rank</div>
+        </div>
+      </div>
+      <div className="border-t border-blue-800 mx-16 mt-2"></div>
+
+          
         {/* Charts */}
         
   {/* First Row: Two charts side by side */}
 
-                <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 justify-center shadow-md rounded-lg p-4">
+                <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 justify-center shadow-md rounded-lg py-8 p-4">
                     <StudentVsClassAvgChart studentData={studentData} classData={classData} />
                     <TopicWisePerformanceChart studentData={studentTopicData} classData={classTopicData}/>
                 </div>

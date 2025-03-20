@@ -12,10 +12,7 @@ const current_subject = "PHYSICS";
 const studentInfo = {
   name: "Shreyas",
   studentNo: "69",
-  yearLevel: "1",
-  course: "How to get bitches",
-  major: "wiffing",
-  term: "2 years"
+  rank:"5"
 };
 
 const subjects = {
@@ -132,7 +129,10 @@ const subjects = {
   }
 };
 
-
+const today = new Date();
+const formattedDate = today.getDate().toString().padStart(2, '0') + '/' + 
+                      (today.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                      today.getFullYear();
 
 const groupByBlocks = (data, type) => {
   const groupedScores = {};
@@ -169,7 +169,7 @@ const groupByBlocks = (data, type) => {
 };
 
 
-const BWReplicaHomePage = () => {
+const ReplicaHomePage = () => {
   if (!studentData || !classData) {
     return <div className="text-center text-gray-500">Loading data...</div>;
   }
@@ -182,124 +182,78 @@ const BWReplicaHomePage = () => {
 
 
   return (
-    <div className="max-w mx-auto">
-        <Link to="/bwreport">
-      <div className="bg-white overflow-hidden relative">
-        {/* Header with logo and university name */}
-        <div className="bg-black text-white p-8 flex items-center justify-center">
+    <div className="w-full text-sm border-black border-2">
+      <div className="bg-white overflow-hidden">
+        {/* Header */}
+        <div className="bg-gray-700 text-black py-8 flex items-center justify-center">
           <div className="flex items-center">
-            <div className="mr-6">
-              <div className="w-24 h-24 relative">
-                <div className="absolute inset-0 border-4 border-white rounded-full flex items-center justify-center">
-                  <span className="text-4xl font-bold">M</span>
+            <div className="mr-4">
+              <div className="w-12 h-12 relative">
+                <div className="absolute inset-0 border-2 border-white rounded-full flex items-center justify-center">
+                  <span className="text-xl font-bold">M</span>
                 </div>
-                <div className="absolute inset-0 border-4 border-white rounded-full" style={{
-                  borderLeftColor: 'transparent',
-                  borderBottomColor: 'transparent',
-                  transform: 'rotate(45deg)'
-                }}></div>
+                <div className="absolute inset-0 border-2 border-white rounded-full rotate-45 border-l-transparent border-b-transparent"></div>
               </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold">Manyu Classes</h1>
-            </div>
+            <h1 className="text-xl font-bold">Manyu Classes</h1>
           </div>
         </div>
-
-        {/* Report Card Title */}
-        <div className="bg-cream-50 py-8">
-          <h1 className="text-5xl font-bold text-blue-800 text-center">REPORT CARD</h1>
-          <div className="mt-6 border-t-2 border-blue-800 mx-24"></div>
+  
+        {/* Report Title */}
+        <div className="bg-cream-50 py-2 text-center">
+          <h1 className="text-lg font-bold text-black">REPORT CARD</h1>
+          <div className="border-t border-black mx-16 mt-2"></div>
         </div>
-
-        {/* Student Information */}
-        <div className="bg-cream-50 p-12">
-          <div className="grid grid-cols-2 gap-16 mb-12">
-            <div className="space-y-6">
-              <div>
-                <span className="text-2xl font-bold">Student Name:</span>
-                <span className="text-2xl ml-2">{studentInfo.name}</span>
-              </div>
-              <div>
-                <span className="text-2xl font-bold">Student No.:</span>
-                <span className="text-2xl ml-2">{studentInfo.studentNo}</span>
-              </div>
-              <div>
-                <span className="text-2xl font-bold">Year Level:</span>
-                <span className="text-2xl ml-2">{studentInfo.yearLevel}</span>
-              </div>
-            </div>
-            <div className="space-y-6">
-              <div>
-                <span className="text-2xl font-bold">Course:</span>
-                <span className="text-2xl ml-2">{studentInfo.course}</span>
-              </div>
-              <div>
-                <span className="text-2xl font-bold">Major:</span>
-                <span className="text-2xl ml-2">{studentInfo.major}</span>
-              </div>
-              <div>
-                <span className="text-2xl font-bold">Term:</span>
-                <span className="text-2xl ml-2">{studentInfo.term}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Charts Section */}
-          <div className="space-y-8">
-            {/* First Row: 2 charts side by side */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-white p-6 rounded-lg shadow-md h-full">
-                <StudentVsClassAvgChart studentData={studentData} classData={classData} />
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-md h-full">
-                <TopicWisePerformanceChart studentData={studentTopicData} classData={classTopicData} />
-              </div>
-            </div>
-            
-            {/* Second Row: Heatmap (full width) */}
-            <div className="bg-white p-4 rounded-lg shadow-md">
-              <StudentClassHeatmaps studentData={studentTopicData} classData={classTopicData} bw={true}/>
-            </div>
-                        
-            {/* Third Row: SPI Chart (full width) */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <StudentVsClassSPIChart studentSPI={studentSPI} classSPI={classSPI} />
-            </div>
-          </div>
+  
+        {/* Student Info */}
+        <div className="bg-cream-50 px-32 grid grid-cols-2 gap-12 text-lg flex justify-between items-center">
+        <div className="text-left">
+          <div><b>Student Name:</b> {studentInfo.name}</div>
+          <div><b>Roll Number:</b> {studentInfo.studentNo}</div>
+          <div><b>Generated On:</b> {formattedDate}</div>
         </div>
-
-        {/* Bottom section with logos */}
-        <div className="bg-cream-50 p-8 flex justify-between items-center">
-          {/* Your company logo */}
-          <div className="flex items-center">
-            <img 
-              src="/api/placeholder/120/60" 
-              alt="Institute Logo" 
-              className="h-16 w-auto mr-2"
-            />
-          </div>
-          
-          {/* Institute logo */}
-          <div>
-            <img 
-              src="/api/placeholder/120/60" 
-              alt="Tern Logo" 
-              className="h-16 w-auto"
-            />
-          </div>
-        </div>
-
-        {/* Bottom border decoration with branding */}
-        <div className="h-12 bg-blue-800 relative flex items-center justify-center">
-          <div className="text-white text-lg">
-            made with ❤️ by Tern
-          </div>
+        <div className="text-right text-gray-800 flex flex-col items-center justify-center">
+          <div className="text-6xl font-bold">{studentInfo.rank} <span className="text-4xl">/10</span></div>
+          <div className="text-sm text-gray-600 mt-2">Rank</div>
         </div>
       </div>
-      </Link>
+
+          
+        {/* Charts */}
+        
+  {/* First Row: Two charts side by side */}
+
+                <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 justify-center shadow-md rounded-lg py-8 p-4">
+                    <StudentVsClassAvgChart studentData={studentData} classData={classData} bw={true}/>
+                    <TopicWisePerformanceChart studentData={studentTopicData} classData={classTopicData} bw={true}/>
+                </div>
+            
+
+
+            {/* Second Row: Full-width Heatmap */}
+            <div className="bg-white p-2 rounded shadow w-full">
+                <StudentClassHeatmaps studentData={studentTopicData} classData={classTopicData} isStatic={true} bw={true} />
+            </div>
+
+            {/* Third Row: Full-width SPI Chart */}
+            <div className="bg-white p-2 rounded shadow w-full">
+                <StudentVsClassSPIChart studentSPI={studentSPI} classSPI={classSPI} isStatic={true} bw={true}/>
+            </div>
+            <div className="grid place-items-center text-lg p-5">
+                <div>Some important Information</div>
+            </div>
+
+        {/* Footer */}
+        <div className="bg-cream-50 p-2 flex justify-between items-center">
+          <img src="/api/placeholder/80/40" alt="Institute Logo" className="h-10" />
+          <img src="/api/placeholder/80/40" alt="Tern Logo" className="h-10" />
+        </div>
+        <div className="h-8 bg-gray-700 flex items-center justify-center text-white text-xs">
+          made with ❤️ by Tern
+        </div>
+      </div>
     </div>
   );
 };
 
-export default BWReplicaHomePage;
+export default ReplicaHomePage;

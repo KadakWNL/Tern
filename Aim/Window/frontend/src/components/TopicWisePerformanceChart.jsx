@@ -1,28 +1,37 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
 
-const TopicWisePerformanceChart = ({ studentData, classData, isStatic=false }) => {
-    if (!studentData || !classData) {
-        return <div className="text-center text-gray-500">Loading topic data...</div>;
-    }
+const TopicWisePerformanceChart = ({ studentData, classData, isStatic = false, bw = false }) => {
+  if (!studentData || !classData) {
+    return <div className="text-center text-gray-500">Loading topic data...</div>;
+  }
 
-    const topics = Object.keys(studentData);
-    const studentScores = topics.map(topic => {
-      const latestTest = Object.keys(studentData[topic]).pop(); // Get the latest test key
-      return studentData[topic][latestTest]; // Get the latest test score
-    });
-    const classScores = topics.map(topic => {
-      const latestTest = Object.keys(classData[topic]).pop(); // Get the latest test key
-      return classData[topic][latestTest]; // Get the latest class score
-    });
-    
+  const topics = Object.keys(studentData);
+  const studentScores = topics.map(topic => {
+    const latestTest = Object.keys(studentData[topic]).pop(); // Get the latest test key
+    return studentData[topic][latestTest]; // Get the latest test score
+  });
+  const classScores = topics.map(topic => {
+    const latestTest = Object.keys(classData[topic]).pop(); // Get the latest class score
+    return classData[topic][latestTest];
+  });
+
+  // Conditional color modes
+  const colors = bw 
+  ? ['#6B7280', '#9CA3AF']  // Grayscale Mode (Dark Gray & Medium Gray)
+  : ['#050535', '#64748B']; // Deep Navy & Slate Gray
+
+const fillColors = bw 
+  ? ['#F3F4F6', '#E5E7EB']  // Very light grays for a clean look
+  : ['#DDE1F2', '#EEF1F7']; // Soft blue-gray fills for subtle contrast
+
+const strokeColor = bw ? '#8B8B8B' : '#64748B'; // Keep stroke clean and visible
+const opacity = bw ? 0.7 : 0.3; // Lower opacity for a softer fill effect
   const options = {
     chart: {
       type: 'radar',
-      animations:{enabled:!isStatic},
-      toolbar: {
-        show: false,
-      },
+      animations: { enabled: !isStatic },
+      toolbar: { show: false },
       fontFamily: 'inherit',
     },
     title: {
@@ -31,6 +40,7 @@ const TopicWisePerformanceChart = ({ studentData, classData, isStatic=false }) =
       style: {
         fontSize: '16px',
         fontWeight: 'bold',
+        color: bw ? '#4B5563' : '#000', // Text color based on mode
       },
     },
     xaxis: {
@@ -39,6 +49,7 @@ const TopicWisePerformanceChart = ({ studentData, classData, isStatic=false }) =
         style: {
           fontSize: '12px',
           fontWeight: 'bold',
+          color: bw ? '#4B5563' : '#000',
         },
       },
     },
@@ -49,15 +60,19 @@ const TopicWisePerformanceChart = ({ studentData, classData, isStatic=false }) =
         show: true,
         style: {
           fontSize: '10px',
+          color: bw ? '#4B5563' : '#000',
         },
       },
     },
-    colors: ['#007AFF', '#FF5733'],
+    colors: colors,
     legend: {
       position: 'top',
       fontSize: '12px',
       fontWeight: 'bold',
       offsetY: 0,
+      labels: {
+        colors: bw ? '#4B5563' : '#000',
+      },
     },
     markers: {
       size: 4,
@@ -66,7 +81,7 @@ const TopicWisePerformanceChart = ({ studentData, classData, isStatic=false }) =
       width: 2,
     },
     fill: {
-      opacity: 0.4,
+      opacity: opacity,
     },
     dataLabels: {
       enabled: false,
@@ -76,14 +91,14 @@ const TopicWisePerformanceChart = ({ studentData, classData, isStatic=false }) =
     },
     plotOptions: {
       radar: {
-        size: 120, // This controls the size of the radar chart
+        size: 120,
         polygons: {
-          strokeColors: '#e9e9e9',
+          strokeColors: strokeColor,
           fill: {
-            colors: ['#f8f8f8', '#fff']
-          }
-        }
-      }
+            colors: fillColors,
+          },
+        },
+      },
     },
     responsive: [
       {
@@ -91,12 +106,12 @@ const TopicWisePerformanceChart = ({ studentData, classData, isStatic=false }) =
         options: {
           plotOptions: {
             radar: {
-              size: 100
-            }
-          }
-        }
-      }
-    ]
+              size: 100,
+            },
+          },
+        },
+      },
+    ],
   };
 
   const series = [
@@ -111,14 +126,8 @@ const TopicWisePerformanceChart = ({ studentData, classData, isStatic=false }) =
   ];
 
   return (
-        <div>
-        <Chart 
-          options={options} 
-          series={series} 
-          type="radar" 
-          height="100%" 
-          width="80%" 
-        />
+    <div>
+      <Chart options={options} series={series} type="radar" height="100%" width="80%" />
     </div>
   );
 };

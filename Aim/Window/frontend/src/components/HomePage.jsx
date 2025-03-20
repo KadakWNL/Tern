@@ -11,10 +11,7 @@ const current_subject = "PHYSICS";
 const studentInfo = {
   name: "Shreyas",
   studentNo: "69",
-  yearLevel: "1",
-  course: "How to get bitches",
-  major: "wiffing",
-  term: "2 years"
+  rank:"5"
 };
 
 const subjects = {
@@ -131,7 +128,10 @@ const subjects = {
   }
 };
 
-
+const today = new Date();
+const formattedDate = today.getDate().toString().padStart(2, '0') + '/' + 
+                      (today.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                      today.getFullYear();
 
 const groupByBlocks = (data, type) => {
   const groupedScores = {};
@@ -184,7 +184,7 @@ const HomePage = () => {
     <div className="max-w mx-auto">
       <div className="bg-white overflow-hidden relative">
         {/* Header with logo and university name */}
-        <div className="bg-blue-800 text-white p-8 flex items-center justify-center">
+        <div className="text-white p-8 flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 5, 53, 1)' }}>
           <div className="flex items-center">
             <div className="mr-6">
               <div className="w-24 h-24 relative">
@@ -206,42 +206,39 @@ const HomePage = () => {
 
         {/* Report Card Title */}
         <div className="bg-cream-50 py-8">
-          <h1 className="text-5xl font-bold text-blue-800 text-center">REPORT CARD</h1>
-          <div className="mt-6 border-t-2 border-blue-800 mx-24"></div>
-        </div>
-
-        {/* Student Information */}
-        <div className="bg-cream-50 p-12">
-          <div className="grid grid-cols-2 gap-16 mb-12">
-            <div className="space-y-6">
-              <div>
-                <span className="text-2xl font-bold">Student Name:</span>
-                <span className="text-2xl ml-2">{studentInfo.name}</span>
-              </div>
-              <div>
-                <span className="text-2xl font-bold">Student No.:</span>
-                <span className="text-2xl ml-2">{studentInfo.studentNo}</span>
-              </div>
-              <div>
-                <span className="text-2xl font-bold">Year Level:</span>
-                <span className="text-2xl ml-2">{studentInfo.yearLevel}</span>
-              </div>
-            </div>
-            <div className="space-y-6">
-              <div>
-                <span className="text-2xl font-bold">Course:</span>
-                <span className="text-2xl ml-2">{studentInfo.course}</span>
-              </div>
-              <div>
-                <span className="text-2xl font-bold">Major:</span>
-                <span className="text-2xl ml-2">{studentInfo.major}</span>
-              </div>
-              <div>
-                <span className="text-2xl font-bold">Term:</span>
-                <span className="text-2xl ml-2">{studentInfo.term}</span>
-              </div>
-            </div>
+            <h1 className="text-5xl font-bold text-center" style={{ color: 'rgba(5, 5, 53, 1)' }}>
+              REPORT CARD
+            </h1>
+            <div className="mt-6 mx-auto w-full max-w-screen-xl" style={{ borderTop: '2px solid rgba(5, 5, 53, 0.5)' }}></div>
           </div>
+
+          {/* Student Information */}
+          <div className="bg-cream-50 px-12 p-12">
+            <div className="grid grid-cols-2 gap-16 mb-12">
+              <div className="space-y-6">
+                <div>
+                  <span className="text-2xl font-bold">Student Name:</span>
+                  <span className="text-2xl ml-2">{studentInfo.name}</span>
+                </div>
+                <div>
+                  <span className="text-2xl font-bold">Roll No:</span>
+                  <span className="text-2xl ml-2">{studentInfo.studentNo}</span>
+                </div>
+                <div>
+                  <span className="text-2xl font-bold">Generated On:</span>
+                  <span className="text-2xl ml-2">{formattedDate}</span>
+                </div>
+              </div>
+              <div className="space-y-6">
+                <div className="text-right text-gray-800 flex flex-col items-center justify-center">
+                  <div className="text-6xl font-bold">{studentInfo.rank} <span className="text-4xl">/10</span></div>
+                  <div className="text-sm text-gray-600 mt-2">Rank</div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 mx-auto w-full max-w-screen-xl" style={{ borderTop: '2px solid rgba(5, 5, 53, 0.5)' }}></div>
+
+                    
 
           {/* Charts Section */}
           <div className="space-y-8">
@@ -285,8 +282,8 @@ const HomePage = () => {
         </div>
 
         {/* Bottom border decoration with branding */}
-        <div className="h-12 bg-blue-800 relative flex items-center justify-center">
-          <div className="text-white text-lg">
+        <div className="h-12 relative flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 5, 53, 1)' }}>
+          <div className="text-lg text-white" >
             made with ❤️ by Tern
           </div>
         </div>
