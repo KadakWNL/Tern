@@ -8,6 +8,9 @@ import StudentClassHeatmaps from './StudentClassHeatmaps';
 import studentData from '../Data/242021.json';
 import classData from '../Data/common_data.json';
 const current_subject = "PHYSICS";
+import manyuLogo from '../assets/manyu_navy_blue.png';
+import ternLogo from '../assets/Tern_logo_inverted_with_text.png';
+import manyuWLogo from '../assets/manyu_white.png';
 const studentInfo = {
   name: "Shreyas",
   studentNo: "69",
@@ -157,8 +160,8 @@ const groupByBlocks = (data, type) => {
               count++;
             }
           });
-
-          groupedScores[block][testKey] = count > 0 ? Math.round(totalScore / count) : null;
+          const date_of_test=testKey.split('-')[0];
+          groupedScores[block][date_of_test] = count > 0 ? Math.round(totalScore / count) : null;
         }
       }
     }
@@ -185,23 +188,11 @@ const HomePage = () => {
       <div className="bg-white overflow-hidden relative">
         {/* Header with logo and university name */}
         <div className="text-white p-8 flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 5, 53, 1)' }}>
-          <div className="flex items-center">
-            <div className="mr-6">
-              <div className="w-24 h-24 relative">
-                <div className="absolute inset-0 border-4 border-white rounded-full flex items-center justify-center">
-                  <span className="text-4xl font-bold">M</span>
-                </div>
-                <div className="absolute inset-0 border-4 border-white rounded-full" style={{
-                  borderLeftColor: 'transparent',
-                  borderBottomColor: 'transparent',
-                  transform: 'rotate(45deg)'
-                }}></div>
-              </div>
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold">Manyu Classes</h1>
-            </div>
-          </div>
+           <div className="flex items-center">
+                      <div className="mr-4">
+                        <img src={manyuWLogo} alt="Institute Logo" className="h-30" />
+                      </div>
+                    </div>
         </div>
 
         {/* Report Card Title */}
@@ -265,18 +256,18 @@ const HomePage = () => {
           {/* Your company logo */}
           <div className="flex items-center">
             <img 
-              src="/api/placeholder/120/60" 
+              src={manyuLogo}
               alt="Institute Logo" 
-              className="h-16 w-auto mr-2"
+              className="h-25 w-auto mr-2 pl-5"
             />
           </div>
           
           {/* Institute logo */}
           <div>
             <img 
-              src="/api/placeholder/120/60" 
+              src={ternLogo}
               alt="Tern Logo" 
-              className="h-16 w-auto"
+              className="h-40 w-auto"
             />
           </div>
         </div>

@@ -12,7 +12,7 @@ const StudentVsClassSPIChart = ({ studentSPI, classSPI, isStatic = false, bw = f
   const options = {
     chart: {
       type: 'bar',
-      height: 200,
+      height: 170,
       animations: { enabled: !isStatic },
       toolbar: { show: false },
     },
@@ -59,7 +59,7 @@ const StudentVsClassSPIChart = ({ studentSPI, classSPI, isStatic = false, bw = f
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
       <h3 className="text-lg font-semibold text-gray-700 mb-2">Student vs Class SPI</h3>
-      <Chart options={options} series={series} type="bar" height={200} />
+      <Chart options={options} series={series} type="bar" height={170} />
     </div>
   );
 };

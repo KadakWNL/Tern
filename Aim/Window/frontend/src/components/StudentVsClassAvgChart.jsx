@@ -3,9 +3,57 @@ import Chart from "react-apexcharts";
 
 const StudentVsClassAvgChart = ({ studentData, classData, isStatic = false, bw = false }) => {
   // Extract dates and averages
-  const dates = studentData.map((test) => Object.keys(test)[0]);
-  const studentAvg = studentData.map((test) => test[Object.keys(test)[0]].Avg_of_test);
-  const classAvg = classData.map((test) => test[Object.keys(test)[0]].Avg_of_class);
+// Function to process student and class data safely
+// This function safely processes student and class data for line graphs
+const processDataForLineGraph = (studentData, classData) => {
+  // Extract dates from student data
+  const classDates = classData.map(item => Object.keys(item)[0]);
+  const filteredDates=[];
+  const studentDataMap = {};
+  studentData.forEach(item => {
+    const key = Object.keys(item)[0];
+    // Use includes() method to check if the value exists in the array
+    if(classDates.includes(key)){
+      studentDataMap[key] = item[key]["Avg_of_test"];
+      filteredDates.push(key);
+    }
+  });
+  
+  const classDataMap = {};
+  classData.forEach(item => {
+    const key = Object.keys(item)[0];
+    if(filteredDates.includes(key)){
+    classDataMap[key] = item[key]["Avg_of_class"];
+    }
+  });
+  console.log(classDataMap)
+  
+  const studentPlots = [];
+  Object.entries(studentDataMap).forEach(([date, score]) => {
+    studentPlots.push({
+      x: date.split('-')[0],
+      y: score
+    });
+  });
+  const classPlots=[];
+  Object.entries(classDataMap).forEach(([date, score]) => {
+    classPlots.push({
+      x: date.split('-')[0],
+      y: score
+    });
+  });
+  console.log(studentPlots)
+  console.log(classPlots)
+  return {
+    dates: filteredDates,
+    studentAvg: studentPlots,
+    classAvg: classPlots
+  };
+};
+
+
+// Usage:
+const { dates, studentAvg, classAvg } = processDataForLineGraph(studentData, classData);
 
   // Color Scheme
   let colors, fill;

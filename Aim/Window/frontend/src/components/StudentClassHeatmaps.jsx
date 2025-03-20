@@ -2,6 +2,7 @@ import React from "react";
 import Chart from "react-apexcharts";
 
 const StudentClassHeatmaps = ({ studentData, classData, bw = null, isStatic = false }) => {
+
   if (!studentData || !classData) {
     return <div className="text-center text-gray-500">Loading heatmap data... ⏳</div>;
   }
@@ -17,16 +18,60 @@ const StudentClassHeatmaps = ({ studentData, classData, bw = null, isStatic = fa
   if (testNames.length === 0) {
     return <div className="text-center text-red-500">No test data available 😢</div>;
   }
-
+  let allTestNames;
   // Function to format data for ApexCharts
   const formatDataForHeatmap = (data) => {
-    return Object.keys(data).map((topic) => ({
-      name: topic,
-      data: testNames.map((test) => ({
-        x: test,
-        y: Math.round(data[topic]?.[test] ?? null),
-      })),
-    }));
+    // Get all test names
+    allTestNames=[];
+    allTestNames = testNames.slice();
+    
+    // Get the last two tests (assuming testNames is sorted chronologically)
+    const lastTwoTests = allTestNames.slice(-2);
+    
+    // All other tests for calculating the average
+    const remainingTests = allTestNames.slice(0, -2);
+    
+    return Object.keys(data).map((topic) => {
+      // Calculate average for remaining tests
+      let sum = 0;
+      let count = 0;
+      
+      remainingTests.forEach((test) => {
+        const value = data[topic]?.[test];
+        if (value !== undefined && value !== null) {
+          sum += value;
+          count++;
+        }
+      });
+      
+      // Average of remaining tests (ensuring it's not null)
+      const average = count > 0 ? Math.round(sum / count) : 0;
+      
+      // Ensure each value is valid to prevent blank columns
+      const secondLatestValue = data[topic]?.[lastTwoTests[0]];
+      const latestValue = data[topic]?.[lastTwoTests[1]];
+      allTestNames=[lastTwoTests[1],lastTwoTests[0],"Average"];
+      return {
+        name: topic,
+        data: [
+          // First column: most recent test
+          {
+            x: lastTwoTests[1],
+            y: Math.round(latestValue ?? 0)
+          },
+          // Second column: second most recent test
+          {
+            x: lastTwoTests[0],
+            y: Math.round(secondLatestValue ?? 0)
+          },
+          // Third column: average of remaining tests
+          {
+            x: "Average",
+            y: average
+          }
+        ]
+      };
+    });
   };
 
   const studentSeries = formatDataForHeatmap(studentData);
@@ -57,6 +102,10 @@ const StudentClassHeatmaps = ({ studentData, classData, bw = null, isStatic = fa
     plotOptions: {
       heatmap: {
         colorScale, // Using the dynamically assigned colorScale here
+        distributed: true, // Helps in evenly spacing the cells
+        useFillColorAsStroke: false, // Optional: makes smaller cells more visible
+        columnWidth: "60%", // Reduce this to make cells smaller horizontally
+        rowHeight: "80%", // Reduce this to make cells smaller vertically
       },
     },
     dataLabels: {
@@ -64,7 +113,7 @@ const StudentClassHeatmaps = ({ studentData, classData, bw = null, isStatic = fa
       style: { colors: ["#ffffff"] }, // White text for better contrast
     },
     xaxis: {
-      categories: testNames,
+      categories: allTestNames,
       labels: {
         rotate: -45,
         style: { fontSize: "10px", color: bw ? "#4B5563" : "#000000" },
@@ -73,7 +122,11 @@ const StudentClassHeatmaps = ({ studentData, classData, bw = null, isStatic = fa
     yaxis: {
       labels: { style: { fontSize: "12px", color: bw ? "#4B5563" : "#000000" } },
     },
+    grid: {
+      padding: { top: 5, right: 8, bottom: 5, left: 5 }, // Reduces gaps around the heatmap
+    },
   };
+  
 
   return (
     <div>

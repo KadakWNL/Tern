@@ -8,10 +8,12 @@ import StudentClassHeatmaps from './StudentClassHeatmaps';
 import studentData from '../Data/242021.json';
 import classData from '../Data/common_data.json';
 const current_subject = "PHYSICS";
-
+import manyuLogo from '../assets/manyu_navy_blue.png';
+import ternLogo from '../assets/Tern_logo_inverted_with_text.png';
+import manyuWLogo from '../assets/manyu_white.png';
 const studentInfo = {
   name: "Shreyas",
-  studentNo: "69",
+  studentNo: "242069",
   rank:"5"
 };
 
@@ -185,24 +187,19 @@ const ReplicaHomePage = () => {
     <div className="w-full text-sm border-black border-2">
       <div className="bg-white overflow-hidden">
         {/* Header */}
-        <div className="bg-blue-800 text-white py-8 flex items-center justify-center">
-          <div className="flex items-center">
+        <div className=" text-white py-4 flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 5, 53, 1)' }}>
+        <div className="flex items-center">
             <div className="mr-4">
-              <div className="w-12 h-12 relative">
-                <div className="absolute inset-0 border-2 border-white rounded-full flex items-center justify-center">
-                  <span className="text-xl font-bold">M</span>
-                </div>
-                <div className="absolute inset-0 border-2 border-white rounded-full rotate-45 border-l-transparent border-b-transparent"></div>
-              </div>
+              <img src={manyuWLogo} alt="Institute Logo" className="h-20" />
             </div>
-            <h1 className="text-xl font-bold">Manyu Classes</h1>
           </div>
+
         </div>
   
         {/* Report Title */}
-        <div className="bg-cream-50 py-2 text-center">
-          <h1 className="text-lg font-bold text-blue-800">REPORT CARD</h1>
-          <div className="border-t border-blue-800 mx-16 mt-2"></div>
+        <div className="bg-cream-50 py-2 text-center" >
+          <h1 className="text-lg font-bold "style={{ color: 'rgba(5, 5, 53, 1)' }} >REPORT CARD</h1>
+          <div className="border-t  mx-16 mt-2" style={{ borderTop: '2px solid rgba(5, 5, 53, 0.5)' }}></div>
         </div>
   
         {/* Student Info */}
@@ -217,14 +214,13 @@ const ReplicaHomePage = () => {
           <div className="text-sm text-gray-600 mt-2">Rank</div>
         </div>
       </div>
-      <div className="border-t border-blue-800 mx-16 mt-2"></div>
-
+      <div className="border-t mx-16 mt-2" style={{ borderTop: '2px solid rgba(5, 5, 53, 0.5)' }}></div>
           
         {/* Charts */}
         
   {/* First Row: Two charts side by side */}
 
-                <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 justify-center shadow-md rounded-lg py-8 p-4">
+                <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 justify-center shadow-md rounded-lg py-4 p-4">
                     <StudentVsClassAvgChart studentData={studentData} classData={classData} />
                     <TopicWisePerformanceChart studentData={studentTopicData} classData={classTopicData}/>
                 </div>
@@ -240,17 +236,19 @@ const ReplicaHomePage = () => {
             <div className="bg-white p-2 rounded shadow w-full">
                 <StudentVsClassSPIChart studentSPI={studentSPI} classSPI={classSPI} isStatic={true} />
             </div>
-            <div className="grid place-items-center text-lg p-5">
+            <div className="grid place-items-center text-lg p-3">
                 <div>Some important Information</div>
             </div>
 
         {/* Footer */}
         <div className="bg-cream-50 p-2 flex justify-between items-center">
-          <img src="/api/placeholder/80/40" alt="Institute Logo" className="h-10" />
-          <img src="/api/placeholder/80/40" alt="Tern Logo" className="h-10" />
+        <img src={manyuLogo} alt="Institute Logo" className="h-15 pl-5" />
+        <img src={ternLogo} alt="Tern Logo" className="h-30" />
         </div>
-        <div className="h-8 bg-blue-800 flex items-center justify-center text-white text-xs">
-          made with ❤️ by Tern
+        <div className="h-8 relative flex items-center justify-center" style={{ backgroundColor: 'rgba(5, 5, 53, 1)' }}>
+          <div className="text-lg text-white" >
+            made with ❤️ by Tern
+          </div>
         </div>
       </div>
     </div>
