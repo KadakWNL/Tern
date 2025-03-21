@@ -1,5 +1,3 @@
-
-import { Link } from "react-router-dom";
 import React, { useRef } from 'react';
 import StudentVsClassAvgChart from './StudentVsClassAvgChart';
 import StudentVsClassSPIChart from './StudentVsClassSPIChart';
@@ -8,8 +6,6 @@ import StudentClassHeatmaps from './StudentClassHeatmaps';
 import manyuLogo from '../assets/manyu_navy_blue.png';
 import ternLogo from '../assets/Tern_logo_inverted_with_text.png';
 import manyuWLogo from '../assets/manyu_white.png';
-
-
 const subjects = {
   "PHYSICS": {
       "Mechanics": [
@@ -54,31 +50,37 @@ const subjects = {
       ]
   },
   "CHEMISTRY": {
-      "Physical Chemistry": [
+      "Physical Chemistry (PUC-I)": [
           "Some Basic Concepts of Chemistry (PUC-I)",
           "Structure of Atom (PUC-I)",
-          "Classification of Elements and Periodicity in Properties (PUC-I)",
-          "Chemical Bonding and Molecular Structure (PUC-I)",
           "Thermodynamics (PUC-I)",
           "Equilibrium (PUC-I)",
           "Redox Reactions (PUC-I)",
-          "Solutions (PUC-II)",
-          "Electrochemistry (PUC-II)",
-          "Chemical Kinetics (PUC-II)"
       ],
-      "Inorganic Chemistry": [
+      "Physical Chemistry (PUC-II)":[
+        "Solutions (PUC-II)",
+        "Electrochemistry (PUC-II)",
+        "Chemical Kinetics (PUC-II)"
+      ],
+      "Inorganic Chemistry (PUC-I)": [
+          "Classification of Elements and Periodicity in Properties (PUC-I)",
+          "Chemical Bonding and Molecular Structure (PUC-I)",
+      ],
+      "Inorganic Chemistry (PUC-II)": [
           "The d and f Block Elements (PUC-II)",
           "Coordination Compounds (PUC-II)"
       ],
-      "Organic Chemistry": [
+      "Organic Chemistry(PUC-I)": [
           "Organic Chemistry: Some Basic Principles and Techniques (PUC-I)",
           "Hydrocarbons (PUC-I)",
+      ],
+      "Organic Chemistry(PUC-II)": [
           "Haloalkanes and Haloarenes (PUC-II)",
           "Alcohols, Phenols and Ethers (PUC-II)",
           "Aldehydes, Ketones and Carboxylic Acids (PUC-II)",
           "Amines (PUC-II)",
           "Biomolecules (PUC-II)"
-      ]
+      ],
   },
   "MATHEMATICS": {
       "Algebra": [
@@ -202,7 +204,7 @@ const ReplicaHomePage = ({ studentData, classData, studentInfo }) => {
           <div><b>Generated On:</b> {formattedDate}</div>
         </div>
         <div className="text-right text-gray-800 flex flex-col items-center justify-center">
-          <div className="text-6xl font-bold">{studentInfo.rank} <span className="text-4xl">/10</span></div>
+          <div className="text-6xl font-bold">{studentInfo.rank} <span className="text-4xl">/{studentInfo.total_students}</span></div>
           <div className="text-sm text-gray-600 mt-2">Rank Achieved in Latest Test</div>
         </div>
       </div>
@@ -212,7 +214,7 @@ const ReplicaHomePage = ({ studentData, classData, studentInfo }) => {
         
   {/* First Row: Two charts side by side */}
 
-                <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 justify-center shadow-md rounded-lg py-4 p-4">
+                <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 justify-center py-4 p-4">
                     <StudentVsClassAvgChart studentData={studentData} classData={classData} />
                     <TopicWisePerformanceChart studentData={studentTopicData} classData={classTopicData}/>
                 </div>
@@ -220,12 +222,12 @@ const ReplicaHomePage = ({ studentData, classData, studentInfo }) => {
 
 
             {/* Second Row: Full-width Heatmap */}
-            <div className="bg-white p-2 rounded shadow w-full">
+            <div className="bg-white p-2 w-full">
                 <StudentClassHeatmaps studentData={studentTopicData} classData={classTopicData} isStatic={true} />
             </div>
 
             {/* Third Row: Full-width SPI Chart */}
-            <div className="bg-white p-2 rounded shadow w-full">
+            <div className="bg-white p-2 w-full">
                 <StudentVsClassSPIChart studentSPI={studentSPI} classSPI={classSPI} isStatic={true} />
             </div>
             <div className="grid place-items-center text-lg p-3">

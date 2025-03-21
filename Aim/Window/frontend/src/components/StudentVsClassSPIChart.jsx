@@ -57,7 +57,7 @@ const StudentVsClassSPIChart = ({ studentSPI, classSPI, isStatic = false, bw = f
   const series = [{ name: 'SPI', data: [classSPI, studentSPI] }];
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
+    <div className="bg-white p-4s">
       <h3 className="text-lg font-semibold text-gray-700 mb-2">Student vs Class SPI</h3>
       <Chart options={options} series={series} type="bar" height={170} />
     </div>

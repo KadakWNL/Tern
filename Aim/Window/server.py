@@ -5,11 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import asyncio
 from playwright.async_api import async_playwright  # Playwright import
-
+from Window import shared_state
 app = FastAPI()
 @app.get("/api/files")
 async def get_json_files():
-    with open(r"Aim\Window\242020.json", "r") as file1, open(r"Aim\Window\common_data.json", "r") as file2:
+    with open(rf"Data/Processed/{shared_state.subject}/{shared_state.rollno}.json", "r") as file1, open(rf"Data/Processed/{shared_state.subject}/common_data.json", "r") as file2:
         data1 = json.load(file1)
         data2 = json.load(file2)
 
@@ -27,10 +27,11 @@ app.add_middleware(
 @app.get("/api/data")
 def get_data():
     return JSONResponse({
-        "name": "A1m",
-        "studentNo": 242007,
-        "rank":1,
-        "subject": "PHYSICS"
+        "name": shared_state.name,
+        "studentNo": shared_state.rollno,
+        "rank":shared_state.rank,
+        "subject": shared_state.subject,
+        "total_students":shared_state.total_students
     })
 
 
@@ -136,14 +137,13 @@ async def create_pdf():
         )
 
         await browser.close()
-        print("✅ PDF generated successfully!")
 
     return pdf_path
 # FastAPI endpoint to trigger PDF generation
 @app.get("/d")
 async def generate_pdf():
     pdf_file = await create_pdf()
-    return FileResponse(pdf_file, filename="exported_page.pdf", media_type="application/pdf")
+    return JSONResponse({"file_path": pdf_file})
 
 # Serve React Frontend
 @app.get("/{full_path:path}")  # Handles all routes (Fixes 404 errors)
@@ -162,6 +162,6 @@ def serve_react(full_path: str = ""):
     
     return JSONResponse({"error": "React build not found"}, status_code=404)
 
-if __name__ == "__main__":
+def main():
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
