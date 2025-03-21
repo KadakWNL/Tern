@@ -5,17 +5,10 @@ import StudentVsClassAvgChart from './StudentVsClassAvgChart';
 import StudentVsClassSPIChart from './StudentVsClassSPIChart';
 import TopicWisePerformanceChart from './TopicWisePerformanceChart';
 import StudentClassHeatmaps from './StudentClassHeatmaps';
-import studentData from '../Data/242021.json';
-import classData from '../Data/common_data.json';
-const current_subject = "PHYSICS";
 import manyuLogo from '../assets/manyu_navy_blue.png';
 import ternLogo from '../assets/Tern_logo_inverted_with_text.png';
 import manyuWLogo from '../assets/manyu_white.png';
-const studentInfo = {
-  name: "Shreyas",
-  studentNo: "242069",
-  rank:"5"
-};
+
 
 const subjects = {
   "PHYSICS": {
@@ -136,7 +129,7 @@ const formattedDate = today.getDate().toString().padStart(2, '0') + '/' +
                       (today.getMonth() + 1).toString().padStart(2, '0') + '/' + 
                       today.getFullYear();
 
-const groupByBlocks = (data, type) => {
+const groupByBlocks = (data, type,current_subject) => {
   const groupedScores = {};
 
   data.forEach((test) => {
@@ -160,8 +153,8 @@ const groupByBlocks = (data, type) => {
               count++;
             }
           });
-
-          groupedScores[block][testKey] = count > 0 ? Math.round(totalScore / count) : null;
+          const date_of_test=testKey.split('-')[0];
+          groupedScores[block][date_of_test] = count > 0 ? Math.round(totalScore / count) : null;
         }
       }
     }
@@ -171,16 +164,15 @@ const groupByBlocks = (data, type) => {
 };
 
 
-const ReplicaHomePage = () => {
+const ReplicaHomePage = ({ studentData, classData, studentInfo }) => {
   if (!studentData || !classData) {
     return <div className="text-center text-gray-500">Loading data...</div>;
   }
-
   const studentSPI = studentData[studentData.length - 1][Object.keys(studentData[studentData.length - 1])[0]].Avg_SPI_till_date;
   const classSPI = classData[classData.length - 1][Object.keys(classData[classData.length - 1])[0]].Avg_SPI_of_class_till_date;
-
-  const studentTopicData = groupByBlocks(studentData, 'student');
-  const classTopicData = groupByBlocks(classData, 'class');
+  const current_subject=studentInfo["subject"]
+  const studentTopicData = groupByBlocks(studentData, 'student',current_subject);
+  const classTopicData = groupByBlocks(classData, 'class',current_subject);
 
 
   return (
@@ -211,7 +203,7 @@ const ReplicaHomePage = () => {
         </div>
         <div className="text-right text-gray-800 flex flex-col items-center justify-center">
           <div className="text-6xl font-bold">{studentInfo.rank} <span className="text-4xl">/10</span></div>
-          <div className="text-sm text-gray-600 mt-2">Rank</div>
+          <div className="text-sm text-gray-600 mt-2">Rank Achieved in Latest Test</div>
         </div>
       </div>
       <div className="border-t mx-16 mt-2" style={{ borderTop: '2px solid rgba(5, 5, 53, 0.5)' }}></div>

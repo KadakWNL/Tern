@@ -18,7 +18,7 @@ const TopicWisePerformanceChart = ({ studentData, classData, isStatic = false, b
 
   // Conditional color modes
   const colors = bw 
-  ? ['#6B7280', '#9CA3AF']  // Grayscale Mode (Dark Gray & Medium Gray)
+  ? ['#222222', '#9CA3AF']  // Grayscale Mode (Dark Gray & Medium Gray)
   : ['#050535', '#64748B']; // Deep Navy & Slate Gray
 
 const fillColors = bw 
@@ -75,10 +75,10 @@ const opacity = bw ? 0.7 : 0.3; // Lower opacity for a softer fill effect
       },
     },
     markers: {
-      size: 4,
+      size: 5,
     },
     stroke: {
-      width: 2,
+      width: 4,
     },
     fill: {
       opacity: opacity,

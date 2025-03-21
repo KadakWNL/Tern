@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import json
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
@@ -6,11 +7,17 @@ import asyncio
 from playwright.async_api import async_playwright  # Playwright import
 
 app = FastAPI()
+@app.get("/api/files")
+async def get_json_files():
+    with open(r"Aim\Window\242020.json", "r") as file1, open(r"Aim\Window\common_data.json", "r") as file2:
+        data1 = json.load(file1)
+        data2 = json.load(file2)
 
+    return JSONResponse(content={"file1": data1, "file2": data2})
 # Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Allow frontend origin
+    allow_origins=["*"],  # Allow frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -20,9 +27,9 @@ app.add_middleware(
 @app.get("/api/data")
 def get_data():
     return JSONResponse({
-        "student_name": "Test_name",
-        "date": "05/01/2025",
-        "roll_number": 242007,
+        "name": "A1m",
+        "studentNo": 242007,
+        "rank":1,
         "subject": "PHYSICS"
     })
 

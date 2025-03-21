@@ -5,17 +5,10 @@ import StudentVsClassAvgChart from './StudentVsClassAvgChart';
 import StudentVsClassSPIChart from './StudentVsClassSPIChart';
 import TopicWisePerformanceChart from './TopicWisePerformanceChart';
 import StudentClassHeatmaps from './StudentClassHeatmaps';
-import studentData from '../Data/242021.json';
-import classData from '../Data/common_data.json';
-const current_subject = "PHYSICS";
 import manyuLogo from '../assets/manyu_navy_blue.png';
 import ternLogo from '../assets/Tern_logo_inverted_with_text.png';
 import manyuWLogo from '../assets/manyu_white.png';
-const studentInfo = {
-  name: "Shreyas",
-  studentNo: "69",
-  rank:"5"
-};
+let current_subject;
 
 const subjects = {
   "PHYSICS": {
@@ -171,14 +164,14 @@ const groupByBlocks = (data, type) => {
 };
 
 
-const HomePage = () => {
+const HomePage = ({ studentData, classData, studentInfo }) => {
   if (!studentData || !classData) {
     return <div className="text-center text-gray-500">Loading data...</div>;
   }
 
   const studentSPI = studentData[studentData.length - 1][Object.keys(studentData[studentData.length - 1])[0]].Avg_SPI_till_date;
   const classSPI = classData[classData.length - 1][Object.keys(classData[classData.length - 1])[0]].Avg_SPI_of_class_till_date;
-
+  current_subject=studentInfo["subject"];
   const studentTopicData = groupByBlocks(studentData, 'student');
   const classTopicData = groupByBlocks(classData, 'class');
 
@@ -223,7 +216,7 @@ const HomePage = () => {
               <div className="space-y-6">
                 <div className="text-right text-gray-800 flex flex-col items-center justify-center">
                   <div className="text-6xl font-bold">{studentInfo.rank} <span className="text-4xl">/10</span></div>
-                  <div className="text-sm text-gray-600 mt-2">Rank</div>
+                  <div className="text-sm text-gray-600 mt-2">Rank Achieved in Latest Test</div>
                 </div>
               </div>
             </div>

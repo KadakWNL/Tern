@@ -50,7 +50,7 @@ const StudentClassHeatmaps = ({ studentData, classData, bw = null, isStatic = fa
       // Ensure each value is valid to prevent blank columns
       const secondLatestValue = data[topic]?.[lastTwoTests[0]];
       const latestValue = data[topic]?.[lastTwoTests[1]];
-      allTestNames=[lastTwoTests[1],lastTwoTests[0],"Average"];
+      allTestNames=[lastTwoTests[1],lastTwoTests[0],`Avg Before ${lastTwoTests[0]}`];
       return {
         name: topic,
         data: [
