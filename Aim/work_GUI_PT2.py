@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import filedialog, messagebox, PhotoImage
 import datetime, file_check, specific_data_main, upload_main, os, csv, json
+import download_all_pdf as gen_all
 import work_graph as grph
 from datetime import datetime
 from CTkTable import *
@@ -15,8 +16,6 @@ from Window import shared_state
 from playwright.sync_api import sync_playwright
 import os
 import webbrowser
-import shutil
-import asyncio
 from playwright.async_api import async_playwright
 # Set appearance mode and color theme
 
@@ -39,7 +38,7 @@ app = ctk.CTk()
 app.geometry("900x480")
 app.configure(bg="#FFFFFF")
 app.title("Tern - Student Progress Tracker")
-app.iconbitmap(r"Logo\final_inv.ico")
+app.iconbitmap(r"Logo\final0.ico")
 windll.shell32.SetCurrentProcessExplicitAppUserModelID("tern.mainwindow")
 # Grid Configuration for Layout
 app.grid_columnconfigure(1, weight=1)  # Right frame expands
@@ -56,7 +55,7 @@ frame_container.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
 # Different Right Frames for Each Page
 frame_right_upload = ctk.CTkFrame(frame_container, border_width=0, fg_color=THEME_COLORS["main_bg"])
 frame_right_students = ctk.CTkFrame(frame_container, border_width=0, fg_color=THEME_COLORS["main_bg"])
-frame_right_download = ctk.CTkFrame(frame_container, border_width=0, fg_color=THEME_COLORS["main_bg"])
+# frame_right_download = ctk.CTkFrame(frame_container, border_width=0, fg_color=THEME_COLORS["main_bg"])
 frame_right_history = ctk.CTkFrame(frame_container, border_width=0, fg_color=THEME_COLORS["main_bg"])
 
 # Function to Switch Pages
@@ -82,11 +81,11 @@ logo_label = ctk.CTkLabel(logo_frame, image=logo_image, text="", font=("Arial", 
                           text_color=THEME_COLORS["navbar_text"])
 logo_label.pack(expand=True)
 
-nav_button1 = ctk.CTkButton(frame_left, text="Download", fg_color="transparent", 
-                            hover_color=THEME_COLORS["hover_color"],
-                            text_color=THEME_COLORS["navbar_text"],
-                            command=lambda: show_frame(frame_right_download))
-nav_button1.pack(fill="x", pady=5)
+# nav_button1 = ctk.CTkButton(frame_left, text="Download", fg_color="transparent", 
+#                             hover_color=THEME_COLORS["hover_color"],
+#                             text_color=THEME_COLORS["navbar_text"],
+#                             command=lambda: show_frame(frame_right_download))
+# nav_button1.pack(fill="x", pady=5)
 
 nav_button2 = ctk.CTkButton(frame_left, text="Students", fg_color="transparent", 
                             hover_color=THEME_COLORS["hover_color"],
@@ -318,7 +317,7 @@ def process_data():
                          student_analysis_path.get(), expanded_scorelist_path.get(), blueprint_data_path.get())
         
         specific_data_main.main(expanded_scorelist_path.get(), date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
-
+        create_log()
         # Complete progress
         for i in range(50, 100):  # Remaining progress
             time.sleep(0.1)
@@ -340,8 +339,6 @@ def check_progress():
             # Task completed
             run_analysis_button.configure(state="normal")
             progress_bar.set(1)  # Set to 100%
-            messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
-            create_log()
             refresh_frame(frame_right_history)
             empty_variables()
         else:
@@ -375,13 +372,14 @@ students_label.grid(row=0, column=0, columnspan=4, sticky="w", padx=10, pady=(10
 selection_frame = ctk.CTkFrame(main_container, fg_color=THEME_COLORS["main_bg"])
 selection_frame.grid(row=1, column=0, columnspan=4, sticky="ew", padx=5, pady=5)
 
+#**************************---------------------------**************************
 class_individual_variable = ctk.StringVar()
 individual_rbutton = ctk.CTkRadioButton(selection_frame, text="Individual Student", font=("Arial", 14),
                                       variable=class_individual_variable, value="individual",
                                       text_color=THEME_COLORS["main_text"])
 individual_rbutton.grid(row=0, column=0, padx=(5,10), pady=5)
 
-class_rbutton = ctk.CTkRadioButton(selection_frame, text="Class", font=("Arial", 14),
+class_rbutton = ctk.CTkRadioButton(selection_frame, text="All Students (only downloading)", font=("Arial", 14),
                                   variable=class_individual_variable, value="class",
                                   text_color=THEME_COLORS["main_text"])
 class_rbutton.grid(row=0, column=1, padx=10, pady=5)
@@ -390,6 +388,7 @@ roll_no_label = ctk.CTkLabel(selection_frame, text="Roll No:", font=("Arial", 14
                            text_color=THEME_COLORS["main_text"])
 roll_no_label.grid(row=0, column=2, padx=(20,5), pady=5)
 
+#**************************---------------------------**************************
 roll_no_variable_students = ctk.StringVar()
 roll_no_entry = ctk.CTkEntry(selection_frame, placeholder_text="20XXXXX", 
                             textvariable=roll_no_variable_students, state="disabled", width=120)
@@ -398,22 +397,28 @@ roll_no_entry.grid(row=0, column=3, padx=5, pady=5)
 def toggle_roll_no_entry(*args):
     if class_individual_variable.get() == "individual":
         roll_no_entry.configure(state="normal")
+        get_data_button.configure(state="normal")
     else:
         roll_no_entry.configure(state="disabled")
+        get_data_button.configure(state="disabled")
 
 # Trace changes in the radio button variable
 class_individual_variable.trace_add("write", toggle_roll_no_entry)
+
+
 
 #========================================================================================
 #*********************************************************************
 # Second row - Subject Selection
 subject_frame = ctk.CTkFrame(main_container, fg_color=THEME_COLORS["main_bg"])
 subject_frame.grid(row=2, column=0, columnspan=4, sticky="ew", padx=5, pady=5)
+subject_frame.grid_columnconfigure((0, 1, 2, 3, 4), weight=1)
+
 
 subject_label_students = ctk.CTkLabel(subject_frame, text="Subject:", font=("Arial", 14),
                                     text_color=THEME_COLORS["main_text"])
-subject_label_students.grid(row=0, column=0, padx=(5,5), pady=5, sticky="w")
 
+#**************************---------------------------**************************
 subject_entry_variable_students = ctk.StringVar()
 subject_entry_combobox_students = ctk.CTkComboBox(
     subject_frame, 
@@ -423,115 +428,129 @@ subject_entry_combobox_students = ctk.CTkComboBox(
     state="readonly",
     width=200
 )
-subject_entry_combobox_students.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+subject_label_students.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+subject_entry_combobox_students.grid(row=0, column=2, columnspan=1, padx=5, pady=5, sticky="w")
 
 #==========================================================================================
 #*********************************************************************
-# Third row - Performance Type and Topic
-performance_frame = ctk.CTkFrame(main_container, fg_color=THEME_COLORS["main_bg"])
-performance_frame.grid(row=3, column=0, columnspan=4, sticky="ew", padx=5, pady=5)
+# # Third row - Performance Type and Topic
+# performance_frame = ctk.CTkFrame(main_container, fg_color=THEME_COLORS["main_bg"])
+# performance_frame.grid(row=3, column=0, columnspan=4, sticky="ew", padx=5, pady=5)
 
-overall_chapter_variable = ctk.StringVar()
-overall_rbutton = ctk.CTkRadioButton(performance_frame, text="Overall Performance", font=("Arial", 14),
-                                    variable=overall_chapter_variable, value="overall",
-                                    text_color=THEME_COLORS["main_text"])
-overall_rbutton.grid(row=0, column=0, padx=(5,10), pady=5)
+# overall_chapter_variable = ctk.StringVar()
+# overall_rbutton = ctk.CTkRadioButton(performance_frame, text="Overall Performance", font=("Arial", 14),
+#                                     variable=overall_chapter_variable, value="overall",
+#                                     text_color=THEME_COLORS["main_text"])
+# overall_rbutton.grid(row=0, column=0, padx=(5,10), pady=5)
 
-chapterwise_rbutton = ctk.CTkRadioButton(performance_frame, text="Topicwise Performance", font=("Arial", 14),
-                                        variable=overall_chapter_variable, value="chapterwise",
-                                        text_color=THEME_COLORS["main_text"])
-chapterwise_rbutton.grid(row=0, column=1, padx=10, pady=5)
+# chapterwise_rbutton = ctk.CTkRadioButton(performance_frame, text="Topicwise Performance", font=("Arial", 14),
+#                                         variable=overall_chapter_variable, value="chapterwise",
+#                                         text_color=THEME_COLORS["main_text"])
+# chapterwise_rbutton.grid(row=0, column=1, padx=10, pady=5)
 
-chapter_students_label = ctk.CTkLabel(performance_frame, text="Topic:", font=("Arial", 14),
-                                    text_color=THEME_COLORS["main_text"])
-chapter_students_label.grid(row=0, column=2, padx=(20,5), pady=5)
+# chapter_students_label = ctk.CTkLabel(performance_frame, text="Topic:", font=("Arial", 14),
+#                                     text_color=THEME_COLORS["main_text"])
+# chapter_students_label.grid(row=0, column=2, padx=(20,5), pady=5)
 
-chapter_variable_students = ctk.StringVar()
-chapter_students_list = ctk.CTkComboBox(performance_frame, values=["hi"], 
-                                      variable=chapter_variable_students, state="disabled",
-                                      width=150)
-chapter_students_list.grid(row=0, column=3, padx=5, pady=5)
+# chapter_variable_students = ctk.StringVar()
+# chapter_students_list = ctk.CTkComboBox(performance_frame, values=["hi"], 
+#                                       variable=chapter_variable_students, state="disabled",
+#                                       width=150)
+# chapter_students_list.grid(row=0, column=3, padx=5, pady=5)
 
-def toggle_chapter_entry(*args):
-    if overall_chapter_variable.get() == "chapterwise" and subject_entry_variable_students.get() != "All":
-        chapter_students_list.configure(state="readonly")
-    else:
-        chapter_students_list.configure(state="disabled")
+# def toggle_chapter_entry(*args):
+#     if overall_chapter_variable.get() == "chapterwise" and subject_entry_variable_students.get() != "All":
+#         chapter_students_list.configure(state="readonly")
+#     else:
+#         chapter_students_list.configure(state="disabled")
 
-overall_chapter_variable.trace_add("write", toggle_chapter_entry)
+# overall_chapter_variable.trace_add("write", toggle_chapter_entry)
 
-#*********************************************************************
-mathematics_chapters = ['Algebra', 'Trigonometry', 'Coordinate Geometry', 'Calculus', 
-                    'Statistics and Probability', 'Linear Programming', 'Vector Algebra']
-phyiscs_chapters = ['Mechanics', 'Thermodynamics and Kinetic Theory', 'Waves and Oscillations', 
-                    'Electricity and Magnetism', 'Optics', 'Modern Physics']
-chemistry_chapters = ['Physical Chemistry', 'Inorganic Chemistry', 'Organic Chemistry']
+# #*********************************************************************
+# mathematics_chapters = ['Algebra', 'Trigonometry', 'Coordinate Geometry', 'Calculus', 
+#                     'Statistics and Probability', 'Linear Programming', 'Vector Algebra']
+# phyiscs_chapters = ['Mechanics', 'Thermodynamics and Kinetic Theory', 'Waves and Oscillations', 
+#                     'Electricity and Magnetism', 'Optics', 'Modern Physics']
+# chemistry_chapters = ['Physical Chemistry', 'Inorganic Chemistry', 'Organic Chemistry']
 
-def display_list_subject_chapters(*args):
-    if subject_entry_variable_students.get() == "All":
-        chapterwise_rbutton.configure(state="disabled")
-        chapter_students_list.configure(state="disabled")
+# def display_list_subject_chapters(*args):
+#     if subject_entry_variable_students.get() == "All":
+#         chapterwise_rbutton.configure(state="disabled")
+#         chapter_students_list.configure(state="disabled")
         
-        overall_chapter_variable.set("overall")
-        chapter_students_list.set("")
-        chapter_variable_students.set("")
+#         overall_chapter_variable.set("overall")
+#         chapter_students_list.set("")
+#         chapter_variable_students.set("")
         
-    else:
-        chapterwise_rbutton.configure(state="normal")
-        chapter_students_list.configure(state="readonly")
+#     else:
+#         chapterwise_rbutton.configure(state="normal")
+#         chapter_students_list.configure(state="readonly")
 
-        if subject_entry_variable_students.get() == "PHYSICS":
-            chapter_students_list.configure(values=phyiscs_chapters)
-        elif subject_entry_variable_students.get() == "MATHEMATICS":
-            chapter_students_list.configure(values=mathematics_chapters)
-        elif subject_entry_variable_students.get() == "CHEMISTRY":
-            chapter_students_list.configure(values=chemistry_chapters)
+#         if subject_entry_variable_students.get() == "PHYSICS":
+#             chapter_students_list.configure(values=phyiscs_chapters)
+#         elif subject_entry_variable_students.get() == "MATHEMATICS":
+#             chapter_students_list.configure(values=mathematics_chapters)
+#         elif subject_entry_variable_students.get() == "CHEMISTRY":
+#             chapter_students_list.configure(values=chemistry_chapters)
         
-        chapter_students_list.set("")
-        chapter_variable_students.set("")
-        toggle_chapter_entry()
+#         chapter_students_list.set("")
+#         chapter_variable_students.set("")
+#         toggle_chapter_entry()
 
-subject_entry_variable_students.trace_add("write", display_list_subject_chapters)
+# subject_entry_variable_students.trace_add("write", display_list_subject_chapters)
 
-#*********************************************************************
-chapter_index_students = ""  # Reset index on any change
-def get_chapter_index(*args):
-    global chapter_index_students
+# #*********************************************************************
+# chapter_index_students = ""  # Reset index on any change
+# def get_chapter_index(*args):
+#     global chapter_index_students
     
-    if overall_chapter_variable.get() == "chapterwise" and subject_entry_variable_students.get() != "All":
-        try:
-            if subject_entry_variable_students.get() == "Physics":
-                chapter_index_students = phyiscs_chapters.index(chapter_variable_students.get())
-            elif subject_entry_variable_students.get() == "Mathematics":
-                chapter_index_students = mathematics_chapters.index(chapter_variable_students.get())
-            elif subject_entry_variable_students.get() == "Chemistry":
-                chapter_index_students = chemistry_chapters.index(chapter_variable_students.get())
-            print(f"Chapter Index Updated: {chapter_index_students}")
-        except ValueError as e:
-            print(f"Error: Chapter or Subject not found. {e}")
+#     if overall_chapter_variable.get() == "chapterwise" and subject_entry_variable_students.get() != "All":
+#         try:
+#             if subject_entry_variable_students.get() == "Physics":
+#                 chapter_index_students = phyiscs_chapters.index(chapter_variable_students.get())
+#             elif subject_entry_variable_students.get() == "Mathematics":
+#                 chapter_index_students = mathematics_chapters.index(chapter_variable_students.get())
+#             elif subject_entry_variable_students.get() == "Chemistry":
+#                 chapter_index_students = chemistry_chapters.index(chapter_variable_students.get())
+#             print(f"Chapter Index Updated: {chapter_index_students}")
+#         except ValueError as e:
+#             print(f"Error: Chapter or Subject not found. {e}")
 
-overall_chapter_variable.trace_add("write", get_chapter_index)
-chapter_variable_students.trace_add("write", get_chapter_index)
+# overall_chapter_variable.trace_add("write", get_chapter_index)
+# chapter_variable_students.trace_add("write", get_chapter_index)
 
 #*********************************************************************
-def check_missing_fields_students():
+def check_missing_fields_students(state=True):
     if class_individual_variable.get() == "individual" and not roll_no_variable_students.get():
         messagebox.showerror("Missing Input", "Please enter the roll number before proceeding.")
-    if not subject_entry_variable_students.get():
+        return False
+    elif not subject_entry_variable_students.get():
         messagebox.showerror("Missing Input", "Please enter the subject before proceeding.")
-    if not chapter_variable_students.get() and overall_chapter_variable.get() == "chapterwise":
-        messagebox.showerror("Missing Input", "Please enter the topic before proceeding.")
+        return False
+    elif not report_folder_path and state:
+        messagebox.showerror("Missing Input", "Please enter the folder path before proceeding.")
+        return False
+    else:
+        pass
+    return True
+def check_data(roll,subject):
+    path=rf"Data/Processed/{subject}/{roll}.json"
+    with open(path, "r") as file:
+        student_data = json.load(file)
+    if isinstance(student_data, dict):
+        return False
+    if len(student_data) > 1:
+        return True  
+    else:
+        return False 
 
 def clear_fields_students():
     class_individual_variable.set("")
     roll_no_variable_students.set("")
     subject_entry_variable_students.set("")
-    overall_chapter_variable.set("")
-    chapter_variable_students.set("")
-
+    report_folder_path=""
 
 #*********************************************************************
-
 def retrieve_data(roll, student_data_path):
     # Read student names from CSV
     student_records = pd.read_csv("Data/student_names.csv") 
@@ -540,66 +559,170 @@ def retrieve_data(roll, student_data_path):
     total_students=len(student_numbers)
     with open(student_data_path, "r") as file:
         student_data = json.load(file)
-    
-    # Extract the latest test record
+
     try:
-        latest_test = student_data[-1]  # Assuming the last entry is the latest
+        latest_test = student_data[-1] 
     except KeyError:
         latest_test=student_data
     finally:
-        latest_test_key = list(latest_test.keys())[0]  # Get the test key (e.g., "05/01/2025-PHYSICS-101")
-        rank = latest_test[latest_test_key]["Rank"]  # Extract the rank
+        latest_test_key = list(latest_test.keys())[0] 
+        rank = latest_test[latest_test_key]["Rank"]
         
     return student, rank, total_students
 #*********************************************************************
-def generate_graph(roll_no, subject,state=False):
-    check_missing_fields_students()
-    student_data_path = f"Data/Processed/{subject}/{roll_no}.json"
-    common_data_path = f"Data/Processed/{subject}/common_data.json"
-    shared_state.update_values(new_name=retrieve_data(roll_no,student_data_path)[0],new_rollno=roll_no,new_rank=retrieve_data(roll_no,student_data_path)[1],new_subject=subject_entry_variable_students.get(),new_total_students=retrieve_data(roll_no,student_data_path)[2])
-    if not state:
-        webbrowser.open("http://127.0.0.1:8000") 
-    else:
-        pass
-    clear_fields_students()
+
+def generate_graph(roll_no, subject, state=False, download_state=False, bw=False, path=None, all_state=False, buttons_to_disable=None):
+    if check_missing_fields_students(state):
+        print(all_state)
+        if all_state == 'individual':
+            if check_data(roll_no, subject):
+                student_data_path = f"Data/Processed/{subject}/{roll_no}.json"
+                common_data_path = f"Data/Processed/{subject}/common_data.json"
+                shared_state.update_values(
+                    new_name=retrieve_data(roll_no, student_data_path)[0],
+                    new_rollno=roll_no, 
+                    new_rank=retrieve_data(roll_no, student_data_path)[1],
+                    new_subject=subject_entry_variable_students.get(),
+                    new_total_students=retrieve_data(roll_no, student_data_path)[2]
+                )
+                if not state:
+                    webbrowser.open("http://127.0.0.1:8000") 
+                    clear_fields_students()
+                else:
+                    pass
+                
+                if download_state:
+                    shared_state.update_path(path)
+                    
+                    # Show info message before download starts
+                    messagebox.showinfo("Download Started", "The PDF will be downloaded shortly")
+                    
+                    # Disable all buttons during download
+                    if buttons_to_disable:
+                        for button in buttons_to_disable:
+                            button.configure(state="disabled")
+                    
+                    # Define download function to run in separate thread
+                    def download_pdf():
+                        try:
+                            if not bw:
+                                url = "http://127.0.0.1:8000/d" 
+                            else:
+                                url = "http://127.0.0.1:8000/bwd"
+                                
+                            response = requests.get(url, stream=True)
+                            
+                            # Show success message after download completes
+                            messagebox.showinfo("Download Complete", "PDF downloaded successfully")
+                        except Exception as e:
+                            messagebox.showerror("Download Error", f"Failed to download PDF: {str(e)}")
+                        finally:
+                            # Re-enable all buttons when download finishes (success or failure)
+                            if buttons_to_disable:
+                                for button in buttons_to_disable:
+                                    button.configure(state="normal")
+                    
+                    # Start download in a new thread
+                    download_thread = threading.Thread(target=download_pdf)
+                    download_thread.daemon = True
+                    download_thread.start()
+                    
+                    clear_fields_students()
+            else:
+                messagebox.showerror("Insufficient Data", "Graphs cannot be generated with data from only one test. Please add more test data.")
+        else:
+            gen_all.main(subject,bw,path,app=app,max_workers=5)
 
 
-def download_pdf():
-    url = "http://127.0.0.1:8000/d"
-    response = requests.get(url, stream=True)  
 
+# def download_pdf(bw=False):
+#     if check_missing_fields_students(False):
+#         if not bw:
+#             url = "http://127.0.0.1:8000/d" 
+#             response = requests.get(url, stream=True)
+#         else:
+#             url="http://127.0.0.1:8000/bwd"
+#             response = requests.get(url, stream=True)
+#         clear_fields_students()
+button_width = 170  # Adjust width if needed
+button_height = 35
+
+#*****************___________BUTTONS IN GUI__________*******************************
+report_folder_path = ""
+def open_folder():
+    global report_folder_path
+    report_folder_path = filedialog.askdirectory(title="Select a Folder")
+    report_generate_path_label.configure(text=report_folder_path)
+
+get_data_button=ctk.CTkButton(main_container)
+download_bw_button=ctk.CTkButton(main_container)
+download_coloured_button=ctk.CTkButton(main_container)
+buttons_to_disable=[
+    get_data_button,
+    download_coloured_button,
+    download_bw_button
+]
 get_data_button = ctk.CTkButton(main_container, text="Generate Data", 
-                               width=150, height=35, font=("Arial", 14),
-                               fg_color=THEME_COLORS["button_bg"],
-                               text_color=THEME_COLORS["button_text"],
-                               hover_color=THEME_COLORS["hover_color"],
-                               command=lambda: generate_graph(roll_no_variable_students.get(),subject_entry_variable_students.get()))
+                                width=button_width, height=button_height, font=("Arial", 14),
+                                fg_color=THEME_COLORS["button_bg"],
+                                text_color=THEME_COLORS["button_text"],
+                                hover_color=THEME_COLORS["hover_color"],
+                                command=lambda: generate_graph(roll_no_variable_students.get(), subject_entry_variable_students.get(),all_state=class_individual_variable.get()))
+
 download_coloured_button = ctk.CTkButton(main_container, text="Download Coloured", 
-                               width=150, height=35, font=("Arial", 14),
-                               fg_color=THEME_COLORS["button_bg"],
-                               text_color=THEME_COLORS["button_text"],
-                               hover_color=THEME_COLORS["hover_color"],
-                               command=lambda: (generate_graph(roll_no_variable_students.get(),subject_entry_variable_students.get(),state=True),download_pdf()))
-get_data_button.grid(row=4, column=0, columnspan=4, pady=10)
-download_coloured_button.grid(row=4, column=0,columnspan=3,pady=10)
+                                         width=button_width, height=button_height, font=("Arial", 14),
+                                         fg_color=THEME_COLORS["button_bg"],
+                                         text_color=THEME_COLORS["button_text"],
+                                         hover_color=THEME_COLORS["hover_color"],
+                                         command=lambda: (generate_graph(roll_no_variable_students.get(), subject_entry_variable_students.get(), state=True,download_state=True,path=report_folder_path,all_state=class_individual_variable.get(),buttons_to_disable=buttons_to_disable)))
+
+download_bw_button = ctk.CTkButton(main_container, text="Download B&W",  # Shortened text
+                                   width=button_width, height=button_height, font=("Arial", 14),
+                                   fg_color=THEME_COLORS["button_bg"],
+                                   text_color=THEME_COLORS["button_text"],
+                                   hover_color=THEME_COLORS["hover_color"],
+                                   command=lambda: (generate_graph(roll_no_variable_students.get(), subject_entry_variable_students.get(), state=True,download_state=True,bw=True,path=report_folder_path,all_state=class_individual_variable.get(),buttons_to_disable=buttons_to_disable)))
+
+get_data_button.grid(row=5, column=0, pady=10)
+download_coloured_button.grid(row=5, column=1, pady=10)
+download_bw_button.grid(row=5, column=2, pady=10)
+
+
+report_generate_label = ctk.CTkLabel(main_container, text="Destination Folder: ",
+                                             font=("Arial", 14),
+                                             text_color=THEME_COLORS["main_text"])
+report_generate_label.grid(row=4, column=0, padx=10, pady=(10,10), sticky="e")
+
+report_generate_path_button = ctk.CTkButton(main_container, text="Select Folder", font=("Arial", 14),
+                                         fg_color=THEME_COLORS["button_bg"],
+                                         text_color=THEME_COLORS["button_text"],
+                                         hover_color=THEME_COLORS["hover_color"],
+                                         command=open_folder)
+report_generate_path_button.grid(row=4, column=1, padx=10, pady=(10,10))
+
+report_generate_path_label = ctk.CTkLabel(main_container, text="Folder Path",
+                                             font=("Arial", 14),
+                                             text_color=THEME_COLORS["main_text"])
+report_generate_path_label.grid(row=4, column=2, padx=10, pady=(10,10), sticky="w")
+
 
 #===================================Download======================================= 
 #==================================================================================
 # Setup Settings Page
-download_label = ctk.CTkLabel(frame_right_download, text="Download", font=("Arial", 24, "bold"),
-                             text_color=THEME_COLORS["main_text"])
-download_label.grid(row=0, column=0, padx=20, pady=20)
+# download_label = ctk.CTkLabel(frame_right_students, text="Download", font=("Arial", 24, "bold"),
+#                              text_color=THEME_COLORS["main_text"])
+# download_label.grid(row=0, column=0, padx=20, pady=20)
 
-download_students_class_var = ctk.StringVar()
-students_report_rbutton = ctk.CTkRadioButton(frame_right_download, text="Students' Report", font=("Arial", 18),
-                                      variable=download_students_class_var, value="students",
-                                      text_color=THEME_COLORS["main_text"])
-students_report_rbutton.grid(row=1, column=0, padx=(25,10), pady=5)
+# download_students_class_var = ctk.StringVar()
+# students_report_rbutton = ctk.CTkRadioButton(frame_right_students, text="Students' Report", font=("Arial", 18),
+#                                       variable=download_students_class_var, value="students",
+#                                       text_color=THEME_COLORS["main_text"])
+# students_report_rbutton.grid(row=1, column=0, padx=(25,10), pady=5)
 
-class_rbutton = ctk.CTkRadioButton(frame_right_download, text="Class", font=("Arial", 18),
-                                  variable=download_students_class_var, value="class",
-                                  text_color=THEME_COLORS["main_text"])
-class_rbutton.grid(row=1, column=1, padx=10, pady=5)
+# class_report_rbutton = ctk.CTkRadioButton(frame_right_students, text="Class", font=("Arial", 18),
+#                                   variable=download_students_class_var, value="class",
+#                                   text_color=THEME_COLORS["main_text"])
+# class_report_rbutton.grid(row=1, column=1, padx=10, pady=5)
 
 #===================================History======================================== 
 #==================================================================================

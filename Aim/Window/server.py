@@ -96,15 +96,22 @@ async def convert_charts_to_images(page):
     });
     """)
 # Playwright function to generate PDF
-async def create_pdf():
-    pdf_path = "output.pdf"
-
+async def create_pdf(bw=False):
+    save_dir = shared_state.path
+    os.makedirs(save_dir, exist_ok=True)
+    if bw:
+        pdf_filename = f"{shared_state.rollno}_bw_{shared_state.subject}.pdf"
+    else:
+        pdf_filename=f"{shared_state.rollno}_coloured_{shared_state.subject}.pdf"
+    pdf_path = os.path.join(save_dir, pdf_filename)
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={"width": 1200, "height": 1600})
-
-        await page.goto("http://127.0.0.1:8000/report", wait_until="networkidle")
-        await page.wait_for_selector(".apexcharts-canvas", timeout=10000)
+        if not bw:
+            await page.goto("http://127.0.0.1:8000/report", wait_until="networkidle")
+        else:
+            await page.goto("http://127.0.0.1:8000/bwreport", wait_until="networkidle")
+        await page.wait_for_selector(".apexcharts-canvas", timeout=2000)
         await asyncio.sleep(3)  # Give charts time to fully render
         
         # Force window resize
@@ -144,6 +151,12 @@ async def create_pdf():
 async def generate_pdf():
     pdf_file = await create_pdf()
     return JSONResponse({"file_path": pdf_file})
+
+@app.get("/bwd")
+async def generate_pdf():
+    pdf_file = await create_pdf(bw=True)
+    return JSONResponse({"file_path": pdf_file})
+
 
 # Serve React Frontend
 @app.get("/{full_path:path}")  # Handles all routes (Fixes 404 errors)

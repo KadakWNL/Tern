@@ -2,6 +2,7 @@ name = "Default Name"
 rollno = "Default RollNo"
 rank = 0
 subject = "Default Subject"
+path="generated_pdfs"
 total_students=100
 # Function to update values
 def update_values(new_name=None, new_rollno=None, new_rank=None, new_subject=None,new_total_students=None):
@@ -16,4 +17,8 @@ def update_values(new_name=None, new_rollno=None, new_rank=None, new_subject=Non
         subject = new_subject
     if new_total_students is not None:
         total_students=new_total_students
+def update_path(new_path):
+    global path
+    if new_path is not None:
+        path=new_path
 
