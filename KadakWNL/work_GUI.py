@@ -178,14 +178,14 @@ def empty_variables():
 def create_log():
 
     now = datetime.now()
-    date, time = now.date().strftime("%d/%m/%Y"), now.time().strftime("%H:%M:%S")
+    date= now.date().strftime("%d/%m/%Y")
     path_save_to = r"Data/logs.csv"
 
     os.makedirs(os.path.dirname(path_save_to), exist_ok=True)
     file_exists = os.path.exists(path_save_to)
 
     with open(path_save_to, "a" if file_exists else "w", newline="") as file_log:
-        columns = ["Test Details", "Upload Date", "Upload Time"]
+        columns = ["Test Details", "Test Date", "Upload Date"]
         file_obj = csv.DictWriter(file_log, fieldnames=columns)
 
         if not file_exists:
@@ -193,11 +193,11 @@ def create_log():
 
         file_obj.writerow({
             "Test Details": f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()}",
-            "Upload Date": date,
-            "Upload Time": time
+            "Test Date": date_entry_variable.get(),
+            "Upload Date": date
         })
 
-    print(f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()} saved on {date} {time}")
+    print(f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()} saved on {date}")
 
 
 
@@ -216,11 +216,14 @@ def run_main_code():
         messagebox.showerror("Input Error", "Please enter a Subject before proceeding.")
         return
     if file_check.main(student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get(),subject_entry_variable.get()):
-        upload_main.main(subject_entry_variable.get(),date_entry_variable.get(),test_id_variable.get(),
-                        student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get())
-        specific_data_main.main(expanded_scorelist_path.get(),date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
-        messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
-        create_log()
+        if file_check.check_if_date_exists(date_entry_variable.get(),test_id_variable.get(),subject_entry_variable.get()):
+            upload_main.main(subject_entry_variable.get(),date_entry_variable.get(),test_id_variable.get(),
+                            student_analysis_path.get(),expanded_scorelist_path.get(),blueprint_data_path.get())
+            specific_data_main.main(expanded_scorelist_path.get(),date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get())
+            messagebox.showinfo("Test Analysis Report", "Test Analysis Done!")
+            create_log()
+        else:
+            messagebox.showerror("Invalid Test ID or Date", "Please check Test ID and Date")
     else:
         messagebox.showerror("File Error","Please recheck the files.")
     
@@ -608,13 +611,11 @@ def refresh_frame(frame):
     delete_butoon = ctk.CTkButton(delete_frame, text="Delete", command=delete_entries)    
     delete_butoon.grid(row=0, column=2, padx=5, pady=5)
 
+
     table = CTkTable(
         master=scrollable_frame,
         row=len(logs), column=3,
-        values=[logs[0]] + sorted(
-            logs[1:], key=lambda x: datetime.strptime(f"{x[1]} {x[2]}", "%d/%m/%Y %H:%M:%S"), 
-            reverse=True
-        ),
+        values=[logs[0]] + sorted(logs[1:], reverse=True),
         corner_radius=3
     )
     table.pack(expand=True, fill="both", padx=20, pady=20)

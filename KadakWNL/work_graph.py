@@ -5,8 +5,6 @@ import json, datetime, os, pprint
 import seaborn as sns
 import numpy as np
 import plotly.graph_objects as go
-from matplotlib.collections import LineCollection
-
 subjects = {
     "PHYSICS": {
         "Mechanics": [
@@ -140,11 +138,6 @@ def get_data(data_processed_path, common_data_processed_path):
     
     return student_data, common_data
 
-def get_common_data(common_data_processed_path):
-    with open(common_data_processed_path) as common_data_file:
-        common_data = json.load(common_data_file)
-    return common_data
-
 
 # def student_class_avg_datewise(student_data, common_data):
 #     dates = []
@@ -233,129 +226,6 @@ def student_class_avg_datewise(student_data, common_data):
     plt.show()
 
 
-def class_avg_datewise(common_data):
-    # Set a clean style
-    plt.style.use('seaborn-v0_8-whitegrid')
-    
-    dates = []
-    class_avg = []
-
-    for tests in common_data:
-        for test in tests:
-            dates.append(test.split("-")[0])
-            class_avg.append(tests[test]['Avg_of_class'])
-
-    dates = [datetime.datetime.strptime(d, "%d/%m/%Y") for d in dates]
-
-    df = pd.DataFrame({
-        "Date": dates,
-        "Class Average": class_avg
-    })
-
-    df_melted = df.melt(id_vars=["Date"], var_name="Type", value_name="Score")
-
-    # Create the plot with improved visibility
-    plt.figure(figsize=(8, 5))
-    
-    # Create a more visible line plot
-    ax = sns.lineplot(data=df_melted, x="Date", y="Score", hue="Type", style="Type",
-                      markers=True, 
-                      dashes=False,
-                      errorbar=None,
-                      palette={"Class Average": "#1E56A0"},  # Darker blue for better visibility
-                      linewidth=4,  # Thicker line
-                      markersize=12)  # Larger markers
-    
-    # Get the line for further customization
-    line = ax.get_lines()[0]
-    
-    # Format x-axis
-    ax.xaxis.set_major_locator(mdates.DayLocator(interval=2))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m'))
-    
-    # Rotate X-ticks for readability
-    plt.xticks(fontsize=10, rotation=30, ha='right')
-    plt.yticks(fontsize=10)
-    
-    # Add a shaded area under the line for better visibility
-    x = line.get_xdata()
-    y = line.get_ydata()
-    ax.fill_between(x, y, min(y) - 1, alpha=0.1, color='#1E56A0')
-    
-    # Add data points with contrasting borders
-    ax.scatter(x, y, s=120, color='#1E56A0', edgecolor='white', linewidth=2, zorder=5)
-    
-    # Labels and Title
-    ax.set_xlabel("Test Date", fontsize=12, fontweight='bold', labelpad=10)
-    ax.set_ylabel("Score", fontsize=12, fontweight='bold', labelpad=10)
-    ax.set_title("Class Average Performance Trend", fontsize=16, fontweight="bold", pad=20)
-    
-    # Keep only left and bottom spines
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["left"].set_visible(True)
-    ax.spines["bottom"].set_visible(True)
-    ax.spines["left"].set_linewidth(1.5)
-    ax.spines["bottom"].set_linewidth(1.5)
-    
-    # Add a subtle background color
-    ax.set_facecolor('#f8f9fa')
-    
-    # Customize grid
-    ax.grid(True, linestyle="--", linewidth=0.7, alpha=0.3)
-    
-    # Add a connecting line between points with arrow to show direction
-    for i in range(len(x)-1):
-        ax.annotate("", 
-                    xy=(x[i+1], y[i+1]), 
-                    xytext=(x[i], y[i]),
-                    arrowprops=dict(arrowstyle="->", color="#1E56A0", lw=2.5, alpha=0.8))
-    
-    # Add annotations for the start and end points
-    first_score = df['Class Average'].iloc[0]
-    last_score = df['Class Average'].iloc[-1]
-    
-    ax.annotate(f'{first_score:.1f}', 
-                xy=(x[0], y[0]), 
-                xytext=(0, 10),
-                textcoords='offset points',
-                fontsize=12,
-                fontweight='bold',
-                color='#1E56A0',
-                ha='center')
-    
-    ax.annotate(f'{last_score:.1f}', 
-                xy=(x[-1], y[-1]), 
-                xytext=(0, 10),
-                textcoords='offset points',
-                fontsize=12,
-                fontweight='bold',
-                color='#1E56A0',
-                ha='center')
-    
-    # Add a trend line
-    z = np.polyfit(mdates.date2num(x), y, 1)
-    p = np.poly1d(z)
-    ax.plot(x, p(mdates.date2num(x)), "r--", alpha=0.7, linewidth=2)
-    
-    # Enhanced legend
-    legend = ax.legend(title="", loc="upper right", fontsize=10, frameon=True)
-    legend.get_frame().set_linewidth(0)
-    legend.get_frame().set_facecolor('#f8f9fa')
-    legend.get_frame().set_alpha(0.8)
-    
-    # Add a percent change indicator
-    percent_change = ((last_score - first_score) / first_score) * 100
-    ax.text(0.05, 0.05, f"Change: {percent_change:.1f}%", 
-            transform=ax.transAxes, 
-            fontsize=12, 
-            fontweight='bold',
-            color='#D62828' if percent_change < 0 else '#1E56A0',
-            bbox=dict(facecolor='white', alpha=0.8, edgecolor='none', boxstyle='round,pad=0.5'))
-    
-    plt.tight_layout()
-    plt.show()
-
 def generate_grayscale_heatmaps(student_data, common_data,subject=None):
     test_dates = []
     student_scores = {}
@@ -427,35 +297,11 @@ def generate_grayscale_heatmaps(student_data, common_data,subject=None):
 
 def group_by_topics(data, subject, who):
     grouped_data = {}
-    # print(type(data))
-    if isinstance(data, list):
-        for test_data in data:
-            # print(test_data)
-            test = list(test_data.keys())[0]
-            temp = test_data[test][f'Avg_of_{who}_chapter_wise']
-            
-            if test not in grouped_data:
-                grouped_data[test] = {}
-
-            for topic, chapters in subjects[subject].items():
-                if topic not in grouped_data[test]:
-                    grouped_data[test][topic] = 0 
-                    count = 0  
-
-                for chapter_main in chapters:
-                    if chapter_main in temp:
-                        grouped_data[test][topic] += temp[chapter_main]
-                        count += 1
-
-                if count > 0:
-                    grouped_data[test][topic] = round(grouped_data[test][topic] / count, 2)
-        # print(grouped_data)
-        return grouped_data
     
-    elif isinstance(data, dict):
-        test = list(data.keys())[0]
-        temp = data[test][f'Avg_of_{who}_chapter_wise']
-        # print
+    for test_data in data:
+        test = list(test_data.keys())[0]
+        temp = test_data[test][f'Avg_of_{who}_chapter_wise']
+        
         if test not in grouped_data:
             grouped_data[test] = {}
 
@@ -471,8 +317,8 @@ def group_by_topics(data, subject, who):
 
             if count > 0:
                 grouped_data[test][topic] = round(grouped_data[test][topic] / count, 2)
-
-        return grouped_data
+    # print(grouped_data)
+    return grouped_data
 
 
 

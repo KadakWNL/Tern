@@ -1,11 +1,81 @@
 import React from "react";
 import Chart from "react-apexcharts";
 
-const StudentVsClassAvgChart = ({ studentData, classData }) => {
+const StudentVsClassAvgChart = ({ studentData, classData, isStatic = false, bw = false }) => {
   // Extract dates and averages
-  const dates = studentData.map((test) => Object.keys(test)[0]);
-  const studentAvg = studentData.map((test) => test[Object.keys(test)[0]].Avg_of_test);
-  const classAvg = classData.map((test) => test[Object.keys(test)[0]].Avg_of_class);
+// Function to process student and class data safely
+// This function safely processes student and class data for line graphs
+const processDataForLineGraph = (studentData, classData) => {
+  // Extract dates from student data
+  const classDates = classData.map(item => Object.keys(item)[0]);
+  const filteredDates=[];
+  const studentDataMap = {};
+  studentData.forEach(item => {
+    const key = Object.keys(item)[0];
+    // Use includes() method to check if the value exists in the array
+    if(classDates.includes(key)){
+      studentDataMap[key] = item[key]["Avg_of_test"];
+      filteredDates.push(key);
+    }
+  });
+  
+  const classDataMap = {};
+  classData.forEach(item => {
+    const key = Object.keys(item)[0];
+    if(filteredDates.includes(key)){
+    classDataMap[key] = item[key]["Avg_of_class"];
+    }
+  });
+  console.log(classDataMap)
+  
+  const studentPlots = [];
+  Object.entries(studentDataMap).forEach(([date, score]) => {
+    studentPlots.push({
+      x: date.split('-')[0],
+      y: score
+    });
+  });
+  const classPlots=[];
+  Object.entries(classDataMap).forEach(([date, score]) => {
+    classPlots.push({
+      x: date.split('-')[0],
+      y: score
+    });
+  });
+  console.log(studentPlots)
+  console.log(classPlots)
+  return {
+    dates: filteredDates,
+    studentAvg: studentPlots,
+    classAvg: classPlots
+  };
+};
+
+
+// Usage:
+const { dates, studentAvg, classAvg } = processDataForLineGraph(studentData, classData);
+
+  // Color Scheme
+  let colors, fill;
+  if (!bw) {
+    colors = ["#050535", "#64748B"]; // Deep Navy & Slate Gray
+    fill = {
+      type: "gradient",
+      gradient: {
+        shade: "light",
+        type: "vertical",
+        shadeIntensity: 0.3,
+        gradientToColors: ["#1E3A8A", "#94A3B8"], // Lighter navy & blue-gray
+        stops: [0, 100],
+      },
+    };
+  } else {
+    colors = ["#6B7280", "#D1D5DB"]; // Grayscale Mode
+    fill = {
+      type: "solid",
+      colors: colors,
+    };
+  }
 
   const options = {
     chart: {
@@ -13,69 +83,69 @@ const StudentVsClassAvgChart = ({ studentData, classData }) => {
       height: 350,
       toolbar: { show: false },
       animations: {
-        enabled: true,
+        enabled: !isStatic,
         easing: "easeout",
         speed: 800,
       },
-      background: "#ffffff", // White background
+      background: "#ffffff",
+    },
+    title: {
+      text: "Overtime Performance",
+      align: "center",
+      style: {
+        fontSize: "16px",
+        fontWeight: "bold",
+        color: bw ? "#4B5563" : "#000",
+      },
     },
     stroke: {
       curve: "smooth",
-      width: 3,
+      width: 4,
     },
     xaxis: {
       categories: dates,
       labels: {
         style: {
-          colors: "#6B7280", // Gray text
+          colors: "#6B7280",
           fontSize: "12px",
           fontWeight: 500,
         },
       },
-      tickAmount: Math.min(10, dates.length), // Limit the number of ticks
+      tickAmount: Math.min(10, dates.length),
     },
     yaxis: {
       min: 0,
       max: 100,
       labels: {
         style: {
-          colors: "#6B7280", // Gray text
+          colors: "#6B7280",
           fontSize: "12px",
           fontWeight: 500,
         },
       },
     },
-    colors: ["#3B82F6", "#EF4444"], // Blue and Red
-    fill: {
-      type: "gradient",
-      gradient: {
-        shade: "light",
-        type: "vertical",
-        shadeIntensity: 0.3,
-        gradientToColors: ["#93C5FD", "#FCA5A5"], // Light blue and light red
-        stops: [0, 100],
-      },
-    },
+    colors: colors,
+    fill: fill,
     markers: {
       size: 5,
-      colors: ["#3B82F6", "#EF4444"], // Blue and Red
-      strokeWidth: 2,
-      strokeColors: ["#ffffff"], // White stroke
+      colors: colors,
+      strokeWidth: 3,
+      strokeColors: ["#ffffff"],
       hover: { size: 7 },
     },
     legend: {
       position: "top",
       fontSize: "14px",
       fontWeight: "bold",
-      labels: { colors: "#374151" }, // Dark gray text
+      labels: { colors: "#374151" },
     },
     tooltip: {
-      theme: "light", // Light theme for tooltip
-      x: { format: "dd MMM yyyy" }, // Format date in tooltip
+      theme: "light",
+      x: { format: "dd MMM yyyy" },
     },
     grid: {
-      borderColor: "#E5E7EB", // Light gray grid lines
-      strokeDashArray: 5, // Dashed grid lines
+      borderColor: "#E5E7EB",
+      strokeDashArray: 5,
     },
   };
 
@@ -91,10 +161,7 @@ const StudentVsClassAvgChart = ({ studentData, classData }) => {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-xl border border-gray-200">
-      <h2 className="text-xl font-semibold text-gray-700 mb-4">
-        📊 Student vs Class Performance
-      </h2>
+    <div>
       <Chart options={options} series={series} type="line" height={350} />
     </div>
   );

@@ -1,32 +1,83 @@
-import React from "react";
-import StudentClassHeatmaps from "./components/StudentClassHeatmaps";
-import StudentVsClassAvgChart from "./components/StudentVsClassAvgChart";
-import StudentVsClassSPIChart from "./components/StudentVsClassSPIChart";
-import TopicWisePerformanceChart from "./components/TopicWisePerformanceChart";
-import studentData from "./Data/242021.json";
-import classData from "./Data/common_data.json";
+import { Routes, Route, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import HomePage from "./components/HomePage";
+import ReplicaHomePage from "./components/ReplicaHomePage";
+import BWReplicaHomePage from "./components/BWReplicaHomePage";
 
-export default function GraphReportApp() {
-  if (!studentData || !classData) {
-    return <div className="text-center text-gray-500">Loading data...</div>;
+const App = () => {
+  const [studentData, setStudentData] = useState(null);
+  const [classData, setClassData] = useState(null);
+  const [studentInfo, setStudentInfo] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch all data
+  useEffect(() => {
+    const fetchAllData = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch files data
+        const filesResponse = await fetch("http://localhost:8000/api/files");
+        const filesData = await filesResponse.json();
+        setStudentData(filesData.file1 || []);
+        setClassData(filesData.file2 || []);
+        
+        // Fetch student info
+        const infoResponse = await fetch("http://localhost:8000/api/data");
+        const infoData = await infoResponse.json();
+        setStudentInfo(infoData);
+        
+        // All data fetched successfully
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false); // Still set loading to false so UI isn't stuck
+      }
+    };
+    
+    fetchAllData();
+  }, []);
+  
+  // This useEffect will run whenever studentData changes
+  useEffect(() => {
+    console.log("Updated studentData:", studentData);
+  }, [studentData]);
+
+  if (isLoading) {
+    return <div>Loading data, please wait...</div>;
   }
 
-  const studentSPI = studentData[studentData.length - 1][Object.keys(studentData[studentData.length - 1])[0]].Avg_SPI_till_date;
-  const classSPI = classData[classData.length - 1][Object.keys(classData[classData.length - 1])[0]].Avg_SPI_of_class_till_date;
-
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Graph Report Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <StudentVsClassAvgChart studentData={studentData} classData={classData} />
-        <TopicWisePerformanceChart studentData={studentData} classData={classData} />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-        <StudentClassHeatmaps studentData={studentData} classData={classData} />
-      </div>
-      <div className="bg-white p-4 rounded-lg shadow-md mt-6">
-        <StudentVsClassSPIChart studentSPI={studentSPI} classSPI={classSPI} />
-      </div>
+    <div>
+      {/* Define Routes */}
+      <Routes>
+        <Route path="/" element={<HomePage 
+        studentData={studentData} 
+        classData={classData} 
+        studentInfo={studentInfo}
+        />} />
+        <Route 
+          path="/report" 
+          element={
+            <ReplicaHomePage 
+              studentData={studentData} 
+              classData={classData} 
+              studentInfo={studentInfo}
+            />
+          } 
+        />
+        <Route 
+          path="/bwreport" 
+          element={
+            <BWReplicaHomePage 
+            studentData={studentData} 
+            classData={classData} 
+            studentInfo={studentInfo}
+            />
+          }
+        />
+      </Routes>
     </div>
   );
-}
+};
+
+export default App;

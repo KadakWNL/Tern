@@ -1,0 +1,13 @@
+1/3/2025
+12:32
+
+Decided to use react and tailwind for the window instead of ctk to make it look better
+Installed fastapi and uvicorn for frontend and backend 
+"pip install fastapi uvicorn"
+Uvicorn for hosting and fastapi for data transfer between python and react
+Installed axios
+npm install axios
+
+ALRIGHT LETS DITCH MATPLOT LIB AND ALL THAT BULLSHIT LIKE BRO WTFFF
+Lets start using apexplotting for plotting graphs sidha into frontend
+also the graphs are amazing
