@@ -129,8 +129,7 @@ def save_data_to_csv(data, roll):
     if os.path.exists(file_path):
         with open(file_path,'r') as current_file:
             data_of_current_file=js.load(current_file)
-            if str(DATE_OF_TEST)+'-'+str(subject)+'-'+str(current_test_id) in list(data_of_current_file.keys()):
-                print("Test data already exists!")  #<===== HANDLE THIS!!!!!!!!!!!!!!!!!!!!!!
+            key_rn=str(DATE_OF_TEST)+'-'+str(subject)+'-'+str(current_test_id)
             if data_of_current_file:
                     pass
             else:

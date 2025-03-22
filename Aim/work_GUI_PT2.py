@@ -163,9 +163,6 @@ def open_file(file_label, file_path_var, filetypes):
     if file_path:
         file_label.configure(text=file_path.split("/")[-1])
         file_path_var.set(file_path) 
-        print(f"File Selected: {file_path}")
-    else:
-        print("No File Selected")
 
 #=============================================================================================================
 expanded_scorelist_file_label = ctk.CTkLabel(frame_right_upload, text="Expanded Scorelist File (.xlsx): ", 
@@ -255,7 +252,6 @@ def create_log():
             "Upload Date": date
         })
 
-    print(f"{date_entry_variable.get()}-{subject_entry_variable.get()}-{test_id_variable.get()} saved on {date}")
 
 # Add a progress bar
 progress_bar = ctk.CTkProgressBar(frame_right_upload, orientation="horizontal", mode="determinate")
@@ -264,7 +260,6 @@ progress_bar.set(0)  # Initialize progress to 0
 
 # Queue for communication between threads
 task_queue = queue.Queue()
-
 def run_main_code():
     """Handles validation and starts the processing thread."""
     if not expanded_scorelist_path.get() or not blueprint_data_path.get() or not student_analysis_path.get():
@@ -297,14 +292,16 @@ def process_data():
     try:
         # File validation
         if not file_check.main(student_analysis_path.get(), expanded_scorelist_path.get(), blueprint_data_path.get(),subject_entry_variable.get(),date_entry_variable.get(),test_id_variable.get()):
-            task_queue.put(None)  # Stop progress
             messagebox.showerror("File Error", "Please recheck the files.")
+            task_queue.put(None)  # Stop progress
+            run_analysis_button.configure(state="normal")  # Re-enable the button
             return
         
         # Check test ID and date validity
         if not file_check.check_if_date_exists(date_entry_variable.get(), test_id_variable.get(), subject_entry_variable.get()):
+            messagebox.showerror("Invalid Test ID or Date", "Test Data already exists!")
             task_queue.put(None)  # Stop progress
-            messagebox.showerror("Invalid Test ID or Date", "Please check Test ID and Date")
+            run_analysis_button.configure(state="normal")  # Re-enable the button
             return
 
         # Simulate task progress
@@ -512,9 +509,9 @@ subject_entry_combobox_students.grid(row=0, column=2, columnspan=1, padx=5, pady
 #                 chapter_index_students = mathematics_chapters.index(chapter_variable_students.get())
 #             elif subject_entry_variable_students.get() == "Chemistry":
 #                 chapter_index_students = chemistry_chapters.index(chapter_variable_students.get())
-#             print(f"Chapter Index Updated: {chapter_index_students}")
+#             (f"Chapter Index Updated: {chapter_index_students}")
 #         except ValueError as e:
-#             print(f"Error: Chapter or Subject not found. {e}")
+#             (f"Error: Chapter or Subject not found. {e}")
 
 # overall_chapter_variable.trace_add("write", get_chapter_index)
 # chapter_variable_students.trace_add("write", get_chapter_index)
@@ -573,7 +570,6 @@ def retrieve_data(roll, student_data_path):
 
 def generate_graph(roll_no, subject, state=False, download_state=False, bw=False, path=None, all_state=False, buttons_to_disable=None):
     if check_missing_fields_students(state):
-        print(all_state)
         if all_state == 'individual':
             if check_data(roll_no, subject):
                 student_data_path = f"Data/Processed/{subject}/{roll_no}.json"
@@ -703,7 +699,7 @@ report_generate_path_button.grid(row=4, column=1, padx=10, pady=(10,10))
 report_generate_path_label = ctk.CTkLabel(main_container, text="Folder Path",
                                              font=("Arial", 14),
                                              text_color=THEME_COLORS["main_text"])
-report_generate_path_label.grid(row=4, column=2, padx=10, pady=(10,10), sticky="w")
+report_generate_path_label.grid(row=4, column=2,columnspan=2, padx=10, pady=(10,10), sticky="w")
 
 
 #===================================Download======================================= 

@@ -7,7 +7,6 @@ import math
 import csv
 from tkinter import messagebox
 
-
 def check_existing_test(subject: str, date: str, test_id: str) -> bool:
     subject_dir = f"Data/{subject}"
     if not os.path.exists(subject_dir):
@@ -27,26 +26,14 @@ def check_existing_test(subject: str, date: str, test_id: str) -> bool:
             duplicate_exists = any((df['Date'] == date) & (df['Test ID'] == test_id))
             
             if duplicate_exists:
-                print(f"Found duplicate in file: {file_path}")
-                print(f"Existing entries with Date={date}, Test ID={test_id}:")
-                print(df[((df['Date'] == date) & (df['Test ID'] == test_id))][['Date', 'Test ID']])
                 return True
                 
         except (pd.errors.EmptyDataError, KeyError) as e:
-            print(f"Warning: Error processing file {file_path}: {str(e)}")
             continue
     return False
-
 def get_user_inputs(date,test_id,subject: str) -> Tuple[str, str]:
     while True:
-        if check_existing_test(subject, date, test_id):
-            messagebox.showerror("Test Exists", "Please check your inputs again!")
-            return
-            if input("Would you like to try again? (y/n): ").lower() != 'y':
-                exit()
-            print()
-        else:
-            return date, test_id
+        return date, test_id
 
 def categorize_questions(student_analysis: pd.DataFrame) -> Tuple[List[int], List[int], List[int]]:
     data = student_analysis.head(68)  # Questions start from row 8
@@ -177,7 +164,6 @@ def scaling_marks(initial_spi,max_spi) -> Dict[str,float]:
 def create_directory(directory_path: str) -> None:
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
-        print(f"Created directory: {directory_path}")
 
 def save_results(
     results: List[List],
@@ -198,13 +184,10 @@ def save_results(
             combined_df = pd.concat([existing_df, new_df], ignore_index=True)
             combined_df = combined_df.sort_values(['Date', 'Test ID'])
             combined_df.to_csv(file_path, index=False)
-            print(f"Data appended successfully for student {student_id}")
         except pd.errors.EmptyDataError:
             new_df.to_csv(file_path, index=False)
-            print(f"Created new file for student {student_id}")
     else:
         new_df.to_csv(file_path, index=False)
-        print(f"Created new file for student {student_id}")
 
 
 def is_duplicate_test(subject: str, date: str, test_id: str, metadata_file: str = "test_metadata.csv") -> bool:
@@ -220,7 +203,6 @@ def main(subject=None,date=None,test_id=None,student_analysis_path=None,expanded
     date, test_id = get_user_inputs(date,test_id,subject)
     
     if is_duplicate_test(subject, date, test_id):
-        print(f"Test with Subject: {subject}, Date: {date}, and Test ID: {test_id} already exists. Skipping...")
         return
     
     
@@ -230,7 +212,6 @@ def main(subject=None,date=None,test_id=None,student_analysis_path=None,expanded
     chapterwise_questions = get_chapter_questions(blueprint_path)
     expanded_scorelist = pd.read_excel(expanded_scorelist_path)
     max_spi = calculation_of_max_spi(chapterwise_questions, easy_questions, med_questions, hard_questions)
-    print(max_spi)
     
     for idx in range(len(expanded_scorelist)):
         student_data = expanded_scorelist.iloc[idx]
