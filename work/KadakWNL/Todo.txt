@@ -1,6 +1,0 @@
-1. Fix the deletion of data. The function is not deleting the processed data DONE
-2. Fix the random errors coming in terminal after uploading files. (Suspected: Prolly coming because of widget cleaning)
-3. Specific_data_main line 133 (I think its already fixed. Just cross check pls)
-4. While checking the graphs, make sure it gives proper error output when a wrong roll number is given
-5. When u upload wrong files, logs are being stored with a successful msg, fix that
-6. Add an error. Which goes like: If theres data for only 1 test, then the report card cannot be generated :>

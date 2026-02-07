@@ -1,2 +1,0 @@
-Future Projections
-- Multiple chapter selection feature before displaying the data.
